@@ -25,8 +25,6 @@ Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https:
 ## ⚙️ 기능 요구사항
 백엔드 스웨거 : https://blog.leets.land/swagger-ui/index.html
 
-<br>
-
 ###  회원가입
 - 사용자는 이메일 주소 또는 카카오 OAuth를 통해 회원가입을 진행할 수 있어야 합니다.
 - 사용자는 비밀번호를 생성하여 회원가입을 진행할 수 있어야 합니다.
@@ -38,7 +36,6 @@ Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https:
 - (토큰 방식으로 구현시) refresh token을 통해 새로운 access token을 발급받을 수 있어야 합니다.
 - 토큰은 브라우저에 cookie / storage 중 원하는 방식을 골라 선택하신 후 저장 해 두셔야 합니다.
   
-
 ### 게시물
 - 사용자는 로그인을 하지 않고도 게시물을 조회할 수 있어야 합니다.
 - 사용자는 로그인을 진행해야 게시물을 작성할 수 있어야 합니다.
