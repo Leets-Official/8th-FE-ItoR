@@ -2,7 +2,7 @@
 
 ## 🎯 미션 요구사항
 미션 진행 방법을 꼭 읽고 진행해주세요
-[미션 진행 방법](https://leets-7th-workspace.notion.site/327ca3362bee80acbd1be10724249c37)
+[미션 진행 방법](https://leets-workspace.notion.site/3e3ca3362bee809b9342ed35b1993b83)
 ## ItoR이 성장하기 위해 고민해보면 좋을 요구사항
 - useRef, useMemo, useCallback를 불필요하게 사용하지 않는 습관 만들기
 - 클린 코드 원칙 지키기(SRP, DRY, KISS) 등 읽기 쉽고 유지보수하기 좋은 코드 만들기
