@@ -1,0 +1,111 @@
+/* ===== 폰트: Noto Sans KR 가변 폰트 (100~900) ===== */
+@import '@fontsource-variable/noto-sans-kr';
+@import '@fontsource/smooch/400.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== 공통 변수 및 기본 스타일 ===== */
+@layer base {
+  :root {
+    --font-noto-sans: 'Noto Sans KR Variable', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --font-smooch: 'Smooch', cursive;
+
+    /* 색상값 */
+    --white: #ffffff;
+    --black: #000000;
+
+    --gray-96: #f5f5f5;
+    --gray-90: #e6e6e6;
+    --gray-56: #909090;
+    --gray-7: #111112;
+
+    --color-positive: #15dc5e;
+    --color-negative: #ff3f3f;
+    --color-point: #00a1ff;
+
+    --color-primary-6: #1890ff;
+
+    --color-neutral-5: #d9d9d9;
+    --color-neutral-3: #f5f5f5;
+    --color-neutral-1: #ffffff;
+
+    /* 아이콘 크기 */
+    --icon-40: 40px;
+    --icon-24: 24px;
+    --icon-14: 14px;
+  }
+
+  body {
+    font-family: var(--font-noto-sans);
+    background-color: var(--white);
+    color: var(--black);
+  }
+
+  #root {
+    width: 100%;
+    max-width: 1366px;
+    min-height: 100vh;
+    margin: 0 auto;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+/* ===== 공통 컴포넌트 스타일 ===== */
+@layer components {
+  /* 실제 UI에서 반복되는 스타일을 구현 시 추가합니다. */
+}
+
+/* ===== 텍스트 스타일: 크기·행간·자간·굵기를 함께 적용 ===== */
+@layer utilities {
+  .text-12-regular {
+    font-size: 12px;
+    line-height: 160%;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .text-14-regular {
+    font-size: 14px;
+    line-height: 160%;
+    letter-spacing: -0.005em; /* letter-spacing : -0.5%와 같음 */
+    font-weight: 400;
+  }
+
+  .text-14-light {
+    font-size: 14px;
+    line-height: 160%;
+    letter-spacing: -0.005em;
+    font-weight: 300;
+  }
+
+  .text-16-medium {
+    font-size: 16px;
+    line-height: 160%;
+    letter-spacing: -0.0025em;
+    font-weight: 500;
+  }
+
+  .text-24-medium {
+    font-size: 24px;
+    line-height: 160%;
+    letter-spacing: 0;
+    font-weight: 500;
+  }
+
+  .text-logo {
+    font-family: var(--font-smooch);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 28px;
+    letter-spacing: 0;
+    color: var(--black);
+  }
+}
