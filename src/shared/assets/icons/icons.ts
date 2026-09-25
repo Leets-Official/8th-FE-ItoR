@@ -10,3 +10,5 @@ export { default as MoreVertIcon } from './svg/more_vert.svg?react';
 export { default as NavigateBeforeIcon } from './svg/navigate_before.svg?react';
 export { default as ReorderIcon } from './svg/reorder.svg?react';
 export { default as SettingsIcon } from './svg/settings.svg?react';
+export { default as ArrowRightIcon } from './svg/arrow_right.svg?react';
+export { default as ArrowLeftIcon } from './svg/arrow_left.svg?react';
