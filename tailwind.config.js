@@ -8,7 +8,10 @@ export default {
         black: 'var(--black)',
         gray: {
           7: 'var(--gray-7)',
+          20: 'var(--gray-20)',
+          33: 'var(--gray-33)',
           56: 'var(--gray-56)',
+          78: 'var(--gray-78)',
           90: 'var(--gray-90)',
           96: 'var(--gray-96)',
         },
@@ -29,6 +32,7 @@ export default {
       },
       fontFamily: {
         noto_sans: ['var(--font-noto-sans)'],
+        roboto: ['var(--font-roboto)'],
       },
     },
   },
