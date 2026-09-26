@@ -10,13 +10,10 @@ const heightStyles = {
 
 /**
  * variant: 20px, 32px, 64px 중 사용할 여백 높이
- * @returns 콘텐츠 사이의 흰색 여백
+ * @returns 부모의 배경색이 보이는 콘텐츠 사이의 여백
  */
 export function CustomBlank({ variant }: CustomBlankProps) {
   return (
-    <div
-      aria-hidden="true"
-      className={`w-[688px] max-w-full shrink-0 bg-white ${heightStyles[variant]}`}
-    />
+    <div aria-hidden="true" className={`w-[688px] max-w-full shrink-0 ${heightStyles[variant]}`} />
   );
 }

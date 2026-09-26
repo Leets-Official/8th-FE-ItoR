@@ -1,7 +1,14 @@
-type TitleTextBoxProps = {
-  variant: '24' | '16';
+type Title24TextBoxProps = {
+  variant: '24';
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  text?: never;
+};
+
+type Title16TextBoxProps = {
+  variant: '16';
+  title: string;
+  subtitle?: string;
   text?: never;
 };
 
@@ -12,50 +19,54 @@ type TextBoxProps = {
   subtitle?: never;
 };
 
-type CustomTextBoxProps = TitleTextBoxProps | TextBoxProps;
+type CustomTextBoxProps = Title24TextBoxProps | Title16TextBoxProps | TextBoxProps;
 
-type TitleContentProps = {
+type Title24ContentProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
+};
+
+type Title16ContentProps = {
+  title: string;
+  subtitle?: string;
 };
 
 type TextContentProps = {
   text: string;
 };
 
-function Title24TextBox({ title, subtitle }: TitleContentProps) {
+function Title24TextBox({ title, subtitle }: Title24ContentProps) {
   return (
-    <div className="flex h-fit w-[688px] max-w-full flex-col gap-3 bg-white px-4 py-3">
+    <div className="flex h-fit w-[688px] max-w-full flex-col justify-center gap-3 px-4 py-3">
       <h2 className="text-24-medium line-clamp-1 text-black">{title}</h2>
-      <p className="text-14-light line-clamp-1 text-gray-20">{subtitle}</p>
+      {subtitle && <p className="text-14-light line-clamp-1 text-gray-20">{subtitle}</p>}
     </div>
   );
 }
 
-function Title16TextBox({ title, subtitle }: TitleContentProps) {
+function Title16TextBox({ title, subtitle }: Title16ContentProps) {
   return (
-    <div className="flex h-fit w-full flex-col gap-2 bg-white px-4 py-3">
+    <div className="flex h-fit w-full flex-col justify-center gap-2 px-4 py-3">
       <h2 className="text-16-medium line-clamp-1 text-black">{title}</h2>
-      <p className="text-14-light line-clamp-2 text-gray-20">{subtitle}</p>
+      {subtitle && <p className="text-14-light line-clamp-2 text-gray-20">{subtitle}</p>}
     </div>
   );
 }
 
 function TextOnlyBox({ text }: TextContentProps) {
   return (
-    <div className="h-fit w-[688px] max-w-full bg-white px-4 py-3">
+    <div className="h-fit w-[688px] max-w-full px-4 py-3">
       <p className="text-14-light whitespace-pre-wrap text-gray-20">{text}</p>
     </div>
   );
 }
 
 /**
- * variant: '24', '16', 'text' 중 사용할 텍스트 박스 형태
- * - '24' or '16': title과 subtitle은 필수로 입력
- * - 'text': text는 필수 입력
- * title: '24', '16' 형태에 표시할 제목
- * subtitle: '24', '16' 형태에 표시할 부제목
- * text: 'text' 형태에 표시할 본문
+ * variant별 필수 입력값
+ * - `24`: `title` 필수, `subtitle` 선택
+ * - `16`: `title` 필수, `subtitle` 선택
+ * - `text`: `text`
+ *
  * @returns 형태에 맞는 제목과 내용을 표시하는 텍스트 박스
  */
 export function CustomTextBox(props: CustomTextBoxProps) {
