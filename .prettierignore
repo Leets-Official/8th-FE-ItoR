@@ -1,6 +1,7 @@
 node_modules
 dist
 pnpm-lock.yaml
+src/app/routeTree.gen.ts
 
 # Preserve the provided mission templates.
 .github/

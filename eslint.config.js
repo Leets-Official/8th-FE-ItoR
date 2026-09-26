@@ -8,7 +8,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules']),
+  globalIgnores(['dist', 'node_modules', 'src/app/routeTree.gen.ts']),
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     extends: [js.configs.recommended],
