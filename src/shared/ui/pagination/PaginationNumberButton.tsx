@@ -12,12 +12,12 @@ type PaginationNumberButtonProps = {
  * onClick: 숫자 버튼 클릭 시 실행할 함수
  * @returns 해당 페이지 번호를 표시하는 버튼
  */
-export const PaginationNumberButton = ({
+export function PaginationNumberButton({
   pageNumber,
   isCurrent = false,
   disabled = false,
   onClick,
-}: PaginationNumberButtonProps) => {
+}: PaginationNumberButtonProps) {
   return (
     <button
       type="button"
@@ -32,4 +32,4 @@ export const PaginationNumberButton = ({
       </span>
     </button>
   );
-};
+}

@@ -22,7 +22,7 @@ const toastStyles = {
  * message: 표시할 문구
  * @returns 상태에 맞는 아이콘과 문구를 표시하는 토스트
  */
-export const CustomToast = ({ variant, message }: CustomToastProps) => {
+export function CustomToast({ variant, message }: CustomToastProps) {
   const { icon, color } = toastStyles[variant];
 
   return (
@@ -34,4 +34,4 @@ export const CustomToast = ({ variant, message }: CustomToastProps) => {
       <span className="text-14-regular">{message}</span>
     </div>
   );
-};
+}

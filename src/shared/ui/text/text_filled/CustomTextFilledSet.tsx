@@ -20,7 +20,7 @@ type CustomTextFilledSetProps = {
  * onChange: 입력값 변경 함수
  * @returns 제목, 입력창, 주의 문구로 구성된 입력 세트
  */
-export const CustomTextFilledSet = ({
+export function CustomTextFilledSet({
   title,
   textPlaceholder,
   warningMessage,
@@ -28,11 +28,11 @@ export const CustomTextFilledSet = ({
   value,
   disabled = false,
   onChange,
-}: CustomTextFilledSetProps) => {
+}: CustomTextFilledSetProps) {
   return (
     <div className="flex h-fit w-[688px] max-w-full flex-col gap-1 px-4 py-3">
       <label className="flex w-full flex-col gap-3">
-        <span className="text-14-light text-gray-56 px-[6px]">{title}</span>
+        <span className="text-14-light px-[6px] text-gray-56">{title}</span>
         <CustomTextFilled
           variant="14"
           placeholder={textPlaceholder}
@@ -43,10 +43,10 @@ export const CustomTextFilledSet = ({
       </label>
 
       {showWarning && (
-        <p role="alert" className="text-12-light text-negative px-[6px]">
+        <p role="alert" className="text-12-light px-[6px] text-negative">
           {warningMessage}
         </p>
       )}
     </div>
   );
-};
+}

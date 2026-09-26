@@ -22,7 +22,7 @@ const variantStyles = {
  * @param props.onClick - 클릭 시 실행할 콜백.
  * @returns 선택한 유형의 눌림 효과가 적용된 둥근 버튼.
  */
-export const ActiveRoundButton = ({ variant, icon, text, onClick }: ActiveRoundButtonProps) => {
+export function ActiveRoundButton({ variant, icon, text, onClick }: ActiveRoundButtonProps) {
   return (
     <button
       type="button"
@@ -35,4 +35,4 @@ export const ActiveRoundButton = ({ variant, icon, text, onClick }: ActiveRoundB
       <span>{text}</span>
     </button>
   );
-};
+}

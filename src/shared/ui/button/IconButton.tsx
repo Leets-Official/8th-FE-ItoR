@@ -11,7 +11,7 @@ type IconButtonProps = {
  * onClick: 버튼 클릭 시 실행할 함수
  * @returns 40px 영역에 아이콘을 표시하는 버튼
  */
-export const IconButton = ({ icon, onClick }: IconButtonProps) => {
+export function IconButton({ icon, onClick }: IconButtonProps) {
   return (
     <button
       type="button"
@@ -21,4 +21,4 @@ export const IconButton = ({ icon, onClick }: IconButtonProps) => {
       <Icon source={icon} size="icon-24" />
     </button>
   );
-};
+}

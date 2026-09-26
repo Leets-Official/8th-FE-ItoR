@@ -16,7 +16,7 @@ const modalButtonStyles = {
  * onClick: 버튼 클릭 시 실행할 함수
  * @returns 선택한 유형의 모달 동작 버튼
  */
-const ModalButton = ({ variant, text, onClick }: ModalButtonProps) => {
+function ModalButton({ variant, text, onClick }: ModalButtonProps) {
   return (
     <button
       type="button"
@@ -26,7 +26,7 @@ const ModalButton = ({ variant, text, onClick }: ModalButtonProps) => {
       {text}
     </button>
   );
-};
+}
 
 type CustomModalProps = {
   title: string;
@@ -38,7 +38,7 @@ type CustomModalProps = {
  * description: 제목 아래에 선택적으로 표시할 설명이며 없으면 표시되지 않습니다.
  * @returns 제목·설명·동작 버튼을 표시하는 모달
  */
-export const CustomModal = ({ title, description }: CustomModalProps) => {
+export function CustomModal({ title, description }: CustomModalProps) {
   return (
     <div className="flex h-fit w-[326px] flex-col gap-6 rounded-[4px] bg-white px-4 pb-4 pt-6 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
       <div className="flex h-fit w-full flex-col gap-2 rounded-xl px-1">
@@ -54,4 +54,4 @@ export const CustomModal = ({ title, description }: CustomModalProps) => {
       </div>
     </div>
   );
-};
+}

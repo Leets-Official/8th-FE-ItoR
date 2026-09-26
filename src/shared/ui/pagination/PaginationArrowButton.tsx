@@ -12,11 +12,11 @@ type PaginationArrowButtonProps = {
  * onClick: 버튼 클릭 시 실행할 함수
  * @returns 방향과 상태에 맞는 페이지 이동 버튼
  */
-export const PaginationArrowButton = ({
+export function PaginationArrowButton({
   direction,
   disabled = false,
   onClick,
-}: PaginationArrowButtonProps) => {
+}: PaginationArrowButtonProps) {
   const ArrowIcon = direction === 'previous' ? ArrowLeftIcon : ArrowRightIcon;
 
   return (
@@ -30,4 +30,4 @@ export const PaginationArrowButton = ({
       <ArrowIcon className="text-black opacity-[0.85] transition-[color,opacity] duration-100 ease-out group-hover:text-primary-6 group-hover:opacity-100 group-disabled:text-neutral-5 group-disabled:opacity-100" />
     </button>
   );
-};
+}

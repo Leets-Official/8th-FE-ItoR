@@ -15,6 +15,6 @@ type IconProps = {
  * color: 아이콘에 적용할 색상
  * @returns 지정한 크기와 색상이 적용된 SVG 아이콘
  */
-export const Icon = ({ source: SvgIcon, size, color }: IconProps) => {
+export function Icon({ source: SvgIcon, size, color }: IconProps) {
   return <SvgIcon style={{ width: `var(--${size})`, height: `var(--${size})`, color }} />;
-};
+}

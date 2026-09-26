@@ -15,11 +15,7 @@ type CustomPaginationProps = {
  * onPageChange: 페이지 변경 시 실행할 함수
  * @returns 이전·다음 및 숫자 버튼으로 구성된 페이지네이션
  */
-export const CustomPagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: CustomPaginationProps) => {
+export function CustomPagination({ currentPage, totalPages, onPageChange }: CustomPaginationProps) {
   const firstPageInGroup = Math.floor((currentPage - 1) / PAGE_GROUP_SIZE) * PAGE_GROUP_SIZE + 1;
   const visiblePageNumbers = Array.from(
     { length: Math.min(PAGE_GROUP_SIZE, totalPages - firstPageInGroup + 1) },
@@ -48,4 +44,4 @@ export const CustomPagination = ({
       />
     </div>
   );
-};
+}

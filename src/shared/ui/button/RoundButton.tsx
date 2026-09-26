@@ -16,7 +16,7 @@ type RoundButtonProps = {
  * @param props.onClick - 클릭 시 실행할 콜백.
  * @returns 클릭에 따른 색상 변화가 없는 버튼 요소.
  */
-export const RoundButton = ({ color, icon, text, onClick }: RoundButtonProps) => {
+export function RoundButton({ color, icon, text, onClick }: RoundButtonProps) {
   return (
     <button
       type="button"
@@ -30,4 +30,4 @@ export const RoundButton = ({ color, icon, text, onClick }: RoundButtonProps) =>
       <span>{text}</span>
     </button>
   );
-};
+}

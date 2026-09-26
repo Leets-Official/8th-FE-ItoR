@@ -23,14 +23,14 @@ const textStyles = {
  * onChange: 입력값 변경 함수
  * @returns 입력 상태가 자동으로 표현되는 입력창
  */
-export const CustomTextFilled = ({
+export function CustomTextFilled({
   variant,
   placeholder,
   value,
   disabled = false,
   ariaLabel,
   onChange,
-}: CustomTextFilledProps) => {
+}: CustomTextFilledProps) {
   return (
     <input
       type="text"
@@ -42,4 +42,4 @@ export const CustomTextFilled = ({
       onChange={(event) => onChange?.(event.target.value)}
     />
   );
-};
+}

@@ -10,7 +10,7 @@ type ActiveButtonProps = {
  * text: 오른쪽에 표시할 텍스트
  * @returns 누르는 동안 배경색이 바뀌는 아이콘·텍스트 버튼
  */
-export const ActiveButton = ({ icon, text }: ActiveButtonProps) => {
+export function ActiveButton({ icon, text }: ActiveButtonProps) {
   return (
     <button
       type="button"
@@ -22,4 +22,4 @@ export const ActiveButton = ({ icon, text }: ActiveButtonProps) => {
       <span>{text}</span>
     </button>
   );
-};
+}
