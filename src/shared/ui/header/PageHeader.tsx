@@ -3,9 +3,11 @@ import { IconButton } from '../button/IconButton';
 import { Logo } from '../logo/Logo';
 import { Icon } from '@/shared/assets/icons/Icon';
 
+export type PageHeaderVariant = 'ver1' | 'ver2' | 'ver3' | 'ver4';
+
 type PageHeaderProps = {
-  /** ver1: 깃로그 작성 / ver2: 채팅·더보기 / ver3: 삭제·게시 */
-  variant: 'ver1' | 'ver2' | 'ver3';
+  /** ver1: 깃로그 작성 / ver2: 채팅·더보기 / ver3: 삭제·게시 / ver4: 우측 버튼 없음 */
+  variant: PageHeaderVariant;
 };
 
 const rightContent = {
@@ -31,12 +33,13 @@ const rightContent = {
       </div>
     </div>
   ),
+  ver4: null,
 };
 
 /** @returns 선택한 variant의 우측 영역을 표시하는 페이지 헤더 */
-export const PageHeader = ({ variant }: PageHeaderProps) => {
+export function PageHeader({ variant }: PageHeaderProps) {
   return (
-    <header className="flex h-fit w-full items-center justify-between bg-white py-4 pl-3 pr-4 backdrop-blur-sm">
+    <header className="flex h-fit w-full items-center justify-between bg-[rgba(255,255,255,0.9)] py-4 pl-3 pr-4 backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <IconButton icon={ReorderIcon} />
         <Logo />
@@ -45,4 +48,4 @@ export const PageHeader = ({ variant }: PageHeaderProps) => {
       {rightContent[variant]}
     </header>
   );
-};
+}
