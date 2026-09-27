@@ -5,6 +5,7 @@ import type { PageHeaderVariant } from '@/shared/ui/header/PageHeader';
 declare module '@tanstack/react-router' {
   interface StaticDataRouteOption {
     headerVariant?: PageHeaderVariant;
+    headerFormId?: string;
   }
 }
 
