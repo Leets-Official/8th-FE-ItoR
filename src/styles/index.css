@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-point: #00a1ff;
+  --color-point-light: #e5f6ff;
+  --color-page-active: #1890ff;
+  --color-ink: #111112;
+  --color-danger: #ff3f3f;
+  --color-success: #15dc5e;
+  --color-kakao: #fee500;
+
+  --color-gray-50: #f5f5f5;
+  --color-gray-100: #eeeeee;
+  --color-gray-200: #e6e6e6;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #bfbfbf;
+  --color-gray-500: #999999;
+  --color-gray-600: #777777;
+  --color-gray-700: #555555;
+
+  --color-code: #1e1f22;
+  --color-code-block: #2b2d30;
+
+  --animate-fade-in: fade-in 0.15s ease-out;
+  --animate-slide-in: slide-in 0.2s ease-out;
+  --animate-toast: toast 2.4s ease-in-out forwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes toast {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+    10%,
+    85% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, 0);
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
