@@ -1,0 +1,40 @@
+@import 'tailwindcss';
+/* shadcn/ui 컴포넌트의 열림·닫힘 애니메이션 유틸리티 (animate-in, fade-in-0 등) */
+@import 'tw-animate-css';
+
+@theme {
+  --font-sans: 'Noto Sans KR', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+  --font-smooch: 'Smooch', cursive;
+
+  /* Tailwind 기본 팔레트를 비활성화 — 여기 정의된 색만 유틸리티 클래스로 생성됨 */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-point: #00a1ff;
+  --color-negative: #ff3f3f;
+  --color-positive: #15dc5e;
+
+  --color-gray-7: #111112;
+  --color-gray-20: #333333;
+  --color-gray-33: #555555;
+  --color-gray-56: #909090;
+  --color-gray-78: #c8c8c8;
+  --color-gray-85: #d9d9d9;
+  --color-gray-90: #e6e6e6;
+  --color-gray-96: #f5f5f5;
+
+  /* Figma "32 medium"(실제 24px) / "16 medium" / "14 regular·light" / "12 regular·light" — 굵기는 font-* 클래스로 지정 */
+  --text-24: 24px;
+  --text-24--line-height: 1.6;
+  --text-16: 16px;
+  --text-16--line-height: 1.6;
+  --text-16--letter-spacing: -0.0025em;
+  --text-14: 14px;
+  --text-14--line-height: 1.6;
+  --text-14--letter-spacing: -0.005em;
+  --text-12: 12px;
+  --text-12--line-height: 1.6;
+}
