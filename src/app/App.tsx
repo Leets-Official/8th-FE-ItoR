@@ -1,8 +1,19 @@
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { BlogDetailPage } from '@/pages/BlogDetailPage';
+import { BlogSearchPage } from '@/pages/BlogSearchPage';
+import { Toaster } from '@/shared/ui';
+
+const router = createBrowserRouter([
+  { path: '/', element: <BlogSearchPage /> },
+  { path: '/posts/:postId', element: <BlogDetailPage /> },
+]);
+
 function App() {
   return (
-    <main className="flex min-h-svh items-center justify-center">
-      <h1 className="text-24 font-medium text-black">Hello Tailwind</h1>
-    </main>
+    <>
+      <RouterProvider router={router} />
+      <Toaster />
+    </>
   );
 }
 
