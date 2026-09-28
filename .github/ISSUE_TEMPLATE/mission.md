@@ -1,9 +1,9 @@
 ---
-name: "미션 이슈"
-about: "주차별 작업 계획과 범위를 기록합니다."
-title: "[n주차] 이름/[type] 작업 내용"
-labels: ""
-assignees: ""
+name: '미션 이슈'
+about: '주차별 작업 계획과 범위를 기록합니다.'
+title: '[n주차] 이름/[type] 작업 내용'
+labels: ''
+assignees: ''
 ---
 
 ## 1. 무엇을?
