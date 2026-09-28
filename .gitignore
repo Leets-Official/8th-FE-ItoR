@@ -1,8 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
 # Environment variables
 .env
@@ -46,3 +43,4 @@ coverage/
 
 # AI tooling
 .omc/
+*.tsbuildinfo
