@@ -60,3 +60,5 @@ Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https:
 
 ### 반응형 디자인
 - Figma에서 제공한 디자인 가이드에 맞춰 데스크톱·모바일 환경에 모두 대응하는 반응형 UI를 구현해야 합니다.
+
+## test
