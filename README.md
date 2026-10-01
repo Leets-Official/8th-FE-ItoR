@@ -1,9 +1,12 @@
 # 8th-FE-Mission-ItoR
 
 ## 🎯 미션 요구사항
+
 미션 진행 방법을 꼭 읽고 진행해주세요
 [미션 진행 방법](https://leets-workspace.notion.site/3e3ca3362bee809b9342ed35b1993b83)
+
 ## ItoR이 성장하기 위해 고민해보면 좋을 요구사항
+
 - useRef, useMemo, useCallback를 불필요하게 사용하지 않는 습관 만들기
 - 클린 코드 원칙 지키기(SRP, DRY, KISS) 등 읽기 쉽고 유지보수하기 좋은 코드 만들기
 - 접근성(a11y) 고려하기 - 시맨틱 HTML, 키보드 내비게이션, ARIA 속성 활용
@@ -13,30 +16,36 @@
 - Dynamic Import + Lazy Loading 적용
 
 ## 🎨 Blog UI 요구사항
+
 Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https://www.figma.com/design/4hyz65a9mwAkEKplbXcfyo/%EA%B0%9C%EB%B0%9C-%EA%B5%90%EC%9C%A1%EC%9A%A9-ui?node-id=0-1&m=dev)
 <br/>
 <br>
 
 ## 💡 공통 요구사항
+
 - 공통 컴포넌트 / UI 컴포넌트 / 페이지 별 필요한 컴포넌트로 모듈화 하여 작업합니다.
 - Error, Success 상태를 관리하고, 상태에 따른 결과를 사용자에게 UI로 보여 주셔야 합니다.
 - 모든 방식에는 근거가 있어야 합니다. 왜 해당 방식을 / 기능을 선택하였는지 문서화 하여 매주 미션 PR에 남겨주세요.
-  
+
 ## ⚙️ 기능 요구사항
+
 백엔드 스웨거 : https://blog.leets.land/swagger-ui/index.html
 
-###  회원가입
+### 회원가입
+
 - 사용자는 이메일 주소 또는 카카오 OAuth를 통해 회원가입을 진행할 수 있어야 합니다.
 - 사용자는 비밀번호를 생성하여 회원가입을 진행할 수 있어야 합니다.
 - 사용자는 프로필사진을 등록하며 회원가입을 진행할 수 있어야합니다.
 - 사용자가 입력한 이메일 주소와 닉네임은 시스템에 이미 등록되어 있지 않아야 합니다.
 
 ### 로그인
+
 - 사용자는 등록한 이메일 주소 또는 카카오 로그인을 이용하여 로그인할 수 있어야 합니다.
 - (토큰 방식으로 구현시) refresh token을 통해 새로운 access token을 발급받을 수 있어야 합니다.
 - 토큰은 브라우저에 cookie / storage 중 원하는 방식을 골라 선택하신 후 저장 해 두셔야 합니다.
-  
+
 ### 게시물
+
 - 사용자는 로그인을 하지 않고도 게시물을 조회할 수 있어야 합니다.
 - 사용자는 로그인을 진행해야 게시물을 작성할 수 있어야 합니다.
 - 사용자는 자신의 게시물만 수정, 삭제할 수 있어야 합니다.
@@ -47,18 +56,22 @@ Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https:
   - 추후 READ 기능 구현 시 텍스트 / 이미지의 순서를 맞추어 렌더링 할 수 있게 해야 합니다.
 
 ### 댓글
+
 - 사용자는 로그인을 하지 않고도 댓글을 확인할 수 있어야 합니다.
 - 사용자는 댓글을 입력 하고 싶으면 로그인을 해야 합니다.
 - 사용자는 자신의 댓글만 수정, 삭제할 수 있어야 합니다.
 
 ### 유저
+
 - 사용자는 닉네임, 비밀번호, 프로필 사진을 변경할 수 있어야 합니다.
 - 사용자는 자신의 정보를 조회할 수 있어야 합니다.
 
 ### 이미지
+
 - 이미지는 Pre-Signed Url 방식으로 업로드 할 수 있어야 합니다.
 
 ### 반응형 디자인
+
 - Figma에서 제공한 디자인 가이드에 맞춰 데스크톱·모바일 환경에 모두 대응하는 반응형 UI를 구현해야 합니다.
 
 ## 로컬 실행
@@ -66,3 +79,7 @@ Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https:
 1. 의존성을 설치합니다: npm install
 2. .env.example을 .env.local로 복사하고 API 주소를 설정합니다.
 3. 개발 서버를 실행합니다: npm run dev
+
+## 아이콘
+
+`src/shared/assets/icons/`의 12개 SVG는 Figma 코드를 넣기 위한 빈 틀입니다. 각 파일의 `<svg>` 내용을 Figma에서 내보낸 코드로 교체하면 공통 컴포넌트와 미리보기 화면에 반영됩니다. 단색 아이콘의 색을 CSS로 제어하려면 SVG의 해당 색상 속성에 `currentColor`를 사용합니다.

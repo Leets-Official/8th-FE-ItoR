@@ -33,7 +33,7 @@ export function GitlogButton({
   return (
     <Button
       type={type}
-      variant="ghost"
+      variant= {null}
       className={cn('h-9 gap-1.5 px-3 text-xs font-normal', appearances[appearance], className)}
       {...props}
     >

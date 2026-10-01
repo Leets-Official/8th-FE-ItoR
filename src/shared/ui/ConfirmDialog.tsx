@@ -1,4 +1,7 @@
+import type { ComponentProps } from 'react';
+
 import { Button } from '@/shared/ui/primitives/button';
+
 import {
   Dialog,
   DialogClose,
@@ -15,6 +18,7 @@ interface ConfirmDialogProps {
   title: string;
   description?: string;
   confirmLabel: string;
+  confirmVariant?: ComponentProps<typeof Button>['variant'];
   onConfirm: () => void;
 }
 
@@ -24,11 +28,13 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel,
+  confirmVariant = 'default',
   onConfirm,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        {...(description ? {} : { 'aria-describedby': undefined })}
         showCloseButton={false}
         className="max-w-[calc(100%-2rem)] rounded-sm bg-white p-4 sm:max-w-70"
       >
@@ -54,8 +60,9 @@ export function ConfirmDialog({
           </DialogClose>
           <Button
             type="button"
+            variant={confirmVariant}
             onClick={onConfirm}
-            className="h-8 flex-1 rounded-sm bg-gitlog-danger text-xs font-normal text-white hover:bg-gitlog-danger/90"
+            className="h-8 flex-1 rounded-sm text-xs font-normal"
           >
             {confirmLabel}
           </Button>

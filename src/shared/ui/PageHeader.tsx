@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import gitlogLogo from '@/shared/assets/images/gitlog-logo.png';
+import gitlogLogo from '@/shared/assets/images/gitlog-logo.svg';
 import { cn } from '@/shared/utils/cn';
 
 interface PageHeaderProps {

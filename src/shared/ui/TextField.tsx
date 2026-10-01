@@ -15,11 +15,13 @@ export function TextField({
   id,
   className,
   disabled,
+  'aria-describedby': externalDescriptionIds,
   ...props
 }: TextFieldProps) {
   const generatedId = useId();
   const inputId = id ?? props.name ?? generatedId;
   const hintId = hint && inputId ? `${inputId}-hint` : undefined;
+  const descriptionIds = [externalDescriptionIds, hintId].filter(Boolean).join(' ') || undefined;
 
   return (
     <div className="w-full">
@@ -32,7 +34,7 @@ export function TextField({
         {...props}
         id={inputId}
         disabled={disabled}
-        aria-describedby={hintId}
+        aria-describedby={descriptionIds}
         className={cn(
           'w-full border border-transparent bg-white/20 text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400 aria-invalid:border-gitlog-danger',
           size === 'md' ? 'h-12 px-3 text-base' : 'h-9 px-3 text-xs',

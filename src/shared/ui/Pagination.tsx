@@ -1,5 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { NavigateBeforeIcon } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 
 interface PaginationProps {
@@ -20,7 +19,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
       >
-        <ChevronLeft aria-hidden="true" />
+        <NavigateBeforeIcon aria-hidden="true" />
       </PaginationControl>
       {pages.map((pageNumber) => (
         <PaginationControl
@@ -37,7 +36,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
       >
-        <ChevronRight aria-hidden="true" />
+        <NavigateBeforeIcon aria-hidden="true" className="rotate-180" />
       </PaginationControl>
     </nav>
   );

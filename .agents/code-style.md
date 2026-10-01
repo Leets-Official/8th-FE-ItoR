@@ -88,7 +88,7 @@ import { cn } from '../../../shared/utils/cn';
 | Zustand store, 도입 시 | `use{Name}Store` | `useDraftStore` |
 | cva variants | `{componentName}Variants` | `buttonVariants` |
 | CSS variable | kebab-case, 의미 기반 | `--gitlog-action` |
-| 자체 SVG icon export, 도입 시 | PascalCase + `Icon` | `WriteIcon` |
+| SVG icon export | PascalCase + `Icon` | `CreateIcon` |
 
 ## File Naming
 
@@ -98,6 +98,7 @@ import { cn } from '../../../shared/utils/cn';
 | shadcn/ui primitive | CLI가 생성한 이름 유지 | `button.tsx` |
 | Hook / Store | camelCase.ts | `usePostList.ts`, `useDraftStore.ts` |
 | Utility | camelCase.ts | `formatDate.ts`, `cn.ts` |
+| SVG icon asset | snake_case.svg | `add_photo_alternate.svg` |
 | Route file, 라우터 도입 시 | 선택한 React Router 모드의 규약 | `app/routes/` 내부의 route module |
 | Barrel export, 필요 시 | index.ts | `shared/ui/index.ts` |
 

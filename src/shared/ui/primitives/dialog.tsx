@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { cn } from '@/shared/utils/cn';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 
+import { ClearIcon } from '@/shared/assets/icons';
+import { cn } from '@/shared/utils/cn';
 import { Button } from '@/shared/ui/primitives/button';
-import { XIcon } from 'lucide-react';
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -60,7 +60,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
-              <XIcon />
+              <ClearIcon aria-hidden="true" />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>

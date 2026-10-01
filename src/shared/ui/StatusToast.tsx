@@ -1,6 +1,6 @@
-import { Check, CircleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { DoneIcon, ErrorOutlineIcon } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 
 type ToastStatus = 'error' | 'success';
@@ -12,7 +12,7 @@ interface StatusToastProps {
 
 export function StatusToast({ status, message }: StatusToastProps) {
   const isError = status === 'error';
-  const Icon = isError ? CircleAlert : Check;
+  const Icon = isError ? ErrorOutlineIcon : DoneIcon;
 
   return (
     <div

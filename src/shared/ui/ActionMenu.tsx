@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { EllipsisVertical } from 'lucide-react';
+import type { ReactElement } from 'react';
 
+import { MoreVertIcon } from '@/shared/assets/icons';
 import { Button } from '@/shared/ui/primitives/button';
 import {
   DropdownMenu,
@@ -21,7 +21,7 @@ interface ActionMenuItem {
 interface ActionMenuProps {
   label: string;
   items: ActionMenuItem[];
-  trigger?: ReactNode;
+  trigger?: ReactElement;
   appearance?: 'floating' | 'flat';
 }
 
@@ -31,7 +31,7 @@ export function ActionMenu({ label, items, trigger, appearance = 'floating' }: A
       <DropdownMenuTrigger asChild>
         {trigger ?? (
           <Button type="button" variant="ghost" size="icon" aria-label={label}>
-            <EllipsisVertical aria-hidden="true" />
+            <MoreVertIcon aria-hidden="true" />
           </Button>
         )}
       </DropdownMenuTrigger>

@@ -1,6 +1,6 @@
 import type { ImgHTMLAttributes } from 'react';
 
-import defaultProfileAvatar from '@/shared/assets/images/profile-avatar.png';
+import defaultProfileAvatar from '@/shared/assets/images/gitlog-profile.svg';
 import { cn } from '@/shared/utils/cn';
 
 interface ProfileAvatarProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'alt' | 'src'> {

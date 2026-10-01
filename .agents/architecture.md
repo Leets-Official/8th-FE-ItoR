@@ -107,15 +107,16 @@ src/
 ### Re-export
 
 - 공유 UI import가 많아지면 `shared/ui/index.ts`를 추가한다. 처음부터 모든 폴더에 `index.ts`를 만들지 않는다.
-- 자체 SVG 아이콘을 여러 곳에서 쓰면 `shared/assets/icons/index.ts`로 재수출한다. 현재 Lucide 아이콘은 라이브러리에서 직접 가져온다.
+- Figma에서 추출한 SVG 아이콘은 `shared/assets/icons/`에 두고 `index.ts`에서 React 컴포넌트로 재수출한다. 애플리케이션 코드는 barrel에서 가져온다.
+- 단색 아이콘은 실제 SVG 코드를 넣을 때 색상 속성에 `currentColor`를 사용할 수 있다. 여러 색을 쓰는 로고는 원래 색을 유지한다.
 - 라우트 파일은 일괄 재수출하지 않는다.
 
 ```ts
 // Good
-import { ProductTonerIcon } from "@/shared/assets/icons";
+import { CreateIcon } from "@/shared/assets/icons";
 
 // Avoid
-import ProductTonerIcon from "@/shared/assets/icons/product_toner.svg?react";
+import CreateIcon from "@/shared/assets/icons/create.svg?react";
 ```
 
 ### Data Flow

@@ -1,18 +1,18 @@
 import { useState, type ReactNode } from 'react';
 import {
-  Check,
-  ChevronLeft,
-  CircleAlert,
-  EllipsisVertical,
-  FolderOpen,
-  ImagePlus,
-  Menu,
-  MessageSquareText,
-  Pencil,
-  Settings,
-  Trash2,
-  X,
-} from 'lucide-react';
+  AddPhotoAlternateIcon,
+  ChatIcon,
+  ClearIcon,
+  CreateIcon,
+  DeleteForeverIcon,
+  DoneIcon,
+  ErrorOutlineIcon,
+  FolderOpenIcon,
+  MoreVertIcon,
+  NavigateBeforeIcon,
+  ReorderIcon,
+  SettingsIcon,
+} from '@/shared/assets/icons';
 
 import { Button } from '@/shared/ui/primitives/button';
 import { Toaster } from '@/shared/ui/primitives/sonner';
@@ -28,6 +28,21 @@ import { Skeleton } from '@/shared/ui/Skeleton';
 import { StatusToast, notify } from '@/shared/ui/StatusToast';
 import { TextField } from '@/shared/ui/TextField';
 import { Heading, Text } from '@/shared/ui/Typography';
+
+const iconPreviews = [
+  { name: 'reorder.svg', Icon: ReorderIcon },
+  { name: 'create.svg', Icon: CreateIcon },
+  { name: 'chat.svg', Icon: ChatIcon },
+  { name: 'more_vert.svg', Icon: MoreVertIcon },
+  { name: 'add_photo_alternate.svg', Icon: AddPhotoAlternateIcon },
+  { name: 'folder_open.svg', Icon: FolderOpenIcon },
+  { name: 'delete_forever.svg', Icon: DeleteForeverIcon },
+  { name: 'done.svg', Icon: DoneIcon },
+  { name: 'error_outline.svg', Icon: ErrorOutlineIcon },
+  { name: 'settings.svg', Icon: SettingsIcon },
+  { name: 'clear.svg', Icon: ClearIcon },
+  { name: 'navigate_before.svg', Icon: NavigateBeforeIcon },
+];
 
 function PreviewSection({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -49,7 +64,7 @@ export function ComponentGallery() {
   ];
   const menuTrigger = (
     <IconButton label="메뉴 열기">
-      <Menu aria-hidden="true" />
+      <ReorderIcon aria-hidden="true" />
     </IconButton>
   );
 
@@ -70,7 +85,7 @@ export function ComponentGallery() {
               actions={
                 <GitlogButton
                   appearance="text"
-                  icon={<Pencil className="size-4" aria-hidden="true" />}
+                  icon={<CreateIcon className="size-4" aria-hidden="true" />}
                   onClick={() => notify.success('작성 버튼을 눌렀습니다.')}
                 >
                   깃로그 쓰기
@@ -88,7 +103,7 @@ export function ComponentGallery() {
                     aria-label="댓글 보기"
                     onClick={() => notify.success('댓글 버튼을 눌렀습니다.')}
                   >
-                    <MessageSquareText aria-hidden="true" />
+                    <ChatIcon aria-hidden="true" />
                   </Button>
                   <ActionMenu label="게시물 메뉴" items={demoItems} />
                 </>
@@ -154,12 +169,12 @@ export function ComponentGallery() {
             <div className="grid min-h-36 grid-cols-2 content-start justify-items-start gap-3 sm:grid-cols-4 lg:grid-cols-2">
               {(['outline', 'muted', 'solid', 'text'] as const).map((appearance) => (
                 <div key={appearance} className="flex flex-col items-start gap-2">
-                  <GitlogButton appearance={appearance} icon={<Pencil aria-hidden="true" />}>
+                  <GitlogButton appearance={appearance} icon={<CreateIcon aria-hidden="true" />}>
                     깃로그 시작하기
                   </GitlogButton>
                   <GitlogButton
                     appearance={appearance}
-                    icon={<Pencil aria-hidden="true" />}
+                    icon={<CreateIcon aria-hidden="true" />}
                     disabled
                   >
                     깃로그 시작하기
@@ -243,22 +258,12 @@ export function ComponentGallery() {
 
           <PreviewSection title="아이콘">
             <div className="grid min-h-56 grid-cols-3 gap-5 bg-white p-4 sm:grid-cols-6">
-              {[
-                Menu,
-                Pencil,
-                MessageSquareText,
-                EllipsisVertical,
-                ImagePlus,
-                FolderOpen,
-                Trash2,
-                Check,
-                CircleAlert,
-                Settings,
-                X,
-                ChevronLeft,
-              ].map((Icon, index) => (
-                <div key={index} className="flex items-center justify-center text-neutral-800">
-                  <Icon aria-hidden="true" className="size-8" />
+              {iconPreviews.map(({ name, Icon }) => (
+                <div key={name} className="flex flex-col items-center gap-2 text-neutral-800">
+                  <span className="flex size-10 items-center justify-center rounded border border-dashed border-neutral-200">
+                    <Icon aria-hidden="true" className="size-8" />
+                  </span>
+                  <code className="max-w-full text-center text-[10px] break-all">{name}</code>
                 </div>
               ))}
             </div>
@@ -268,20 +273,20 @@ export function ComponentGallery() {
         <PreviewSection title="아이콘 버튼 크기와 클릭">
           <div className="flex min-h-36 items-start gap-8 bg-white p-4">
             <IconButton label="작은 메뉴" size="sm">
-              <Menu aria-hidden="true" />
+              <ReorderIcon aria-hidden="true" />
             </IconButton>
             <IconButton label="메뉴">
-              <Menu aria-hidden="true" />
+              <ReorderIcon aria-hidden="true" />
             </IconButton>
             <IconButton label="큰 메뉴" size="lg">
-              <Menu aria-hidden="true" />
+              <ReorderIcon aria-hidden="true" />
             </IconButton>
             <IconButton
               label="메뉴 열기"
               onClick={() => notify.success('메뉴 버튼을 눌렀습니다.')}
               className="rounded-xl bg-neutral-100 hover:bg-neutral-200"
             >
-              <Menu aria-hidden="true" />
+              <ReorderIcon aria-hidden="true" />
             </IconButton>
           </div>
         </PreviewSection>
@@ -340,7 +345,7 @@ export function ComponentGallery() {
                 }
                 footer={
                   <>
-                    <GitlogButton appearance="muted" icon={<Settings aria-hidden="true" />}>
+                    <GitlogButton appearance="muted" icon={<SettingsIcon aria-hidden="true" />}>
                       설정
                     </GitlogButton>
                     <GitlogButton appearance="muted">로그아웃</GitlogButton>
@@ -370,7 +375,8 @@ export function ComponentGallery() {
             ? 'description line one\ndescription line two'
             : undefined
         }
-        confirmLabel="삭제하기"
+        confirmLabel={dialogKind === 'withDescription' ? '삭제하기' : '확인'}
+        confirmVariant={dialogKind === 'withDescription' ? 'destructiveSolid' : 'default'}
         onConfirm={() => {
           setDialogKind(null);
           notify.success('확인했습니다.');
