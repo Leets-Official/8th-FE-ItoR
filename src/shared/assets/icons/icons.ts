@@ -1,0 +1,14 @@
+export { default as AddPhotoAlternateIcon } from './svg/add_photo_alternate.svg?react';
+export { default as ChatIcon } from './svg/chat.svg?react';
+export { default as ClearIcon } from './svg/clear.svg?react';
+export { default as CreateIcon } from './svg/create.svg?react';
+export { default as DeleteForeverIcon } from './svg/delete_forever.svg?react';
+export { default as DoneIcon } from './svg/done.svg?react';
+export { default as ErrorOutlineIcon } from './svg/error_outline.svg?react';
+export { default as FolderOpenIcon } from './svg/folder_open.svg?react';
+export { default as MoreVertIcon } from './svg/more_vert.svg?react';
+export { default as NavigateBeforeIcon } from './svg/navigate_before.svg?react';
+export { default as ReorderIcon } from './svg/reorder.svg?react';
+export { default as SettingsIcon } from './svg/settings.svg?react';
+export { default as ArrowRightIcon } from './svg/arrow_right.svg?react';
+export { default as ArrowLeftIcon } from './svg/arrow_left.svg?react';
