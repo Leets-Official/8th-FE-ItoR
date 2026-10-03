@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { MOCK_POSTS, PostListItem } from '@/entities/post';
 import { Blank, PageHeader, Pagination } from '@/shared/ui';
 

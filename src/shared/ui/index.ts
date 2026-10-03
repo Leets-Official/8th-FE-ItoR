@@ -9,7 +9,7 @@ export {
 export { Icon, type IconName, type IconSize } from './Icon';
 export { IconButton } from './IconButton';
 export { Menu } from './Menu';
-export { Modal } from './Modal';
+export { Modal, type ModalVariant } from './Modal';
 export { CompactPageHeader, PageHeader, type PageHeaderVariant } from './PageHeader';
 export {
   Pagination,

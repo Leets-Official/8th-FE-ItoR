@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import { getMockPostDetail, PostContent, PostTitleSection } from '@/entities/post';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Blank, Button, PageHeader } from '@/shared/ui';
@@ -12,6 +12,8 @@ export function BlogDetailPage() {
   const { postId } = useParams();
   const commentSectionRef = useRef<HTMLElement>(null);
   const post = getMockPostDetail(Number(postId));
+  // 인증 API 연동 전에는 비로그인 상태로 동작한다.
+  const isLoggedIn = false;
 
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -52,7 +54,7 @@ export function BlogDetailPage() {
 
         <section ref={commentSectionRef} className={`${SECTION_CLASS} scroll-mt-[72px] bg-white`}>
           <div className={CONTENT_CLASS}>
-            <CommentSection commentCount={commentCount} />
+            <CommentSection commentCount={commentCount} isLoggedIn={isLoggedIn} />
           </div>
           <Blank size={64} />
         </section>

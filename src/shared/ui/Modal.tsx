@@ -2,7 +2,15 @@ import type { MouseEventHandler, ReactNode } from 'react';
 import { AlertDialog as AlertDialogPrimitive } from 'radix-ui';
 import { cn } from '@/shared/lib/utils';
 
+export type ModalVariant = 'default' | 'destructive';
+
+const CONFIRM_CLASS: Record<ModalVariant, string> = {
+  default: 'bg-point',
+  destructive: 'bg-negative',
+};
+
 interface ModalProps {
+  variant?: ModalVariant;
   title: ReactNode;
   description?: ReactNode;
   cancelLabel?: ReactNode;
@@ -20,10 +28,11 @@ interface ModalProps {
 // shadcn/ui alert-dialog 기반 — 포커스 가두기, ESC 닫기, 스크롤 잠금, 닫힌 뒤 트리거로 포커스 복귀는 Radix가 처리한다
 // 취소·확인 버튼을 누르면 onCancel/onConfirm 호출 후 자동으로 닫힌다 (onOpenChange(false))
 export function Modal({
+  variant = 'default',
   title,
   description,
   cancelLabel = '취소',
-  confirmLabel = '삭제하기',
+  confirmLabel = '확인',
   trigger,
   open,
   defaultOpen,
@@ -64,7 +73,10 @@ export function Modal({
             </AlertDialogPrimitive.Cancel>
             <AlertDialogPrimitive.Action
               onClick={onConfirm}
-              className="flex h-[38px] flex-1 cursor-pointer items-center justify-center rounded-xs bg-negative px-3 py-2 text-14 text-white hover:brightness-95 active:brightness-90"
+              className={cn(
+                'flex h-[38px] flex-1 cursor-pointer items-center justify-center rounded-xs px-3 py-2 text-14 text-white hover:brightness-95 active:brightness-90',
+                CONFIRM_CLASS[variant],
+              )}
             >
               {confirmLabel}
             </AlertDialogPrimitive.Action>

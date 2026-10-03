@@ -1,12 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { BlogDetailPage } from '@/pages/BlogDetailPage';
-import { BlogSearchPage } from '@/pages/BlogSearchPage';
+import { RouterProvider } from 'react-router/dom';
 import { Toaster } from '@/shared/ui';
-
-const router = createBrowserRouter([
-  { path: '/', element: <BlogSearchPage /> },
-  { path: '/posts/:postId', element: <BlogDetailPage /> },
-]);
+import { router } from './router';
 
 function App() {
   return (
