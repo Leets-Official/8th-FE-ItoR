@@ -1,5 +1,5 @@
 import { useState, type FocusEvent } from 'react';
-import { LoginModal } from '@/features/login-user';
+import { LoginModal } from '@/features/auth';
 import { Blank } from '@/shared/ui';
 
 interface CommentSectionProps {

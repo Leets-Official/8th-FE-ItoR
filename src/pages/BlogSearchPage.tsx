@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { MOCK_POSTS, PostListItem } from '@/entities/post';
+import { MOCK_POSTS, PostListItem } from '@/features/post';
 import { Blank, PageHeader, Pagination } from '@/shared/ui';
 
 const POSTS_PER_PAGE = 10;

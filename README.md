@@ -18,7 +18,7 @@ Leets 8기 프론트엔드 부트캠프 미션 프로젝트입니다. 디자인 
 
 ## 프로젝트 구조
 
-Feature-Sliced Design(FSD)을 기준으로 구성합니다. `@/`는 `src/` 경로를 가리킵니다.
+도메인 단위로 묶는 구조를 사용합니다. `@/`는 `src/` 경로를 가리킵니다.
 
 ```text
 src/
@@ -26,15 +26,10 @@ src/
 ├── pages/                    # 페이지 상태 관리와 화면 조립
 │   ├── BlogSearchPage.tsx
 │   └── BlogDetailPage.tsx
-├── widgets/
-│   └── comment-section/      # 댓글 영역
-├── entities/
-│   └── post/
-│       ├── api/              # 게시글 목업 데이터
-│       ├── lib/              # 날짜 포맷 등 게시글 유틸리티
-│       ├── model/            # 게시글·작성자 타입
-│       ├── ui/               # 게시글 목록, 제목, 메타 정보, 본문
-│       └── index.ts          # 슬라이스 Public API
+├── features/                 # 도메인별 컴포넌트·타입·목업·유틸
+│   ├── post/                 # 게시글 목록, 제목, 메타 정보, 본문, 타입, 목업
+│   ├── comment/              # 댓글 영역
+│   └── auth/                 # 로그인 모달
 └── shared/
     ├── api/                  # 공용 Axios 인스턴스
     ├── assets/               # SVG 아이콘·이미지
@@ -42,19 +37,19 @@ src/
     └── ui/                   # 도메인에 의존하지 않는 공통 UI
 ```
 
-의존 방향은 `app → pages → widgets → features → entities → shared`입니다. `features`는 사용자 행동을 별도 기능으로 구현할 때 추가합니다. 슬라이스 외부에서는 `index.ts`의 Public API로 가져옵니다.
+의존 방향은 `app → pages → features → shared`입니다. 도메인 폴더 외부에서는 `index.ts`의 Public API로 가져옵니다.
 
 ## 재사용 컴포넌트
 
-| 위치                      | 컴포넌트                                                                 | 역할                                                 |
-| ------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------- |
-| `entities/post`           | `PostTitleSection`                                                       | 제목·부제목과 `PostMeta`, `Blank`를 조합한 제목 영역 |
-| `entities/post`           | `PostMeta`                                                               | 목록과 상세에서 공유하는 작성자·작성일·댓글 수       |
-| `entities/post`           | `PostListItem`, `PostContent`                                            | 목록 항목 및 텍스트·이미지 본문 표시                 |
-| `widgets/comment-section` | `CommentSection`                                                         | 댓글 수·빈 상태·입력 UI 조합                         |
-| `shared/ui`               | `PageHeader`, `CompactPageHeader`, `Pagination`, `Blank`                 | 헤더, 페이지 이동, 여백                              |
-| `shared/ui`               | `Button`, `IconButton`, `Icon`, `TextField`, `TextFieldSet`, `TextBlock` | 기본 버튼·아이콘·입력·텍스트 UI                      |
-| `shared/ui`               | `DropdownMenu`, `Menu`, `Modal`, `Toast`, `Toaster`, `showToast`         | 메뉴·모달·토스트 UI                                  |
+| 위치               | 컴포넌트                                                                 | 역할                                                 |
+| ------------------ | ------------------------------------------------------------------------ | ---------------------------------------------------- |
+| `features/post`    | `PostTitleSection`                                                       | 제목·부제목과 `PostMeta`, `Blank`를 조합한 제목 영역 |
+| `features/post`    | `PostMeta`                                                               | 목록과 상세에서 공유하는 작성자·작성일·댓글 수       |
+| `features/post`    | `PostListItem`, `PostContent`                                            | 목록 항목 및 텍스트·이미지 본문 표시                 |
+| `features/comment` | `CommentSection`                                                         | 댓글 수·빈 상태·입력 UI 조합                         |
+| `shared/ui`        | `PageHeader`, `CompactPageHeader`, `Pagination`, `Blank`                 | 헤더, 페이지 이동, 여백                              |
+| `shared/ui`        | `Button`, `IconButton`, `Icon`, `TextField`, `TextFieldSet`, `TextBlock` | 기본 버튼·아이콘·입력·텍스트 UI                      |
+| `shared/ui`        | `DropdownMenu`, `Menu`, `Modal`, `Toast`, `Toaster`, `showToast`         | 메뉴·모달·토스트 UI                                  |
 
 게시글 컴포넌트는 데이터를 props로 받아 표시하고, 페이지는 데이터 조회와 페이지네이션 같은 상태를 관리합니다.
 

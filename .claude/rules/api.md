@@ -49,18 +49,13 @@ api.interceptors.response.use(
 
 ### TanStack Query 사용 예시
 
-API 요청 함수는 FSD 슬라이스의 `api/` 세그먼트에 작성하고, 슬라이스의 `index.ts`로 공개합니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
-
-- **조회(GET)처럼 데이터를 읽어오는 기본 요청** → `src/entities/{엔티티}/api/` (예: `getPosts`, `getPost`)
-- **사용자 행동에 따른 생성·수정·삭제 요청** → `src/features/{행동}/api/` (예: `features/write-post/api/createPost.ts`)
-
-구분 기준은 [architecture.md](./architecture.md)의 계층별 역할을 참고하세요.
+API 요청 함수는 해당 도메인 폴더(`src/features/{도메인}/`)에 작성하고, 도메인의 `index.ts`로 공개합니다. 조회(`getPosts`)와 생성·수정·삭제(`createPost`) 요청 모두 같은 도메인 폴더에 둡니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
 
 ```ts
-// src/entities/post/api/getPosts.ts
+// src/features/post/getPosts.ts
 import { api } from '@/shared/api/instance';
 
-import type { PostSummary } from '../model/types';
+import type { PostSummary } from './types';
 
 export const getPosts = () => api.get<PostSummary[]>('/posts').then((res) => res.data);
 ```
@@ -68,7 +63,7 @@ export const getPosts = () => api.get<PostSummary[]>('/posts').then((res) => res
 ```tsx
 // 사용하는 컴포넌트
 import { useQuery } from '@tanstack/react-query';
-import { getPosts } from '@/entities/post'; // index.ts에서 getPosts를 공개
+import { getPosts } from '@/features/post'; // index.ts에서 getPosts를 공개
 
 function PostList() {
   const { data, isLoading, error } = useQuery({

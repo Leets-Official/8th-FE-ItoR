@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import { Link, useParams } from 'react-router';
-import { getMockPostDetail, PostContent, PostTitleSection } from '@/entities/post';
+import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Blank, Button, PageHeader } from '@/shared/ui';
-import { CommentSection } from '@/widgets/comment-section';
+import { CommentSection } from '@/features/comment';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';

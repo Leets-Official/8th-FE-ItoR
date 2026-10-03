@@ -1,4 +1,4 @@
-import type { PostContentBlock, PostDetail, PostSummary } from '../model/types';
+import type { PostContentBlock, PostDetail, PostSummary } from './types';
 import blogDetailPhoto from '@/shared/assets/images/blog_detail_photo.svg';
 import blogDetailText from '@/shared/assets/images/blog_detail_text.svg';
 import blogPhoto from '@/shared/assets/images/blog_photo.svg';
