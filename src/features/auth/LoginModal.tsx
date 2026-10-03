@@ -1,32 +1,42 @@
-import type { FormEvent, FormEventHandler, ReactNode } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Icon } from '@/shared/ui';
 import { LoginFields } from './LoginFields';
+import { useAuth } from './useAuth';
 
 interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onLogin?: FormEventHandler<HTMLFormElement>;
   onKakaoLogin?: () => void;
   onSignUp?: () => void;
-  errorMessage?: ReactNode;
 }
 
-export function LoginModal({
-  open,
-  onOpenChange,
-  onLogin,
-  onKakaoLogin,
-  onSignUp,
-  errorMessage,
-}: LoginModalProps) {
+export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: LoginModalProps) {
+  const { login } = useAuth();
+  const [errorMessage, setErrorMessage] = useState<string>();
+
+  function handleOpenChange(nextOpen: boolean) {
+    // 다시 열었을 때 이전 실패 메시지가 남지 않게 한다
+    if (!nextOpen) setErrorMessage(undefined);
+    onOpenChange(nextOpen);
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onLogin?.(event);
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get('email') ?? '');
+    const password = String(formData.get('password') ?? '');
+
+    if (!login(email, password)) {
+      setErrorMessage('이메일 또는 비밀번호가 올바르지 않습니다.');
+      return;
+    }
+
+    handleOpenChange(false);
   }
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 flex min-h-[469px] w-[min(782px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-wrap content-center items-center justify-center rounded-[9px] bg-gray-7 py-20 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
@@ -44,7 +54,9 @@ export function LoginModal({
             </p>
           </div>
 
+          {/* 목업 계정 아이디(admin)가 이메일 형식이 아니라 브라우저 기본 검증을 끄고 직접 확인한다 */}
           <form
+            noValidate
             className="flex w-[391px] max-w-full min-w-60 flex-col items-center px-4"
             onSubmit={handleSubmit}
           >
