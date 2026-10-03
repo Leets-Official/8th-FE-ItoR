@@ -1,62 +1,79 @@
-# 8th-FE-Mission-ItoR
+# GITLOG — 8th-FE-ItoR
 
-## 🎯 미션 요구사항
-미션 진행 방법을 꼭 읽고 진행해주세요
-[미션 진행 방법](https://leets-workspace.notion.site/3e3ca3362bee809b9342ed35b1993b83)
-## ItoR이 성장하기 위해 고민해보면 좋을 요구사항
-- useRef, useMemo, useCallback를 불필요하게 사용하지 않는 습관 만들기
-- 클린 코드 원칙 지키기(SRP, DRY, KISS) 등 읽기 쉽고 유지보수하기 좋은 코드 만들기
-- 접근성(a11y) 고려하기 - 시맨틱 HTML, 키보드 내비게이션, ARIA 속성 활용
-- Tanstack Query + Axios Interceptor 활용
-- 이미지 최적화, 이미지 Lazy 로딩하기
-- Lighthouse 점수 90점 이상 유지하기
-- Dynamic Import + Lazy Loading 적용
+Leets 8기 프론트엔드 부트캠프 미션 프로젝트입니다. 디자인 시안을 바탕으로 블로그 목록·상세 화면과 재사용 가능한 UI 컴포넌트를 구현합니다.
 
-## 🎨 Blog UI 요구사항
-Figma :[ https://www.figma.com/team_invite/redeem/DjdTfdfKC0X3ImzDcw0wbi](https://www.figma.com/design/4hyz65a9mwAkEKplbXcfyo/%EA%B0%9C%EB%B0%9C-%EA%B5%90%EC%9C%A1%EC%9A%A9-ui?node-id=0-1&m=dev)
-<br/>
-<br>
+현재는 목업 데이터를 사용하는 프론트엔드 UI 단계입니다.
 
-## 💡 공통 요구사항
-- 공통 컴포넌트 / UI 컴포넌트 / 페이지 별 필요한 컴포넌트로 모듈화 하여 작업합니다.
-- Error, Success 상태를 관리하고, 상태에 따른 결과를 사용자에게 UI로 보여 주셔야 합니다.
-- 모든 방식에는 근거가 있어야 합니다. 왜 해당 방식을 / 기능을 선택하였는지 문서화 하여 매주 미션 PR에 남겨주세요.
-  
-## ⚙️ 기능 요구사항
-백엔드 스웨거 : https://blog.leets.land/swagger-ui/index.html
+## 기술 스택
 
-###  회원가입
-- 사용자는 이메일 주소 또는 카카오 OAuth를 통해 회원가입을 진행할 수 있어야 합니다.
-- 사용자는 비밀번호를 생성하여 회원가입을 진행할 수 있어야 합니다.
-- 사용자는 프로필사진을 등록하며 회원가입을 진행할 수 있어야합니다.
-- 사용자가 입력한 이메일 주소와 닉네임은 시스템에 이미 등록되어 있지 않아야 합니다.
+| 구분      | 사용 기술                                          |
+| --------- | -------------------------------------------------- |
+| UI        | React 19, TypeScript 6                             |
+| 개발·빌드 | Vite 8                                             |
+| 스타일    | Tailwind CSS v4, 디자인 토큰, clsx, tailwind-merge |
+| 라우팅    | React Router 7 (`createBrowserRouter`)             |
+| UI 기반   | Radix UI, class-variance-authority, Sonner         |
+| HTTP      | Axios 공용 인스턴스 준비                           |
+| 코드 품질 | ESLint, Prettier, Husky, lint-staged               |
 
-### 로그인
-- 사용자는 등록한 이메일 주소 또는 카카오 로그인을 이용하여 로그인할 수 있어야 합니다.
-- (토큰 방식으로 구현시) refresh token을 통해 새로운 access token을 발급받을 수 있어야 합니다.
-- 토큰은 브라우저에 cookie / storage 중 원하는 방식을 골라 선택하신 후 저장 해 두셔야 합니다.
-  
-### 게시물
-- 사용자는 로그인을 하지 않고도 게시물을 조회할 수 있어야 합니다.
-- 사용자는 로그인을 진행해야 게시물을 작성할 수 있어야 합니다.
-- 사용자는 자신의 게시물만 수정, 삭제할 수 있어야 합니다.
-- 게시물은 페이지네이션이 가능해야 합니다.
-- 게시물 리스트는 한 페이지에 10개까지 보여야 하며, 초과 시 다음 페이지에서 볼 수 있어야 합니다.
-- 게시물 조회시 댓글도 모두 조회할 수 있어야 합니다.
-- 게시물 작성 시, 텍스트와 이미지의 contentOrder도 트래킹 할 수 있어야 합니다.
-  - 추후 READ 기능 구현 시 텍스트 / 이미지의 순서를 맞추어 렌더링 할 수 있게 해야 합니다.
+## 프로젝트 구조
 
-### 댓글
-- 사용자는 로그인을 하지 않고도 댓글을 확인할 수 있어야 합니다.
-- 사용자는 댓글을 입력 하고 싶으면 로그인을 해야 합니다.
-- 사용자는 자신의 댓글만 수정, 삭제할 수 있어야 합니다.
+Feature-Sliced Design(FSD)을 기준으로 구성합니다. `@/`는 `src/` 경로를 가리킵니다.
 
-### 유저
-- 사용자는 닉네임, 비밀번호, 프로필 사진을 변경할 수 있어야 합니다.
-- 사용자는 자신의 정보를 조회할 수 있어야 합니다.
+```text
+src/
+├── app/                      # 앱 진입점, 라우팅, 전역 스타일·디자인 토큰
+├── pages/                    # 페이지 상태 관리와 화면 조립
+│   ├── BlogSearchPage.tsx
+│   └── BlogDetailPage.tsx
+├── widgets/
+│   └── comment-section/      # 댓글 영역
+├── entities/
+│   └── post/
+│       ├── api/              # 게시글 목업 데이터
+│       ├── lib/              # 날짜 포맷 등 게시글 유틸리티
+│       ├── model/            # 게시글·작성자 타입
+│       ├── ui/               # 게시글 목록, 제목, 메타 정보, 본문
+│       └── index.ts          # 슬라이스 Public API
+└── shared/
+    ├── api/                  # 공용 Axios 인스턴스
+    ├── assets/               # SVG 아이콘·이미지
+    ├── lib/                  # cn 등 공용 유틸리티
+    └── ui/                   # 도메인에 의존하지 않는 공통 UI
+```
 
-### 이미지
-- 이미지는 Pre-Signed Url 방식으로 업로드 할 수 있어야 합니다.
+의존 방향은 `app → pages → widgets → features → entities → shared`입니다. `features`는 사용자 행동을 별도 기능으로 구현할 때 추가합니다. 슬라이스 외부에서는 `index.ts`의 Public API로 가져옵니다.
 
-### 반응형 디자인
-- Figma에서 제공한 디자인 가이드에 맞춰 데스크톱·모바일 환경에 모두 대응하는 반응형 UI를 구현해야 합니다.
+## 재사용 컴포넌트
+
+| 위치                      | 컴포넌트                                                                 | 역할                                                 |
+| ------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------- |
+| `entities/post`           | `PostTitleSection`                                                       | 제목·부제목과 `PostMeta`, `Blank`를 조합한 제목 영역 |
+| `entities/post`           | `PostMeta`                                                               | 목록과 상세에서 공유하는 작성자·작성일·댓글 수       |
+| `entities/post`           | `PostListItem`, `PostContent`                                            | 목록 항목 및 텍스트·이미지 본문 표시                 |
+| `widgets/comment-section` | `CommentSection`                                                         | 댓글 수·빈 상태·입력 UI 조합                         |
+| `shared/ui`               | `PageHeader`, `CompactPageHeader`, `Pagination`, `Blank`                 | 헤더, 페이지 이동, 여백                              |
+| `shared/ui`               | `Button`, `IconButton`, `Icon`, `TextField`, `TextFieldSet`, `TextBlock` | 기본 버튼·아이콘·입력·텍스트 UI                      |
+| `shared/ui`               | `DropdownMenu`, `Menu`, `Modal`, `Toast`, `Toaster`, `showToast`         | 메뉴·모달·토스트 UI                                  |
+
+게시글 컴포넌트는 데이터를 props로 받아 표시하고, 페이지는 데이터 조회와 페이지네이션 같은 상태를 관리합니다.
+
+색상·타이포그래피 토큰은 `src/app/styles/index.css`의 `@theme`에 정의합니다. 컴포넌트에서는 토큰 기반 Tailwind 클래스를 사용하고, `className`은 `cn()`으로 조합합니다.
+
+## 커밋·푸시 자동 검사
+
+Husky 훅으로 다음 검사를 실행합니다.
+
+| 시점         | 실행 내용                                                                                                                        |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `git commit` | `lint-staged`: 스테이징된 TS·TSX 파일에 `eslint --fix`와 `prettier --write`, JS·JSON·CSS·Markdown·HTML 파일에 `prettier --write` |
+| `git push`   | `npm run lint && npm run build`: 전체 린트 통과 후 타입 검사와 빌드                                                              |
+
+검사가 실패하면 해당 커밋 또는 푸시가 중단됩니다. 설정은 `.husky/pre-commit`, `.husky/pre-push`, `package.json`에서 관리합니다.
+
+## 협업 규칙
+
+- 브랜치: `{이름}/{숫자}주차`에서 작업하고 `{이름}/main`으로 PR을 올립니다.
+- 커밋 메시지: `feat`, `fix`, `chore`, `refactor`, `docs` 접두사를 사용합니다.
+- PR과 이슈는 `.github/`의 템플릿을 따릅니다.
+- 상세한 구조·코딩 규칙은 [CLAUDE.md](./CLAUDE.md)와 `.claude/rules/`를 참고합니다.
