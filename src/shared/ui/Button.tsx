@@ -25,9 +25,13 @@ const buttonVariants = cva(
       {
         variant: ['outline', 'white'],
         pressed: false,
-        className: 'bg-white hover:bg-gray-90 active:bg-gray-90',
+        className: 'bg-white not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90',
       },
-      { variant: 'text', pressed: false, className: 'hover:bg-gray-90 active:bg-gray-90' },
+      {
+        variant: 'text',
+        pressed: false,
+        className: 'not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90',
+      },
       { variant: ['outline', 'white', 'text'], pressed: true, className: 'bg-gray-90' },
     ],
     defaultVariants: { variant: 'point', pressed: false },
