@@ -1,26 +1,43 @@
 import { useState } from 'react';
 import { CommentField } from './CommentField';
 import { CommentItem } from './CommentItem';
+import { useCreateComment, useDeleteComment } from './commentQueries';
 import type { PostComment } from './types';
 import { LoginModal } from '@/features/auth';
 import type { User } from '@/features/user';
-import { Blank } from '@/shared/ui';
+import { Blank, showToast } from '@/shared/ui';
 
 interface CommentSectionProps {
+  postId: number;
   comments: PostComment[];
   // 없으면 비로그인 상태
   currentUser?: User;
-  onCommentSubmit?: (content: string) => void;
-  onCommentDelete?: (commentId: number) => void;
 }
 
-export function CommentSection({
-  comments,
-  currentUser,
-  onCommentSubmit,
-  onCommentDelete,
-}: CommentSectionProps) {
+export function CommentSection({ postId, comments, currentUser }: CommentSectionProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { mutate: createComment } = useCreateComment(postId);
+  const { mutate: deleteComment } = useDeleteComment(postId);
+
+  function handleCommentSubmit(content: string) {
+    if (!currentUser) return;
+
+    createComment({
+      postId,
+      content,
+      author: { nickname: currentUser.nickname, profileImageUrl: currentUser.profileImageUrl },
+    });
+  }
+
+  function handleCommentDelete(commentId: number) {
+    deleteComment(
+      { postId, commentId },
+      {
+        onSuccess: () => showToast('positive', '삭제가 완료되었습니다!'),
+        onError: () => showToast('negative', '댓글을 삭제하지 못했습니다.'),
+      },
+    );
+  }
 
   // 사용자 id가 아직 없어 닉네임으로 본인 댓글인지 판단한다
   function isMyComment(comment: PostComment) {
@@ -45,7 +62,7 @@ export function CommentSection({
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                onDelete={isMyComment(comment) ? () => onCommentDelete?.(comment.id) : undefined}
+                onDelete={isMyComment(comment) ? () => handleCommentDelete(comment.id) : undefined}
               />
             ))}
           </ul>
@@ -55,7 +72,7 @@ export function CommentSection({
           <CommentField
             currentUser={currentUser}
             onLoginRequest={() => setIsLoginModalOpen(true)}
-            onSubmit={onCommentSubmit}
+            onSubmit={handleCommentSubmit}
           />
         </div>
       </section>

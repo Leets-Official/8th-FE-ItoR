@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router';
 import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
-import { Blank, Button, PageHeader, showToast } from '@/shared/ui';
+import { Blank, Button, PageHeader } from '@/shared/ui';
 import { useAuth } from '@/features/auth';
-import { CommentSection, type PostComment } from '@/features/comment';
+import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';
@@ -14,27 +15,11 @@ export function BlogDetailPage() {
   const commentSectionRef = useRef<HTMLElement>(null);
   const post = getMockPostDetail(Number(postId));
   const { currentUser } = useAuth();
-  // 댓글 API 연동 전이라 작성한 댓글은 이 페이지 상태에만 보관한다
-  const [comments, setComments] = useState<PostComment[]>([]);
-
-  function handleCommentSubmit(content: string) {
-    if (!currentUser) return;
-
-    setComments((prevComments) => [
-      ...prevComments,
-      {
-        id: Date.now(),
-        author: { nickname: currentUser.nickname, profileImageUrl: currentUser.profileImageUrl },
-        content,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
-  }
-
-  function handleCommentDelete(commentId: number) {
-    setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
-    showToast('positive', '삭제가 완료되었습니다!');
-  }
+  const { data: comments = [] } = useQuery({
+    queryKey: commentQueryKeys.list(Number(postId)),
+    queryFn: () => getComments(Number(postId)),
+    enabled: Boolean(post),
+  });
 
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -75,12 +60,7 @@ export function BlogDetailPage() {
 
         <section ref={commentSectionRef} className={`${SECTION_CLASS} scroll-mt-[72px] bg-white`}>
           <div className={CONTENT_CLASS}>
-            <CommentSection
-              comments={comments}
-              currentUser={currentUser}
-              onCommentSubmit={handleCommentSubmit}
-              onCommentDelete={handleCommentDelete}
-            />
+            <CommentSection postId={post.id} comments={comments} currentUser={currentUser} />
           </div>
           <Blank size={64} />
         </section>
