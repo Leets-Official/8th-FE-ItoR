@@ -1,0 +1,6 @@
+node_modules/
+dist/
+package-lock.json
+.agents/
+.github/ISSUE_TEMPLATE/
+.github/PULL_REQUEST_TEMPLATE.md
