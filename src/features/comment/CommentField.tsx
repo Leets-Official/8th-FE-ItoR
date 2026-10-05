@@ -1,4 +1,4 @@
-import { useRef, useState, type FocusEvent, type FormEvent } from 'react';
+import { useRef, useState, type FocusEvent, type SubmitEvent } from 'react';
 import { CommentAuthor } from './CommentAuthor';
 import { submitOnModifierEnter } from './submitOnModifierEnter';
 import type { User } from '@/features/user';
@@ -33,7 +33,7 @@ export function CommentField({
     onLoginRequest();
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedContent = content.trim();
     // 공백만 입력했으면 등록하지 않고 필드만 비운다
