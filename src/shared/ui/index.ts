@@ -17,6 +17,7 @@ export {
   PaginationItem,
   type PaginationDirection,
 } from './Pagination';
+export { Sidebar } from './Sidebar';
 export { TextBlock, type TextBlockProps, type TextBlockVariant } from './TextBlock';
 export { TextField, TextFieldSet, type TextFieldSize } from './TextField';
 export { showToast } from './showToast';

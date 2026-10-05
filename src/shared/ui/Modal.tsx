@@ -67,7 +67,7 @@ export function Modal({
           <div className="flex h-[38px] w-full items-center gap-3">
             <AlertDialogPrimitive.Cancel
               onClick={onCancel}
-              className="flex h-[38px] flex-1 cursor-pointer items-center justify-center rounded-xs border border-gray-96 px-3 py-2 text-14 text-black hover:bg-gray-90 active:bg-gray-90"
+              className="flex h-[38px] flex-1 cursor-pointer items-center justify-center rounded-xs border border-gray-96 px-3 py-2 text-14 text-black outline-none hover:bg-gray-90 focus-visible:bg-gray-90 active:bg-gray-90"
             >
               {cancelLabel}
             </AlertDialogPrimitive.Cancel>
