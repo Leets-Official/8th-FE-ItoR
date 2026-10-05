@@ -19,7 +19,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
       >
-        <NavigateBeforeIcon aria-hidden="true" />
+        <NavigateBeforeIcon aria-hidden="true" className="size-3" />
       </PaginationControl>
       {pages.map((pageNumber) => (
         <PaginationControl
@@ -36,7 +36,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
       >
-        <NavigateBeforeIcon aria-hidden="true" className="rotate-180" />
+        <NavigateBeforeIcon aria-hidden="true" className="size-3 rotate-180" />
       </PaginationControl>
     </nav>
   );
@@ -65,8 +65,10 @@ function PaginationControl({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'flex size-13 items-center justify-center border-2 bg-white text-base transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-        current ? 'border-gitlog-action text-gitlog-action' : 'border-neutral-200 text-neutral-900',
+        'flex size-8 items-center justify-center rounded-xs border bg-white text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        current
+          ? 'border-gitlog-action bg-blue-50 text-gitlog-action'
+          : 'border-zinc-300 text-black/90',
         disabled && 'cursor-not-allowed text-neutral-300',
       )}
     >

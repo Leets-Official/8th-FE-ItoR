@@ -10,3 +10,4 @@ export { default as ErrorOutlineIcon } from './error_outline.svg?react';
 export { default as SettingsIcon } from './settings.svg?react';
 export { default as ClearIcon } from './clear.svg?react';
 export { default as NavigateBeforeIcon } from './navigate_before.svg?react';
+export { default as KakaoIcon } from './kakao.svg?react';
