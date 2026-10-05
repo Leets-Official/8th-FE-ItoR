@@ -35,13 +35,13 @@ src/
 │   │   ├── PostListItem.tsx · PostTitleSection.tsx · PostMeta.tsx · PostContent.tsx
 │   │   ├── types.ts        # PostSummary, PostAuthor, PostDetail …
 │   │   ├── mocks.ts        # API 연동 전 목업 → 연동 후 요청 함수도 이 폴더에
-│   │   ├── formatPostDate.ts
 │   │   └── index.ts        # Public API
-│   ├── auth/               # 로그인 (LoginModal, LoginFields)
-│   └── comment/            # 댓글 영역 (CommentSection)
+│   ├── auth/               # 로그인 (AuthProvider, useAuth, LoginModal, 목업 계정)
+│   ├── comment/            # 댓글 영역 (CommentSection, CommentAuthor)
+│   └── user/               # 도메인 공통 사용자 타입 (User)
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
-│   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge)
+│   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
 │   ├── assets/
 │   │   ├── icons/          # SVG 아이콘
 │   │   └── images/         # 프로필 등 이미지 에셋

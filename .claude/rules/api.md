@@ -27,11 +27,7 @@ export const api = axios.create({
 
 이슈 템플릿의 "권장 추가 구현" 항목에서 API 연동 시 임시방편의 `fetch`/`axios` 직접 호출보다 이 조합을 우선 고려하도록 안내하고 있습니다.
 
-> **참고**: 현재 `package.json`에는 TanStack Query(`@tanstack/react-query`)가 아직 설치되어 있지 않습니다. 사용하려면 먼저 의존성을 추가하세요.
->
-> ```bash
-> npm install @tanstack/react-query
-> ```
+> **참고**: TanStack Query(`@tanstack/react-query`)는 설치되어 있고, `QueryClientProvider`는 [App.tsx](../../src/app/App.tsx)에 있습니다. 댓글([commentApi.ts](../../src/features/comment/commentApi.ts) · [commentQueries.ts](../../src/features/comment/commentQueries.ts))이 첫 적용 예시입니다 — API 연동 전에는 요청 함수가 메모리 목업 저장소로 응답하고, 등록·삭제 성공 시 목록 쿼리를 무효화합니다.
 
 ### Axios Interceptor
 

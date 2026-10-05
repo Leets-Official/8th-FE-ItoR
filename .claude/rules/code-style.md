@@ -22,6 +22,7 @@
 - 컴포넌트는 `function` 선언으로 작성하고, Props는 시그니처에서 구조 분해하며 기본값도 그 자리에서 지정합니다. (`function Button({ variant = 'point', ...props }: ButtonProps)`)
 - 네이티브 요소를 감싸는 컴포넌트는 `ComponentProps<'button'>` 등을 확장하고 나머지 props를 `{...props}`로 전달합니다.
 - 변형·상태별 클래스는 `Record<Variant, string>` 맵(`BOX_CLASS`, `TOAST_STYLE`)으로 분기하고, 조합이 복잡하면 `cva`를 사용합니다. `className`은 항상 `cn()`으로 합칩니다.
+- 이벤트 타입은 실제 이벤트에 맞춰 씁니다. `FormEvent`는 실제로 없는 이벤트라 `@types/react`에서 deprecated이므로 `onSubmit`에는 `SubmitEvent`, `onChange`에는 `ChangeEvent`, `onInput`에는 `InputEvent`를 씁니다. (`FormEventHandler`도 마찬가지로 `SubmitEventHandler` 등을 씁니다.)
 - 코드 주석은 "왜"를 적습니다. 시안 수치나 라이브러리 제약처럼 코드만 봐서 알 수 없는 이유를 남깁니다.
 
 ## 네이밍 컨벤션
