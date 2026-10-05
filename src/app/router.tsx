@@ -1,10 +1,12 @@
 import { createRouter } from '@tanstack/react-router';
+
+import type { AppHeaderVariant } from '@/app/layout/model/header';
+
 import { routeTree } from './routeTree.gen';
-import type { PageHeaderVariant } from '@/shared/ui/header/PageHeader';
 
 declare module '@tanstack/react-router' {
   interface StaticDataRouteOption {
-    headerVariant?: PageHeaderVariant;
+    headerVariant?: AppHeaderVariant;
     headerFormId?: string;
   }
 }

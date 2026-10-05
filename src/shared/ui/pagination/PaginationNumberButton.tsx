@@ -1,17 +1,15 @@
-type PaginationNumberButtonProps = {
+export type PaginationNumberButtonProps = {
+  /** 버튼에 표시하고 클릭 시 전달할 페이지 번호입니다. */
   pageNumber: number;
+  /** 현재 페이지 표시와 `aria-current`를 적용합니다. */
   isCurrent?: boolean;
+  /** 페이지를 선택할 수 없게 합니다. */
   disabled?: boolean;
+  /** 선택한 페이지 번호를 전달받습니다. */
   onClick?: (pageNumber: number) => void;
 };
 
-/**
- * pageNumber: 버튼에 표시할 페이지 번호
- * isCurrent: 현재 페이지 여부
- * disabled: 버튼 비활성화 여부
- * onClick: 숫자 버튼 클릭 시 실행할 함수
- * @returns 해당 페이지 번호를 표시하는 버튼
- */
+/** Pagination에서 개별 페이지를 선택할 때 사용하는 숫자 버튼입니다. */
 export function PaginationNumberButton({
   pageNumber,
   isCurrent = false,

@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 
-import { useToast } from '@/shared/ui/toast/toastContext';
+import { useToast } from '@/shared/ui/toast/hooks/useToast';
 
 /** @returns 필수 입력값 검사와 임시 게시 동작을 수행하는 함수 */
 export function useWriteBlogSubmit() {
@@ -29,7 +29,7 @@ export function useWriteBlogSubmit() {
       return;
     }
 
-    // TODO API 연결 후 블로그 생성이 성공하면 생성된 ID의 상세 페이지로 이동하고 저장 완료 토스트를 표시합니다.
+    // TODO(API): 생성 요청 성공 후 반환된 게시글 ID의 상세 페이지로 이동합니다.
     await navigate({ to: '/detail' });
     showToast({ variant: 'positive', message: '저장되었습니다!' });
   }

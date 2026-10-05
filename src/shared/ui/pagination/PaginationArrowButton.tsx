@@ -1,17 +1,15 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@/shared/assets/icons/icons';
 
-type PaginationArrowButtonProps = {
+export type PaginationArrowButtonProps = {
+  /** 이동할 페이지 그룹 방향입니다. */
   direction: 'previous' | 'next';
+  /** 이동할 그룹이 없을 때 버튼을 비활성화합니다. */
   disabled?: boolean;
+  /** 버튼을 눌렀을 때 실행할 동작입니다. */
   onClick?: () => void;
 };
 
-/**
- * direction: 이전·다음 이동 방향
- * disabled: 버튼 비활성화 여부
- * onClick: 버튼 클릭 시 실행할 함수
- * @returns 방향과 상태에 맞는 페이지 이동 버튼
- */
+/** Pagination에서 이전 또는 다음 페이지 그룹으로 이동할 때 사용하는 화살표 버튼입니다. */
 export function PaginationArrowButton({
   direction,
   disabled = false,

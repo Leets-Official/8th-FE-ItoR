@@ -18,6 +18,7 @@ export default {
         positive: 'var(--color-positive)',
         negative: 'var(--color-negative)',
         point: 'var(--color-point)',
+        'surface-overlay': 'var(--surface-overlay)',
         primary: {
           6: 'var(--color-primary-6)',
         },

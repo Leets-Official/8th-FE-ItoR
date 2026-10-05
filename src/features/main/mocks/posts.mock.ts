@@ -1,0 +1,86 @@
+import type { MainPost } from '../model/post';
+
+export const MAIN_POSTS_MOCK: readonly MainPost[] = [
+  {
+    id: 'post-1',
+    title: 'TanStack Router를 처음 적용하며 배운 점',
+    subtitle: '파일 기반 라우팅 구조를 구성하고 타입 안전한 경로를 사용해봤습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 27.2026.',
+    commentCount: 3,
+  },
+  {
+    id: 'post-2',
+    title: '공통 UI 컴포넌트 설계 기록',
+    subtitle: '반복되는 버튼과 입력 컴포넌트의 책임을 나누는 기준을 정리했습니다.',
+    nickname: '프론트개발자',
+    createdAt: 'Sep 26.2026.',
+    commentCount: 5,
+  },
+  {
+    id: 'post-3',
+    title: 'React에서 입력 상태 관리하기',
+    subtitle: 'controlled input을 사용하며 알게 된 상태 관리 방식을 공유합니다.',
+    nickname: '리액트초보',
+    createdAt: 'Sep 25.2026.',
+    commentCount: 1,
+  },
+  {
+    id: 'post-4',
+    title: '접근 가능한 아이콘 버튼 만들기',
+    subtitle: '스크린 리더가 버튼의 동작을 이해할 수 있도록 접근 가능한 이름을 추가했습니다.',
+    nickname: '웹접근성',
+    createdAt: 'Sep 24.2026.',
+    commentCount: 8,
+  },
+  {
+    id: 'post-5',
+    title: 'Tailwind CSS 디자인 토큰 정리',
+    subtitle: '색상과 타이포그래피를 프로젝트 전반에서 일관되게 사용하는 방법을 기록했습니다.',
+    nickname: '디자인시스템',
+    createdAt: 'Sep 23.2026.',
+    commentCount: 2,
+  },
+  {
+    id: 'post-6',
+    title: '블로그 상세 페이지 UI 구현',
+    subtitle: '본문과 댓글, 작성자 정보를 섹션 단위로 조립했습니다.',
+    nickname: 'UI개발자',
+    createdAt: 'Sep 22.2026.',
+    commentCount: 4,
+  },
+  {
+    id: 'post-7',
+    title: '텍스트와 이미지 블록 다루기',
+    subtitle: '작성 순서를 유지하는 블록 기반 본문 편집 구조를 실험했습니다.',
+    nickname: '기록하는개발자',
+    createdAt: 'Sep 21.2026.',
+    commentCount: 7,
+  },
+  {
+    id: 'post-8',
+    title: 'TypeScript 판별 유니온 활용',
+    subtitle: 'variant별로 허용되는 props를 타입 단계에서 제한해봤습니다.',
+    nickname: '타입마스터',
+    createdAt: 'Sep 20.2026.',
+    commentCount: 6,
+  },
+  {
+    id: 'post-9',
+    title: '모바일 반응형 UI 점검',
+    subtitle: '390px 이하 화면에서 컴포넌트 간격과 너비를 확인했습니다.',
+    nickname: '반응형연구소',
+    createdAt: 'Sep 19.2026.',
+    commentCount: 0,
+  },
+  {
+    id: 'post-10',
+    title: '첫 번째 주차를 마무리하며',
+    subtitle: '프로젝트 설정부터 공통 컴포넌트와 페이지 UI까지 작업한 내용을 돌아봅니다.',
+    nickname: 'ItoR',
+    createdAt: 'Sep 18.2026.',
+    commentCount: 9,
+  },
+];
+
+export const MAIN_TOTAL_PAGES_MOCK = 10;

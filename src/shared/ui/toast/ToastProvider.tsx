@@ -1,15 +1,16 @@
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { CustomToast } from './CustomToast';
-import { ToastContext, type Toast } from './toastContext';
+import { Toast } from './Toast';
+import { ToastContext, type Toast as ToastState } from './toastContext';
 
-type ToastProviderProps = {
+export type ToastProviderProps = {
+  /** 전역 토스트를 사용할 애플리케이션 영역입니다. */
   children: ReactNode;
 };
 
-/** @returns 앱 전역에서 호출한 토스트를 최상단 중앙에 표시하는 Provider */
+/** `useToast`로 요청한 메시지를 화면 상단에 3초 동안 표시하는 Provider입니다. */
 export function ToastProvider({ children }: ToastProviderProps) {
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
     if (!toast) {
@@ -21,7 +22,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
     return () => window.clearTimeout(timeoutId);
   }, [toast]);
 
-  function showToast(nextToast: Toast) {
+  function showToast(nextToast: ToastState) {
     setToast(nextToast);
   }
 
@@ -34,8 +35,8 @@ export function ToastProvider({ children }: ToastProviderProps) {
       {children}
 
       {toast ? (
-        <div className="fixed left-1/2 top-[137px] z-[60] -translate-x-1/2">
-          <CustomToast variant={toast.variant} message={toast.message} />
+        <div className="fixed left-1/2 top-[88px] z-[60] -translate-x-1/2">
+          <Toast variant={toast.variant} message={toast.message} />
         </div>
       ) : null}
     </ToastContext.Provider>

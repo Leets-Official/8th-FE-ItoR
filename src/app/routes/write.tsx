@@ -5,7 +5,7 @@ import WriteBlogPage from '@/pages/write/WriteBlogPage';
 export const Route = createFileRoute('/write')({
   component: WriteBlogPage,
   staticData: {
-    headerVariant: 'ver3',
+    headerVariant: 'write',
     headerFormId: WRITE_BLOG_FORM_ID,
   },
 });
