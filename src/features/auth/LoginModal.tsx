@@ -32,6 +32,12 @@ export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: Login
     onOpenChange(nextOpen);
   }
 
+  // 회원가입 페이지로 넘어갈 때 모달이 열린 채 남지 않게 먼저 닫는다
+  function handleSignUp() {
+    handleOpenChange(false);
+    onSignUp?.();
+  }
+
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -109,7 +115,7 @@ export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: Login
             <button
               type="button"
               className="rounded-xs px-2 pt-0.5 pb-1 text-12 text-gray-56 hover:bg-gray-20 active:bg-gray-20"
-              onClick={onSignUp}
+              onClick={handleSignUp}
             >
               또는 회원가입
             </button>

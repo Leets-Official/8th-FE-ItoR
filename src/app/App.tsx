@@ -12,7 +12,14 @@ function InitialLoginModal() {
   const { currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(!currentUser);
 
-  return <LoginModal open={isOpen} onOpenChange={setIsOpen} />;
+  // RouterProvider 바깥이라 useNavigate를 쓸 수 없어 router로 직접 이동한다
+  return (
+    <LoginModal
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      onSignUp={() => router.navigate('/signup')}
+    />
+  );
 }
 
 function App() {

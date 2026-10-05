@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { LoginModal, useAuth } from '@/features/auth';
 import { MOCK_POSTS, PostListItem } from '@/features/post';
 import { Blank, Modal, PageHeader, Pagination, Sidebar } from '@/shared/ui';
@@ -7,6 +7,7 @@ import { Blank, Modal, PageHeader, Pagination, Sidebar } from '@/shared/ui';
 const POSTS_PER_PAGE = 10;
 
 export function BlogSearchPage() {
+  const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,7 +46,11 @@ export function BlogSearchPage() {
         onStart={handleStart}
         onLogout={() => setIsLogoutModalOpen(true)}
       />
-      <LoginModal open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen} />
+      <LoginModal
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        onSignUp={() => navigate('/signup')}
+      />
       <Modal
         open={isLogoutModalOpen}
         onOpenChange={setIsLogoutModalOpen}

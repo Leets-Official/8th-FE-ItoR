@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { CommentField } from './CommentField';
 import { CommentItem } from './CommentItem';
 import { useCreateComment, useDeleteComment } from './commentQueries';
@@ -15,6 +16,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postId, comments, currentUser }: CommentSectionProps) {
+  const navigate = useNavigate();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { mutate: createComment } = useCreateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
@@ -76,7 +78,11 @@ export function CommentSection({ postId, comments, currentUser }: CommentSection
           />
         </div>
       </section>
-      <LoginModal open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen} />
+      <LoginModal
+        open={isLoginModalOpen}
+        onOpenChange={setIsLoginModalOpen}
+        onSignUp={() => navigate('/signup')}
+      />
     </>
   );
 }
