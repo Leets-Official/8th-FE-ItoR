@@ -8,24 +8,31 @@ type LoginTextFieldProps = Omit<
 
 interface LoginFieldsProps {
   errorMessage?: ReactNode;
+  // 에러 메시지가 어느 입력칸의 문제인지 스크린 리더에 알린다
+  invalidField?: 'email' | 'password';
   emailInputProps?: LoginTextFieldProps;
   passwordInputProps?: LoginTextFieldProps;
 }
 
 export function LoginFields({
   errorMessage,
+  invalidField = 'password',
   emailInputProps,
   passwordInputProps,
 }: LoginFieldsProps) {
   const errorId = useId();
+  const errorProps = errorMessage
+    ? { 'aria-describedby': errorId, 'aria-invalid': true }
+    : undefined;
 
   return (
-    <div className="flex w-[312px] max-w-full min-w-60 flex-col items-start gap-2 px-4 py-1">
+    <div className="flex w-full max-w-[344px] min-w-60 flex-col items-start gap-2 px-4 py-1">
       <TextField
         type="email"
         name="email"
         placeholder="이메일"
         autoComplete="email"
+        {...(invalidField === 'email' && errorProps)}
         {...emailInputProps}
       />
       <TextField
@@ -33,8 +40,7 @@ export function LoginFields({
         name="password"
         placeholder="비밀번호"
         autoComplete="current-password"
-        aria-describedby={errorMessage ? errorId : undefined}
-        aria-invalid={errorMessage ? true : undefined}
+        {...(invalidField === 'password' && errorProps)}
         {...passwordInputProps}
       />
       {errorMessage && (

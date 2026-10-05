@@ -35,12 +35,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     () => ({
       currentUser,
       login(email, password) {
-        const user = loginWithMockAccount(email, password);
-        if (!user) return false;
+        const result = loginWithMockAccount(email, password);
+        if ('error' in result) return result.error;
 
-        setCurrentUser(user);
-        writeStoredUser(user);
-        return true;
+        setCurrentUser(result.user);
+        writeStoredUser(result.user);
+        return undefined;
       },
       logout() {
         setCurrentUser(undefined);
