@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DetailRouteImport } from './routes/detail'
-import { Route as RegisterRouteImport } from './routes/register'
+import { Route as MyRouteRouteImport } from './routes/my/route'
 import { Route as WriteRouteImport } from './routes/write'
+import { Route as MyIndexRouteImport } from './routes/my/index'
+import { Route as MyEditRouteImport } from './routes/my/edit'
+import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as RegisterEmailRouteImport } from './routes/register/email'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,9 +28,9 @@ const DetailRoute = DetailRouteImport.update({
   path: '/detail',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+const MyRouteRoute = MyRouteRouteImport.update({
+  id: '/my',
+  path: '/my',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WriteRoute = WriteRouteImport.update({
@@ -34,39 +38,96 @@ const WriteRoute = WriteRouteImport.update({
   path: '/write',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyIndexRoute = MyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MyRouteRoute,
+} as any)
+const MyEditRoute = MyEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => MyRouteRoute,
+} as any)
+const RegisterIndexRoute = RegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterEmailRoute = RegisterEmailRouteImport.update({
+  id: '/register/email',
+  path: '/register/email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/my': typeof MyRouteRouteWithChildren
   '/detail': typeof DetailRoute
-  '/register': typeof RegisterRoute
   '/write': typeof WriteRoute
+  '/my/edit': typeof MyEditRoute
+  '/register/email': typeof RegisterEmailRoute
+  '/my/': typeof MyIndexRoute
+  '/register/': typeof RegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/detail': typeof DetailRoute
-  '/register': typeof RegisterRoute
   '/write': typeof WriteRoute
+  '/my/edit': typeof MyEditRoute
+  '/register/email': typeof RegisterEmailRoute
+  '/my': typeof MyIndexRoute
+  '/register': typeof RegisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/my': typeof MyRouteRouteWithChildren
   '/detail': typeof DetailRoute
-  '/register': typeof RegisterRoute
   '/write': typeof WriteRoute
+  '/my/edit': typeof MyEditRoute
+  '/register/email': typeof RegisterEmailRoute
+  '/my/': typeof MyIndexRoute
+  '/register/': typeof RegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/detail' | '/register' | '/write'
+  fullPaths:
+    | '/'
+    | '/my'
+    | '/detail'
+    | '/write'
+    | '/my/edit'
+    | '/register/email'
+    | '/my/'
+    | '/register/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/detail' | '/register' | '/write'
-  id: '__root__' | '/' | '/detail' | '/register' | '/write'
+  to:
+    | '/'
+    | '/detail'
+    | '/write'
+    | '/my/edit'
+    | '/register/email'
+    | '/my'
+    | '/register'
+  id:
+    | '__root__'
+    | '/'
+    | '/my'
+    | '/detail'
+    | '/write'
+    | '/my/edit'
+    | '/register/email'
+    | '/my/'
+    | '/register/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MyRouteRoute: typeof MyRouteRouteWithChildren
   DetailRoute: typeof DetailRoute
-  RegisterRoute: typeof RegisterRoute
   WriteRoute: typeof WriteRoute
+  RegisterEmailRoute: typeof RegisterEmailRoute
+  RegisterIndexRoute: typeof RegisterIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,11 +146,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DetailRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
+    '/my': {
+      id: '/my'
+      path: '/my'
+      fullPath: '/my'
+      preLoaderRoute: typeof MyRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/write': {
@@ -99,14 +160,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WriteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my/': {
+      id: '/my/'
+      path: '/'
+      fullPath: '/my/'
+      preLoaderRoute: typeof MyIndexRouteImport
+      parentRoute: typeof MyRouteRoute
+    }
+    '/my/edit': {
+      id: '/my/edit'
+      path: '/edit'
+      fullPath: '/my/edit'
+      preLoaderRoute: typeof MyEditRouteImport
+      parentRoute: typeof MyRouteRoute
+    }
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register/'
+      preLoaderRoute: typeof RegisterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register/email': {
+      id: '/register/email'
+      path: '/register/email'
+      fullPath: '/register/email'
+      preLoaderRoute: typeof RegisterEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface MyRouteRouteChildren {
+  MyEditRoute: typeof MyEditRoute
+  MyIndexRoute: typeof MyIndexRoute
+}
+
+const MyRouteRouteChildren: MyRouteRouteChildren = {
+  MyEditRoute: MyEditRoute,
+  MyIndexRoute: MyIndexRoute,
+}
+
+const MyRouteRouteWithChildren =
+  MyRouteRoute._addFileChildren(MyRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MyRouteRoute: MyRouteRouteWithChildren,
   DetailRoute: DetailRoute,
-  RegisterRoute: RegisterRoute,
   WriteRoute: WriteRoute,
+  RegisterEmailRoute: RegisterEmailRoute,
+  RegisterIndexRoute: RegisterIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
