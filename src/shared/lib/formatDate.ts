@@ -1,6 +1,6 @@
 const HOUR_IN_MS = 60 * 60 * 1000;
 
-export function formatPostDate(isoDate: string, now = Date.now()) {
+export function formatDate(isoDate: string, now = Date.now()) {
   const date = new Date(isoDate);
   const elapsedHours = Math.floor(Math.max(0, now - date.getTime()) / HOUR_IN_MS);
 
