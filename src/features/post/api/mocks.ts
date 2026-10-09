@@ -2,6 +2,7 @@ import type { PostContentBlock, PostDetail, PostSummary } from '../model/types';
 import blogDetailPhoto from '@/shared/assets/images/blog_detail_photo.svg';
 import blogDetailText from '@/shared/assets/images/blog_detail_text.svg';
 import blogPhoto from '@/shared/assets/images/blog_photo.svg';
+import { MOCK_USERS } from '@/features/user';
 
 const SHORT_EXCERPT = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
 const LONG_EXCERPT =
@@ -27,7 +28,8 @@ export const MOCK_POSTS: PostSummary[] = Array.from({ length: 25 }, (_, index) =
     id,
     title: '32 Title one line',
     excerpt,
-    author: { nickname: '닉네임', introduction: '한 줄 소개' },
+    // 사용자 페이지에서 다른 사람의 글 목록을 볼 수 있게 작성자를 번갈아 넣는다
+    author: MOCK_USERS[index % MOCK_USERS.length],
     createdAt: new Date(2025, 1, 17).toISOString(),
     commentCount: 0,
     thumbnailUrl: hasThumbnail ? blogPhoto : undefined,

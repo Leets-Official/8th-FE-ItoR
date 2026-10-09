@@ -48,7 +48,7 @@ src/
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/
-│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile
+│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile, api/mocks.ts (MOCK_USERS)
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
 │   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
