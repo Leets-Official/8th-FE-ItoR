@@ -9,6 +9,8 @@ export function RootLayout() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isSignUpPage = pathname === SIGN_UP_PATH;
+  // 이메일 회원가입(/signup/email)처럼 회원가입 하위 페이지도 포함한다
+  const isSignUpFlow = pathname.startsWith(SIGN_UP_PATH);
 
   // 이미 회원가입 페이지면 같은 주소가 히스토리에 쌓이지 않게 팝업만 닫는다
   function handleSignUp() {
@@ -17,7 +19,7 @@ export function RootLayout() {
 
   // 비로그인으로 접속하면 로그인 모달부터 띄우되, 회원가입하러 바로 들어온 경우는 제외한다
   return (
-    <LoginModalProvider initialOpen={!currentUser && !isSignUpPage} onSignUp={handleSignUp}>
+    <LoginModalProvider initialOpen={!currentUser && !isSignUpFlow} onSignUp={handleSignUp}>
       <Outlet />
     </LoginModalProvider>
   );

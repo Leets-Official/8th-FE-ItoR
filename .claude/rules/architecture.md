@@ -30,7 +30,9 @@ src/
 │   └── styles/             # 전역 스타일 (Tailwind 임포트, @theme 디자인 토큰)
 ├── pages/                  # 라우트 하나 = 파일 하나 (하위 폴더 없음)
 │   ├── BlogSearchPage.tsx  # / — 블로그 찾기
-│   └── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
+│   ├── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
+│   ├── SignUpPage.tsx      # /signup — 회원가입 방법 선택
+│   └── SignUpFormPage.tsx  # /signup/email — 가입 정보 입력
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
 │   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
@@ -38,8 +40,8 @@ src/
 │   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
 │   ├── auth/               # 로그인
-│   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel
-│   │   ├── api/            # mocks.ts — 목업 계정·로그인
+│   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel · SignUpForm
+│   │   ├── api/            # mocks.ts — 목업 계정·로그인·회원가입
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/

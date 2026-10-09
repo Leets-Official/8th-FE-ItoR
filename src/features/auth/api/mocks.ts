@@ -1,9 +1,15 @@
-import type { AuthUser, LoginError } from '../model/types';
+import type { AuthUser, LoginError, SignUpError, SignUpInput } from '../model/types';
 
-// 인증 API 연동 전까지 로그인에 쓰는 목업 계정
-const MOCK_ACCOUNTS: (AuthUser & { password: string })[] = [
+type MockAccount = AuthUser & Pick<SignUpInput, 'password'> & Partial<SignUpInput>;
+
+// 인증 API 연동 전까지 로그인에 쓰는 목업 계정. 회원가입하면 새로고침 전까지 여기에 추가된다
+const MOCK_ACCOUNTS: MockAccount[] = [
   { email: 'admin@gitlog.com', password: '1111', nickname: '닉네임', introduction: '한 줄 소개' },
 ];
+
+function toAuthUser({ email, nickname, profileImageUrl, introduction }: MockAccount): AuthUser {
+  return { email, nickname, profileImageUrl, introduction };
+}
 
 export function loginWithMockAccount(
   email: string,
@@ -13,12 +19,17 @@ export function loginWithMockAccount(
   if (!account) return { error: 'unregistered-email' };
   if (account.password !== password) return { error: 'wrong-password' };
 
-  return {
-    user: {
-      email: account.email,
-      nickname: account.nickname,
-      profileImageUrl: account.profileImageUrl,
-      introduction: account.introduction,
-    },
-  };
+  return { user: toAuthUser(account) };
+}
+
+export function signUpWithMockAccount(
+  input: SignUpInput,
+): { user: AuthUser } | { error: SignUpError } {
+  if (MOCK_ACCOUNTS.some((candidate) => candidate.email === input.email)) {
+    return { error: 'duplicate-email' };
+  }
+
+  const account: MockAccount = { ...input };
+  MOCK_ACCOUNTS.push(account);
+  return { user: toAuthUser(account) };
 }

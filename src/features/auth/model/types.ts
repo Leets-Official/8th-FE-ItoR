@@ -7,3 +7,16 @@ export interface AuthUser extends User {
 }
 
 export type LoginError = 'unregistered-email' | 'wrong-password';
+
+export interface SignUpInput {
+  email: string;
+  password: string;
+  name: string;
+  // YYYY-MM-DD
+  birthDate: string;
+  nickname: string;
+  introduction?: string;
+  profileImageUrl?: string;
+}
+
+export type SignUpError = 'duplicate-email';
