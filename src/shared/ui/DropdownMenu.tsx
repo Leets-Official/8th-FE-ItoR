@@ -36,16 +36,31 @@ export function DropdownMenuContent({
   );
 }
 
+// destructive: 삭제하기처럼 되돌릴 수 없는 동작을 빨간 글자로 표시한다
+export type DropdownMenuItemVariant = 'default' | 'destructive';
+
+const ITEM_TEXT_CLASS: Record<DropdownMenuItemVariant, string> = {
+  default: 'text-black',
+  destructive: 'text-negative',
+};
+
 interface DropdownMenuItemProps extends ComponentProps<typeof DropdownMenuPrimitive.Item> {
+  variant?: DropdownMenuItemVariant;
   selected?: boolean;
 }
 
-export function DropdownMenuItem({ selected = false, className, ...props }: DropdownMenuItemProps) {
+export function DropdownMenuItem({
+  variant = 'default',
+  selected = false,
+  className,
+  ...props
+}: DropdownMenuItemProps) {
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
       className={cn(
-        'flex h-[42px] w-40 cursor-pointer items-center px-3 pt-2 pb-3 text-14 text-black outline-none',
+        'flex h-[42px] w-40 cursor-pointer items-center px-3 pt-2 pb-3 text-14 outline-none',
+        ITEM_TEXT_CLASS[variant],
         selected ? 'bg-gray-90' : 'bg-white data-highlighted:bg-gray-90',
         className,
       )}

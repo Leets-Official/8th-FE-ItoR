@@ -23,6 +23,10 @@ export function BlogDetailPage() {
     enabled: Boolean(post),
   });
 
+  // TODO: 게시글 수정 페이지·삭제 API가 생기면 연결한다
+  function handleEdit() {}
+  function handleDelete() {}
+
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -50,6 +54,9 @@ export function BlogDetailPage() {
         className="sticky top-0 z-10"
         onMenu={openSidebar}
         onChat={handleChat}
+        // 로그인하지 않았으면 더보기 버튼을 숨긴다
+        onEdit={currentUser ? handleEdit : undefined}
+        onDelete={currentUser ? handleDelete : undefined}
       />
       <main>
         <section className={`${SECTION_CLASS} bg-white`}>

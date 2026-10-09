@@ -1,6 +1,12 @@
 import type { MouseEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Button } from './Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './DropdownMenu';
 import { IconButton } from './IconButton';
 import { cn } from '@/shared/lib/utils';
 
@@ -13,10 +19,10 @@ interface PageHeaderProps {
   onMenu?: MouseEventHandler<HTMLButtonElement>;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   onChat?: MouseEventHandler<HTMLButtonElement>;
-  onMore?: MouseEventHandler<HTMLButtonElement>;
-  onDelete?: MouseEventHandler<HTMLButtonElement>;
+  // detail에서는 더보기 메뉴의 수정하기·삭제하기 항목이 되고, 둘 다 없으면 더보기 버튼을 숨긴다
+  onEdit?: () => void;
+  onDelete?: () => void;
   onPublish?: MouseEventHandler<HTMLButtonElement>;
-  onEdit?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
 }
 
@@ -26,7 +32,6 @@ export function PageHeader({
   onMenu,
   onCreate,
   onChat,
-  onMore,
   onDelete,
   onPublish,
   onEdit,
@@ -63,9 +68,23 @@ export function PageHeader({
       )}
 
       {variant === 'detail' && (
-        <div className="flex h-10 w-[88px] items-center gap-2">
+        <div className="flex h-10 items-center gap-2">
           <IconButton icon="chat" label="채팅" onClick={onChat} />
-          <IconButton icon="more_vert" label="더보기" onClick={onMore} />
+          {(onEdit || onDelete) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <IconButton icon="more_vert" label="더보기" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {onEdit && <DropdownMenuItem onSelect={onEdit}>수정하기</DropdownMenuItem>}
+                {onDelete && (
+                  <DropdownMenuItem variant="destructive" onSelect={onDelete}>
+                    삭제하기
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       )}
 
@@ -74,7 +93,7 @@ export function PageHeader({
           <button
             type="button"
             className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-negative hover:bg-gray-90 active:bg-gray-90"
-            onClick={onDelete}
+            onClick={() => onDelete?.()}
           >
             삭제하기
           </button>
@@ -92,7 +111,7 @@ export function PageHeader({
         <button
           type="button"
           className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-black hover:bg-gray-90 active:bg-gray-90"
-          onClick={onEdit}
+          onClick={() => onEdit?.()}
         >
           수정하기
         </button>
