@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import {
   hasKakaoSignUpPrompt,
@@ -6,8 +6,9 @@ import {
   KAKAO_SIGN_UP_PATH,
   LoginModalProvider,
   useAuth,
+  useLoginModal,
 } from '@/features/auth';
-import { Modal } from '@/shared/ui';
+import { Modal, Sidebar, SidebarContext, type SidebarContextValue } from '@/shared/ui';
 
 const SIGN_UP_PATH = '/signup';
 
@@ -28,9 +29,67 @@ export function RootLayout() {
   // 비로그인으로 접속하면 로그인 모달부터 띄우되, 회원가입하러 바로 들어온 경우는 제외한다
   return (
     <LoginModalProvider initialOpen={!currentUser && !isSignUpFlow} onSignUp={handleSignUp}>
-      <Outlet />
-      <KakaoSignUpPrompt />
+      <SidebarLayout>
+        <Outlet />
+        <KakaoSignUpPrompt />
+      </SidebarLayout>
     </LoginModalProvider>
+  );
+}
+
+interface SidebarLayoutProps {
+  children: ReactNode;
+}
+
+// 사이드바와 로그아웃 확인 모달을 앱에 하나만 두고, 페이지는 useSidebar()로 연다.
+// 시작하기에서 로그인 모달을 열어야 해서 LoginModalProvider 안쪽에 둔다
+function SidebarLayout({ children }: SidebarLayoutProps) {
+  const { currentUser, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const value = useMemo<SidebarContextValue>(
+    () => ({ openSidebar: () => setIsSidebarOpen(true) }),
+    [],
+  );
+
+  function handleStart() {
+    setIsSidebarOpen(false);
+    openLoginModal();
+  }
+
+  function handleMyBlog() {
+    if (!currentUser) return;
+    setIsSidebarOpen(false);
+    navigate(`/users/${encodeURIComponent(currentUser.nickname)}`);
+  }
+
+  function handleLogout() {
+    logout();
+    setIsSidebarOpen(false);
+  }
+
+  return (
+    <SidebarContext.Provider value={value}>
+      {children}
+      <Sidebar
+        open={isSidebarOpen}
+        onOpenChange={setIsSidebarOpen}
+        profile={currentUser}
+        onStart={handleStart}
+        onMyBlog={handleMyBlog}
+        onLogout={() => setIsLogoutModalOpen(true)}
+      />
+      <Modal
+        open={isLogoutModalOpen}
+        onOpenChange={setIsLogoutModalOpen}
+        title="로그아웃을 진행할게요"
+        confirmLabel="로그아웃"
+        onConfirm={handleLogout}
+      />
+    </SidebarContext.Provider>
   );
 }
 

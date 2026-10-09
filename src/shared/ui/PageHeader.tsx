@@ -4,8 +4,8 @@ import { Button } from './Button';
 import { IconButton } from './IconButton';
 import { cn } from '@/shared/lib/utils';
 
-// basic: 메뉴·로고만 있는 헤더 (회원가입 등)
-export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic';
+// basic: 메뉴·로고만 있는 헤더 (회원가입 등), profile: 수정하기 버튼이 있는 헤더 (내 프로필 설정)
+export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic' | 'profile';
 
 interface PageHeaderProps {
   variant?: PageHeaderVariant;
@@ -16,6 +16,7 @@ interface PageHeaderProps {
   onMore?: MouseEventHandler<HTMLButtonElement>;
   onDelete?: MouseEventHandler<HTMLButtonElement>;
   onPublish?: MouseEventHandler<HTMLButtonElement>;
+  onEdit?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
 }
 
@@ -28,6 +29,7 @@ export function PageHeader({
   onMore,
   onDelete,
   onPublish,
+  onEdit,
   className,
 }: PageHeaderProps) {
   return (
@@ -84,6 +86,16 @@ export function PageHeader({
             게시하기
           </button>
         </div>
+      )}
+
+      {variant === 'profile' && (
+        <button
+          type="button"
+          className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-black hover:bg-gray-90 active:bg-gray-90"
+          onClick={onEdit}
+        >
+          수정하기
+        </button>
       )}
     </header>
   );

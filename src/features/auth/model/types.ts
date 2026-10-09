@@ -2,8 +2,13 @@ import type { User } from '@/features/user';
 
 export interface AuthUser extends User {
   email: string;
+  name: string;
+  // YYYY-MM-DD
+  birthDate: string;
   // 사이드바 프로필에 보이는 한 줄 소개
   introduction?: string;
+  // 있으면 소셜 가입 계정 — 비밀번호가 없다
+  provider?: SocialProvider;
 }
 
 export type LoginError = 'unregistered-email' | 'wrong-password';

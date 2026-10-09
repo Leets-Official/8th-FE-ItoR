@@ -25,12 +25,14 @@ src/
 ├── app/                    # 앱 전체 설정·조립
 │   ├── App.tsx             # RouterProvider, 전역 <Toaster />
 │   ├── router.tsx          # 라우터 설정 (createBrowserRouter)
-│   ├── RootLayout.tsx      # 모든 페이지를 감싸는 레이아웃 라우트 (LoginModalProvider + <Outlet />)
+│   ├── RootLayout.tsx      # 모든 페이지를 감싸는 레이아웃 라우트 (LoginModalProvider + 사이드바·로그아웃 모달 + <Outlet />)
 │   ├── main.tsx            # 엔트리 — 전역 스타일 임포트, App 마운트
 │   └── styles/             # 전역 스타일 (Tailwind 임포트, @theme 디자인 토큰)
 ├── pages/                  # 라우트 하나 = 파일 하나 (하위 폴더 없음)
 │   ├── BlogSearchPage.tsx  # / — 블로그 찾기
 │   ├── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
+│   ├── UserBlogPage.tsx    # /users/:nickname — 사용자 프로필·작성 글 (내 것이면 마이페이지)
+│   ├── ProfilePage.tsx     # /profile — 내 프로필 설정 (보기 전용)
 │   ├── SignUpPage.tsx      # /signup — 회원가입 방법 선택
 │   ├── SignUpFormPage.tsx  # /signup/email · /signup/kakao — 가입 정보 입력 (provider prop으로 구분)
 │   └── KakaoCallbackPage.tsx # /oauth/kakao — 카카오 인가 코드를 받는 Redirect URI
@@ -41,12 +43,12 @@ src/
 │   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
 │   ├── auth/               # 로그인
-│   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel · SignUpForm
+│   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel · SignUpForm · AccountInfo
 │   │   ├── api/            # mocks.ts — 목업 계정·로그인, kakaoAuth.ts — 카카오 인가 URL 이동
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/
-│   └── user/               # 도메인 공통 사용자 타입 — model/types.ts (User)
+│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
 │   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
@@ -66,7 +68,7 @@ src/
   | `model/`  | 도메인 타입, 상태를 소유하고 나눠 주는 Provider·Context·훅 | `types`, `AuthProvider`, `useLoginModal` |
   | `lib/`    | 그 도메인에서만 쓰는 유틸 함수                             | `submitOnModifierEnter`                  |
   - Provider는 JSX를 렌더링하더라도 역할이 상태 소유라 `model/`에 둡니다.
-  - 필요한 하위 폴더만 만듭니다. (예: `user`는 `model/`만 있음)
+  - 필요한 하위 폴더만 만듭니다. (예: `user`는 `model/`·`ui/`만 있음)
 
 - 도메인 폴더는 처음 필요해질 때 만들고, 빈 폴더를 미리 만들지 않습니다.
 - **`pages`에는 하위 폴더를 만들지 않고 `{이름}Page.tsx` 파일만 둡니다.** 페이지는 상태 관리와 조립만 하고, 화면 조각은 `features`·`shared`에 둡니다.
@@ -117,5 +119,5 @@ app → pages → features → shared
 ## 라우팅
 
 - 라우팅은 `react-router`의 `createBrowserRouter`로 [router.tsx](../../src/app/router.tsx)에서 설정합니다. [App.tsx](../../src/app/App.tsx)는 `react-router/dom`의 `RouterProvider`와 공통 UI를 배치합니다. 새 페이지는 `src/pages/{이름}Page.tsx`로 만들고 `router.tsx`에서 `RootLayout`의 `children` 배열에 추가합니다.
-- **라우터 기능(`useNavigate`, `useLocation`)이 필요한 공통 UI는 [RootLayout.tsx](../../src/app/RootLayout.tsx)에 둡니다.** URL이 없는 레이아웃 라우트라 `pages`가 아닌 `app`에 두며, 자식 라우트가 바뀌어도 다시 마운트되지 않습니다. 로그인 모달이 여기에 하나만 있고, 페이지에서 `useLoginModal()`의 `openLoginModal()`로 엽니다. 도메인 컴포넌트에는 `onLoginRequest` 같은 콜백으로 내려줍니다. `App.tsx`는 `RouterProvider` 바깥이라 라우터 훅을 쓸 수 없습니다.
+- **라우터 기능(`useNavigate`, `useLocation`)이 필요한 공통 UI는 [RootLayout.tsx](../../src/app/RootLayout.tsx)에 둡니다.** URL이 없는 레이아웃 라우트라 `pages`가 아닌 `app`에 두며, 자식 라우트가 바뀌어도 다시 마운트되지 않습니다. 로그인 모달과 사이드바(+ 로그아웃 확인 모달)가 여기에 하나씩만 있고, 페이지에서 `useLoginModal()`의 `openLoginModal()`, `useSidebar()`의 `openSidebar()`로 엽니다. 헤더는 페이지마다 변형·동작이 달라 각 페이지에 두고 `onMenu={openSidebar}`만 연결합니다. 도메인 컴포넌트에는 `onLoginRequest` 같은 콜백으로 내려줍니다. `App.tsx`는 `RouterProvider` 바깥이라 라우터 훅을 쓸 수 없습니다.
 - 새 코드의 위치는 위 "어디에 둘까" 표의 판단 질문으로 정합니다.

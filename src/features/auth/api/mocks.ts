@@ -4,11 +4,26 @@ type MockAccount = AuthUser & Partial<SignUpInput>;
 
 // 인증 API 연동 전까지 로그인에 쓰는 목업 계정. 회원가입하면 새로고침 전까지 여기에 추가된다
 const MOCK_ACCOUNTS: MockAccount[] = [
-  { email: 'admin@gitlog.com', password: '1111', nickname: '닉네임', introduction: '한 줄 소개' },
+  {
+    email: 'admin@gitlog.com',
+    password: '1111',
+    name: '김릿츠',
+    birthDate: '2000-01-01',
+    nickname: '닉네임',
+    introduction: '한 줄 소개',
+  },
 ];
 
-function toAuthUser({ email, nickname, profileImageUrl, introduction }: MockAccount): AuthUser {
-  return { email, nickname, profileImageUrl, introduction };
+function toAuthUser({
+  email,
+  name,
+  birthDate,
+  nickname,
+  profileImageUrl,
+  introduction,
+  provider,
+}: MockAccount): AuthUser {
+  return { email, name, birthDate, nickname, profileImageUrl, introduction, provider };
 }
 
 export function loginWithMockAccount(

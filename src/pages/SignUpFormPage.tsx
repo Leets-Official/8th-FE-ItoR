@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router';
 import {
   redirectToKakaoAuth,
   SignUpForm,
-  useAuth,
   useLoginModal,
   type SocialProvider,
 } from '@/features/auth';
-import { Modal, PageHeader, Sidebar } from '@/shared/ui';
+import { Modal, PageHeader, useSidebar } from '@/shared/ui';
 
 interface SignUpFormPageProps {
   // /signup/kakao처럼 소셜 계정으로 가입할 때
@@ -16,16 +15,10 @@ interface SignUpFormPageProps {
 
 // /signup/email · /signup/kakao — 가입 정보 입력
 export function SignUpFormPage({ provider }: SignUpFormPageProps) {
-  const { currentUser } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { openSidebar } = useSidebar();
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
-
-  const handleStart = () => {
-    setIsSidebarOpen(false);
-    openLoginModal();
-  };
 
   // 확인·로그인하기·ESC 어느 쪽으로 닫아도 메인으로 보낸다.
   // 뒤로 가기로 다 쓴 가입 폼에 돌아오지 않게 히스토리를 교체한다
@@ -44,17 +37,7 @@ export function SignUpFormPage({ provider }: SignUpFormPageProps) {
 
   return (
     <div className="min-h-svh bg-white">
-      <PageHeader
-        variant="basic"
-        className="sticky top-0 z-10"
-        onMenu={() => setIsSidebarOpen(true)}
-      />
-      <Sidebar
-        open={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-        profile={currentUser}
-        onStart={handleStart}
-      />
+      <PageHeader variant="basic" className="sticky top-0 z-10" onMenu={openSidebar} />
       {/* 제목 영역은 회색 배경이라 흰 배경인 Blank 대신 pt-8·pb-5로 시안의 32px·20px 여백을 준다 */}
       <section className="flex w-full flex-col items-center bg-gray-96 pt-8 pb-5">
         <h1 className="w-full max-w-[688px] px-4 py-3 text-24 font-medium text-black">회원가입</h1>

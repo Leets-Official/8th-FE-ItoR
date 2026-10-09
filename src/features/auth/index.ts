@@ -1,3 +1,4 @@
+export { AccountInfo } from './ui/AccountInfo';
 export { AuthProvider } from './model/AuthProvider';
 export {
   getKakaoReturnPath,
