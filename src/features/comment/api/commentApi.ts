@@ -1,4 +1,4 @@
-import type { PostComment } from './types';
+import type { PostComment } from '../model/types';
 import type { User } from '@/features/user';
 
 // 댓글 API 연동 전이라 메모리에 둔 목업 저장소로 응답한다 (새로고침하면 초기화)

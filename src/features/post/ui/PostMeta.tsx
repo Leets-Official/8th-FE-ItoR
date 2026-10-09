@@ -1,4 +1,4 @@
-import type { PostSummary } from './types';
+import type { PostSummary } from '../model/types';
 import defaultProfile from '@/shared/assets/images/profile_20.svg';
 import { formatDate } from '@/shared/lib/formatDate';
 import { cn } from '@/shared/lib/utils';

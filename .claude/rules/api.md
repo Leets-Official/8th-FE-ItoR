@@ -27,7 +27,7 @@ export const api = axios.create({
 
 이슈 템플릿의 "권장 추가 구현" 항목에서 API 연동 시 임시방편의 `fetch`/`axios` 직접 호출보다 이 조합을 우선 고려하도록 안내하고 있습니다.
 
-> **참고**: TanStack Query(`@tanstack/react-query`)는 설치되어 있고, `QueryClientProvider`는 [App.tsx](../../src/app/App.tsx)에 있습니다. 댓글([commentApi.ts](../../src/features/comment/commentApi.ts) · [commentQueries.ts](../../src/features/comment/commentQueries.ts))이 첫 적용 예시입니다 — API 연동 전에는 요청 함수가 메모리 목업 저장소로 응답하고, 등록·삭제 성공 시 목록 쿼리를 무효화합니다.
+> **참고**: TanStack Query(`@tanstack/react-query`)는 설치되어 있고, `QueryClientProvider`는 [App.tsx](../../src/app/App.tsx)에 있습니다. 댓글([commentApi.ts](../../src/features/comment/api/commentApi.ts) · [commentQueries.ts](../../src/features/comment/api/commentQueries.ts))이 첫 적용 예시입니다 — API 연동 전에는 요청 함수가 메모리 목업 저장소로 응답하고, 등록·삭제 성공 시 목록 쿼리를 무효화합니다.
 
 ### Axios Interceptor
 
@@ -45,13 +45,13 @@ api.interceptors.response.use(
 
 ### TanStack Query 사용 예시
 
-API 요청 함수는 해당 도메인 폴더(`src/features/{도메인}/`)에 작성하고, 도메인의 `index.ts`로 공개합니다. 조회(`getPosts`)와 생성·수정·삭제(`createPost`) 요청 모두 같은 도메인 폴더에 둡니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
+API 요청 함수는 해당 도메인의 `api/` 폴더(`src/features/{도메인}/api/`)에 작성하고, 도메인의 `index.ts`로 공개합니다. 조회(`getPosts`)와 생성·수정·삭제(`createPost`) 요청 모두 같은 `api/` 폴더에 둡니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
 
 ```ts
-// src/features/post/getPosts.ts
+// src/features/post/api/getPosts.ts
 import { api } from '@/shared/api/instance';
 
-import type { PostSummary } from './types';
+import type { PostSummary } from '../model/types';
 
 export const getPosts = () => api.get<PostSummary[]>('/posts').then((res) => res.data);
 ```

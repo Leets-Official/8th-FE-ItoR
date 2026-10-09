@@ -1,4 +1,4 @@
-import type { AuthUser, LoginError } from './types';
+import type { AuthUser, LoginError } from '../model/types';
 
 // 인증 API 연동 전까지 로그인에 쓰는 목업 계정
 const MOCK_ACCOUNTS: (AuthUser & { password: string })[] = [

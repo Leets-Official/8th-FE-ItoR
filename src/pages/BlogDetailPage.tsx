@@ -4,7 +4,7 @@ import { Link, useParams } from 'react-router';
 import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Blank, Button, PageHeader } from '@/shared/ui';
-import { useAuth } from '@/features/auth';
+import { useAuth, useLoginModal } from '@/features/auth';
 import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
@@ -15,6 +15,7 @@ export function BlogDetailPage() {
   const commentSectionRef = useRef<HTMLElement>(null);
   const post = getMockPostDetail(Number(postId));
   const { currentUser } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const { data: comments = [] } = useQuery({
     queryKey: commentQueryKeys.list(Number(postId)),
     queryFn: () => getComments(Number(postId)),
@@ -60,7 +61,12 @@ export function BlogDetailPage() {
 
         <section ref={commentSectionRef} className={`${SECTION_CLASS} scroll-mt-[72px] bg-white`}>
           <div className={CONTENT_CLASS}>
-            <CommentSection postId={post.id} comments={comments} currentUser={currentUser} />
+            <CommentSection
+              postId={post.id}
+              comments={comments}
+              currentUser={currentUser}
+              onLoginRequest={openLoginModal}
+            />
           </div>
           <Blank size={64} />
         </section>

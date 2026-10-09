@@ -25,20 +25,25 @@ src/
 ├── app/                    # 앱 전체 설정·조립
 │   ├── App.tsx             # RouterProvider, 전역 <Toaster />
 │   ├── router.tsx          # 라우터 설정 (createBrowserRouter)
+│   ├── RootLayout.tsx      # 모든 페이지를 감싸는 레이아웃 라우트 (LoginModalProvider + <Outlet />)
 │   ├── main.tsx            # 엔트리 — 전역 스타일 임포트, App 마운트
 │   └── styles/             # 전역 스타일 (Tailwind 임포트, @theme 디자인 토큰)
 ├── pages/                  # 라우트 하나 = 파일 하나 (하위 폴더 없음)
 │   ├── BlogSearchPage.tsx  # / — 블로그 찾기
 │   └── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
-├── features/               # 도메인별 폴더 — 컴포넌트·타입·목업·유틸을 함께 둠
+├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
-│   │   ├── PostListItem.tsx · PostTitleSection.tsx · PostMeta.tsx · PostContent.tsx
-│   │   ├── types.ts        # PostSummary, PostAuthor, PostDetail …
-│   │   ├── mocks.ts        # API 연동 전 목업 → 연동 후 요청 함수도 이 폴더에
+│   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
+│   │   ├── api/            # mocks.ts — API 연동 전 목업 → 연동 후 요청 함수
+│   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
-│   ├── auth/               # 로그인 (AuthProvider, useAuth, LoginModal, 목업 계정)
-│   ├── comment/            # 댓글 영역 (CommentSection, CommentAuthor)
-│   └── user/               # 도메인 공통 사용자 타입 (User)
+│   ├── auth/               # 로그인
+│   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel
+│   │   ├── api/            # mocks.ts — 목업 계정·로그인
+│   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
+│   │   └── index.ts
+│   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/
+│   └── user/               # 도메인 공통 사용자 타입 — model/types.ts (User)
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
 │   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
@@ -49,18 +54,28 @@ src/
 └── vite-env.d.ts
 ```
 
-- **도메인 폴더는 평평하게 둡니다.** `ui/`·`model/` 같은 하위 폴더 없이 파일을 바로 둡니다. 파일이 10개를 넘어 찾기 어려워지면 그때 `components/` 등으로 나눕니다.
+- **도메인 폴더 안은 책임에 따라 한 단계만 나눕니다.** 하위 폴더 안에 또 폴더를 만들지 않고, 모든 도메인이 같은 기준을 따릅니다.
+
+  | 하위 폴더 | 담는 것                                                    | 예시                                     |
+  | --------- | ---------------------------------------------------------- | ---------------------------------------- |
+  | `ui/`     | 화면 조각 컴포넌트                                         | `PostListItem`, `LoginModal`             |
+  | `api/`    | 데이터 출처 — 요청 함수, 쿼리 훅·키, 연동 전 목업          | `commentApi`, `commentQueries`, `mocks`  |
+  | `model/`  | 도메인 타입, 상태를 소유하고 나눠 주는 Provider·Context·훅 | `types`, `AuthProvider`, `useLoginModal` |
+  | `lib/`    | 그 도메인에서만 쓰는 유틸 함수                             | `submitOnModifierEnter`                  |
+  - Provider는 JSX를 렌더링하더라도 역할이 상태 소유라 `model/`에 둡니다.
+  - 필요한 하위 폴더만 만듭니다. (예: `user`는 `model/`만 있음)
+
 - 도메인 폴더는 처음 필요해질 때 만들고, 빈 폴더를 미리 만들지 않습니다.
 - **`pages`에는 하위 폴더를 만들지 않고 `{이름}Page.tsx` 파일만 둡니다.** 페이지는 상태 관리와 조립만 하고, 화면 조각은 `features`·`shared`에 둡니다.
 
 ### 어디에 둘까
 
-| 위치                | 담는 것                             | 판단 질문                                     | 예시                               |
-| ------------------- | ----------------------------------- | --------------------------------------------- | ---------------------------------- |
-| `app`               | 라우터, Provider, 전역 스타일       | 앱 전체에 한 번만 필요한가?                   | `App.tsx`, `QueryClientProvider`   |
-| `pages`             | 라우트 하나에 대응하는 화면         | URL이 있는가?                                 | `BlogSearchPage`, `BlogDetailPage` |
-| `features/{도메인}` | 특정 도메인 데이터·행동을 아는 코드 | 게시글·댓글·로그인 같은 도메인을 알아야 하나? | `PostListItem`, `LoginModal`, 목업 |
-| `shared`            | 도메인을 모르는 재사용 코드         | 블로그가 아닌 프로젝트에서도 쓸 수 있는가?    | `Button`, `cn()`, axios 인스턴스   |
+| 위치                | 담는 것                                 | 판단 질문                                     | 예시                               |
+| ------------------- | --------------------------------------- | --------------------------------------------- | ---------------------------------- |
+| `app`               | 라우터, 레이아웃, Provider, 전역 스타일 | 앱 전체에 한 번만 필요한가?                   | `App.tsx`, `RootLayout.tsx`        |
+| `pages`             | 라우트 하나에 대응하는 화면             | URL이 있는가?                                 | `BlogSearchPage`, `BlogDetailPage` |
+| `features/{도메인}` | 특정 도메인 데이터·행동을 아는 코드     | 게시글·댓글·로그인 같은 도메인을 알아야 하나? | `PostListItem`, `LoginModal`, 목업 |
+| `shared`            | 도메인을 모르는 재사용 코드             | 블로그가 아닌 프로젝트에서도 쓸 수 있는가?    | `Button`, `cn()`, axios 인스턴스   |
 
 - 처음에는 쓰는 도메인 폴더에 두고, 도메인을 모르는 코드가 두 번째 사용처에서 필요해지면 `shared`로 올립니다. 미리 올리지 않습니다.
 
@@ -71,20 +86,21 @@ app → pages → features → shared
 ```
 
 - **위쪽은 아래쪽만 import합니다.** `shared`는 `features`·`pages`·`app`을 import하지 않습니다.
-- **도메인끼리는 서로 import할 수 있지만 순환 import는 금지합니다.** (예: `comment` → `auth`의 `LoginModal` ✅, 이때 `auth` → `comment` ❌) 순환이 생기면 공통 부분을 `shared`로 내리거나 페이지에서 조합합니다.
+- **도메인끼리는 서로 import할 수 있지만 순환 import는 금지합니다.** (예: `comment` → `user`의 `User` 타입 ✅, 이때 `user` → `comment` ❌) 순환이 생기면 공통 부분을 `shared`로 내리거나 페이지에서 조합합니다.
 
 ### import 경로와 Public API 규칙
 
 - **도메인 폴더는 `index.ts`로만 공개합니다.** 바깥에서는 도메인 폴더 루트로 import하고, 내부 파일 경로로 들어가지 않습니다.
   ```ts
   import { MOCK_POSTS, PostListItem } from '@/features/post'; // ✅
-  import { PostListItem } from '@/features/post/PostListItem'; // ❌ 내부 경로 직접 접근
+  import { PostListItem } from '@/features/post/ui/PostListItem'; // ❌ 내부 경로 직접 접근
   ```
 - `index.ts`에는 바깥에서 쓰는 것(컴포넌트, 도메인 타입, API 함수, 외부에서 쓰는 변형 타입)만 이름을 하나씩 나열해 re-export합니다. `export *`는 쓰지 않고, 내부 전용 상수·Props 타입·하위 컴포넌트는 공개하지 않습니다. 타입만 공개할 때는 `export type { … }`을 씁니다.
 - **같은 도메인 폴더(또는 `shared`의 같은 하위 폴더) 안에서는 상대 경로로 import합니다.** 자기 자신의 `index.ts`를 거치면 순환 참조가 생길 수 있습니다.
   ```ts
-  // features/post/PostListItem.tsx
-  import type { PostSummary } from './types';
+  // features/post/ui/PostListItem.tsx
+  import type { PostSummary } from '../model/types';
+  import { PostMeta } from './PostMeta';
   // shared/ui/Button.tsx
   import { Icon } from './Icon';
   ```
@@ -97,5 +113,6 @@ app → pages → features → shared
 
 ## 라우팅
 
-- 라우팅은 `react-router`의 `createBrowserRouter`로 [router.tsx](../../src/app/router.tsx)에서 설정합니다. [App.tsx](../../src/app/App.tsx)는 `react-router/dom`의 `RouterProvider`와 공통 UI를 배치합니다. 새 페이지는 `src/pages/{이름}Page.tsx`로 만들고 `router.tsx`의 라우트 배열에 추가합니다.
+- 라우팅은 `react-router`의 `createBrowserRouter`로 [router.tsx](../../src/app/router.tsx)에서 설정합니다. [App.tsx](../../src/app/App.tsx)는 `react-router/dom`의 `RouterProvider`와 공통 UI를 배치합니다. 새 페이지는 `src/pages/{이름}Page.tsx`로 만들고 `router.tsx`에서 `RootLayout`의 `children` 배열에 추가합니다.
+- **라우터 기능(`useNavigate`, `useLocation`)이 필요한 공통 UI는 [RootLayout.tsx](../../src/app/RootLayout.tsx)에 둡니다.** URL이 없는 레이아웃 라우트라 `pages`가 아닌 `app`에 두며, 자식 라우트가 바뀌어도 다시 마운트되지 않습니다. 로그인 모달이 여기에 하나만 있고, 페이지에서 `useLoginModal()`의 `openLoginModal()`로 엽니다. 도메인 컴포넌트에는 `onLoginRequest` 같은 콜백으로 내려줍니다. `App.tsx`는 `RouterProvider` 바깥이라 라우터 훅을 쓸 수 없습니다.
 - 새 코드의 위치는 위 "어디에 둘까" 표의 판단 질문으로 정합니다.

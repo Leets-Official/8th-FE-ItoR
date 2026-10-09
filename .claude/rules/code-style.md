@@ -46,7 +46,7 @@
 | 컴포넌트 파일        | 컴포넌트 이름과 같은 `PascalCase.tsx`  | `Button.tsx`, `PostListItem.tsx`                       |
 | 페이지 파일          | `{이름}Page.tsx` (`pages/` 바로 아래)  | `pages/BlogSearchPage.tsx`                             |
 | 컴포넌트가 아닌 모듈 | camelCase (JSX가 있으면 `.tsx`)        | `showToast.tsx`, `utils.ts`, `instance.ts`, `mocks.ts` |
-| 도메인 타입 파일     | `{도메인}/types.ts`                    | `features/post/types.ts`                               |
+| 도메인 타입 파일     | `{도메인}/model/types.ts`              | `features/post/model/types.ts`                         |
 | Public API · barrel  | `index.ts`                             | `features/post/index.ts`, `shared/ui/index.ts`         |
 | 에셋(SVG·이미지)     | snake_case, 아이콘은 Figma 레이어 이름 | `error_outline.svg`, `profile_20.svg`                  |
 

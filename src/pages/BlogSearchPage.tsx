@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { LoginModal, useAuth } from '@/features/auth';
+import { Link } from 'react-router';
+import { useAuth, useLoginModal } from '@/features/auth';
 import { MOCK_POSTS, PostListItem } from '@/features/post';
 import { Blank, Modal, PageHeader, Pagination, Sidebar } from '@/shared/ui';
 
 const POSTS_PER_PAGE = 10;
 
 export function BlogSearchPage() {
-  const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const [currentPage, setCurrentPage] = useState(1);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const pageCount = Math.ceil(MOCK_POSTS.length / POSTS_PER_PAGE);
@@ -24,7 +23,7 @@ export function BlogSearchPage() {
 
   const handleStart = () => {
     setIsSidebarOpen(false);
-    setIsLoginModalOpen(true);
+    openLoginModal();
   };
 
   const handleLogout = () => {
@@ -45,11 +44,6 @@ export function BlogSearchPage() {
         profile={currentUser}
         onStart={handleStart}
         onLogout={() => setIsLogoutModalOpen(true)}
-      />
-      <LoginModal
-        open={isLoginModalOpen}
-        onOpenChange={setIsLoginModalOpen}
-        onSignUp={() => navigate('/signup')}
       />
       <Modal
         open={isLogoutModalOpen}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CommentAuthor } from './CommentAuthor';
-import type { PostComment } from './types';
+import type { PostComment } from '../model/types';
 import {
   Blank,
   DropdownMenu,

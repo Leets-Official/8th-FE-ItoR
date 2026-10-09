@@ -1,6 +1,6 @@
-export { getMockPostDetail, MOCK_POSTS } from './mocks';
-export type { PostAuthor, PostContentBlock, PostDetail, PostSummary } from './types';
-export { PostContent } from './PostContent';
-export { PostListItem } from './PostListItem';
-export { PostMeta } from './PostMeta';
-export { PostTitleSection } from './PostTitleSection';
+export { getMockPostDetail, MOCK_POSTS } from './api/mocks';
+export type { PostAuthor, PostContentBlock, PostDetail, PostSummary } from './model/types';
+export { PostContent } from './ui/PostContent';
+export { PostListItem } from './ui/PostListItem';
+export { PostMeta } from './ui/PostMeta';
+export { PostTitleSection } from './ui/PostTitleSection';
