@@ -1,8 +1,8 @@
 import { useRef, useState, type ChangeEvent, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_90.svg';
-import { Blank, Button, showToast, TextFieldSet } from '@/shared/ui';
+import { Blank, Button, Icon, showToast, TextFieldSet } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
-import type { SignUpInput } from '../model/types';
+import type { SignUpInput, SocialProvider } from '../model/types';
 import { useAuth } from '../model/useAuth';
 
 type SignUpField =
@@ -47,24 +47,35 @@ function formatBirthDate(value: string) {
   return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)].filter(Boolean).join('-');
 }
 
-// 한 줄 소개는 선택 항목이라 필수에서 뺀다
-const REQUIRED_FIELDS = SIGN_UP_FIELDS.filter((field) => field !== 'introduction');
+// 한 줄 소개는 선택 항목, 소셜 가입은 비밀번호 칸이 없어 필수에서 뺀다
+const OPTIONAL_FIELDS: SignUpField[] = ['introduction'];
+const PASSWORD_FIELDS: SignUpField[] = ['password', 'passwordConfirm'];
 
-type SignUpValues = Required<Omit<SignUpInput, 'profileImageUrl'>> & {
+const SOCIAL_PROVIDER_LABEL: Record<SocialProvider, string> = {
+  kakao: '카카오 로그인',
+};
+
+function getRequiredFields(provider?: SocialProvider) {
+  return SIGN_UP_FIELDS.filter(
+    (field) => !OPTIONAL_FIELDS.includes(field) && !(provider && PASSWORD_FIELDS.includes(field)),
+  );
+}
+
+type SignUpValues = Required<Omit<SignUpInput, 'profileImageUrl' | 'provider'>> & {
   passwordConfirm: string;
 };
 
 // 입력 순서대로 검사해, 조건이 맞지 않는 칸마다 하나의 문구를 돌려준다
-function validateSignUp(values: SignUpValues): SignUpFieldErrors {
+function validateSignUp(values: SignUpValues, provider?: SocialProvider): SignUpFieldErrors {
   const errors: SignUpFieldErrors = {};
-  REQUIRED_FIELDS.forEach((field) => {
+  getRequiredFields(provider).forEach((field) => {
     if (!values[field]) errors[field] = ERROR_MESSAGE.required;
   });
 
   if (!errors.email && !EMAIL_PATTERN.test(values.email)) {
     errors.email = ERROR_MESSAGE.invalidEmail;
   }
-  if (!errors.passwordConfirm && values.password !== values.passwordConfirm) {
+  if (!provider && !errors.passwordConfirm && values.password !== values.passwordConfirm) {
     errors.passwordConfirm = ERROR_MESSAGE.passwordMismatch;
   }
   if (!errors.name && values.name.length > NAME_MAX_LENGTH) {
@@ -92,11 +103,13 @@ function readAsDataUrl(file: File) {
 }
 
 interface SignUpFormProps {
+  // 있으면 소셜 가입 — 비밀번호 칸 대신 연결된 소셜 로그인을 보여준다
+  provider?: SocialProvider;
   onSuccess?: () => void;
   className?: string;
 }
 
-export function SignUpForm({ onSuccess, className }: SignUpFormProps) {
+export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) {
   const { signUp } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // 새로고침 후에도 사이드바 프로필에 보이도록 object URL 대신 data URL로 보관한다
@@ -145,12 +158,13 @@ export function SignUpForm({ onSuccess, className }: SignUpFormProps) {
       introduction: read('introduction'),
     };
 
-    const nextErrors = validateSignUp(values);
+    const nextErrors = validateSignUp(values, provider);
     if (Object.keys(nextErrors).length === 0) {
       const { email, password, name, nickname } = values;
       const error = signUp({
         email,
-        password,
+        password: provider ? undefined : password,
+        provider,
         name,
         birthDate,
         nickname,
@@ -209,6 +223,16 @@ export function SignUpForm({ onSuccess, className }: SignUpFormProps) {
         </div>
       </div>
 
+      {provider && (
+        <div className={cn(SECTION_CLASS, 'flex flex-col gap-3 px-4 py-3')}>
+          <p className="px-1.5 text-14 font-light text-gray-56">소셜 로그인</p>
+          {/* 가입에 쓰는 소셜 계정을 보여주기만 하고 바꿀 수는 없다 */}
+          <div className="flex items-center gap-2.5 self-stretch rounded-sm bg-gray-90 px-4 py-3 text-14 font-light text-gray-56">
+            <Icon name="kakao" size={24} className="text-gray-7" />
+            {SOCIAL_PROVIDER_LABEL[provider]}
+          </div>
+        </div>
+      )}
       <TextFieldSet
         className={SECTION_CLASS}
         label="이메일"
@@ -218,24 +242,28 @@ export function SignUpForm({ onSuccess, className }: SignUpFormProps) {
         placeholder="이메일"
         autoComplete="email"
       />
-      <TextFieldSet
-        className={SECTION_CLASS}
-        label="비밀번호"
-        type="password"
-        name="password"
-        error={errors.password}
-        placeholder="······"
-        autoComplete="new-password"
-      />
-      <TextFieldSet
-        className={SECTION_CLASS}
-        label="비밀번호 확인"
-        type="password"
-        name="passwordConfirm"
-        error={errors.passwordConfirm}
-        placeholder="······"
-        autoComplete="new-password"
-      />
+      {!provider && (
+        <>
+          <TextFieldSet
+            className={SECTION_CLASS}
+            label="비밀번호"
+            type="password"
+            name="password"
+            error={errors.password}
+            placeholder="······"
+            autoComplete="new-password"
+          />
+          <TextFieldSet
+            className={SECTION_CLASS}
+            label="비밀번호 확인"
+            type="password"
+            name="passwordConfirm"
+            error={errors.passwordConfirm}
+            placeholder="······"
+            autoComplete="new-password"
+          />
+        </>
+      )}
       <TextFieldSet
         className={SECTION_CLASS}
         label="이름"

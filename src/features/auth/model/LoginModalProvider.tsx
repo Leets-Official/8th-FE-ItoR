@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
+import { redirectToKakaoAuth } from '../api/kakaoAuth';
 import { LoginModal } from '../ui/LoginModal';
 import { LoginModalContext, type LoginModalContextValue } from './loginModalContext';
 
@@ -25,7 +26,12 @@ export function LoginModalProvider({
   return (
     <LoginModalContext.Provider value={value}>
       {children}
-      <LoginModal open={isOpen} onOpenChange={setIsOpen} onSignUp={onSignUp} />
+      <LoginModal
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        onKakaoLogin={() => redirectToKakaoAuth()}
+        onSignUp={onSignUp}
+      />
     </LoginModalContext.Provider>
   );
 }

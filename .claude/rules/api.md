@@ -21,6 +21,7 @@ export const api = axios.create({
 ```
 
 - `baseURL`은 `VITE_API_BASE_URL` 환경 변수로 주입됩니다. 로컬 개발 시 프로젝트 루트에 `.env`(`.gitignore`에 포함되어 커밋되지 않음)를 만들고 값을 설정하세요.
+- 카카오 로그인·회원가입은 `.env`에 `VITE_KAKAO_REST_API_KEY`(카카오 디벨로퍼스 > 앱 키 > REST API 키)를 설정합니다. Redirect URI는 기본값 `{origin}/oauth/kakao`이고, 다르게 쓰려면 `VITE_KAKAO_REDIRECT_URI`로 지정합니다. 어느 쪽이든 카카오 디벨로퍼스 앱 설정의 Redirect URI와 정확히 같아야 합니다. 카카오 로그인 화면은 카카오가 띄우므로 앱에서 따로 만들지 않습니다. ([kakaoAuth.ts](../../src/features/auth/api/kakaoAuth.ts))
 - 새 API 요청은 `fetch`나 별도의 `axios.create()` 대신 이 인스턴스(`api`)를 재사용합니다.
 
 ## 권장 패턴: TanStack Query + Axios Interceptor

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { SignUpPanel, useAuth, useLoginModal } from '@/features/auth';
+import { redirectToKakaoAuth, SignUpPanel, useAuth, useLoginModal } from '@/features/auth';
 import { PageHeader, Sidebar } from '@/shared/ui';
 
 export function SignUpPage() {
@@ -32,7 +32,10 @@ export function SignUpPage() {
         <h1 className="w-full max-w-[688px] px-4 py-3 text-24 font-medium text-black">회원가입</h1>
       </section>
       <main className="flex w-full flex-col items-center px-4">
-        <SignUpPanel onEmailSignUp={() => navigate('/signup/email')} />
+        <SignUpPanel
+          onEmailSignUp={() => navigate('/signup/email')}
+          onKakaoSignUp={() => redirectToKakaoAuth()}
+        />
       </main>
     </div>
   );

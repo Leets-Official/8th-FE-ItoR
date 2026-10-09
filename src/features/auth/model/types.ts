@@ -8,9 +8,14 @@ export interface AuthUser extends User {
 
 export type LoginError = 'unregistered-email' | 'wrong-password';
 
+// 비밀번호 대신 소셜 계정으로 로그인하는 가입 방식
+export type SocialProvider = 'kakao';
+
 export interface SignUpInput {
   email: string;
-  password: string;
+  // 소셜 가입이면 비밀번호 없이 provider로 로그인한다
+  password?: string;
+  provider?: SocialProvider;
   name: string;
   // YYYY-MM-DD
   birthDate: string;

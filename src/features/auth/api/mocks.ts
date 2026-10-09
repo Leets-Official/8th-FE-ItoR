@@ -1,6 +1,6 @@
 import type { AuthUser, LoginError, SignUpError, SignUpInput } from '../model/types';
 
-type MockAccount = AuthUser & Pick<SignUpInput, 'password'> & Partial<SignUpInput>;
+type MockAccount = AuthUser & Partial<SignUpInput>;
 
 // 인증 API 연동 전까지 로그인에 쓰는 목업 계정. 회원가입하면 새로고침 전까지 여기에 추가된다
 const MOCK_ACCOUNTS: MockAccount[] = [
@@ -17,7 +17,8 @@ export function loginWithMockAccount(
 ): { user: AuthUser } | { error: LoginError } {
   const account = MOCK_ACCOUNTS.find((candidate) => candidate.email === email.trim());
   if (!account) return { error: 'unregistered-email' };
-  if (account.password !== password) return { error: 'wrong-password' };
+  // 소셜 가입 계정은 비밀번호가 없어 이메일 로그인이 되지 않는다
+  if (!account.password || account.password !== password) return { error: 'wrong-password' };
 
   return { user: toAuthUser(account) };
 }

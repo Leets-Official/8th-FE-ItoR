@@ -32,7 +32,8 @@ src/
 │   ├── BlogSearchPage.tsx  # / — 블로그 찾기
 │   ├── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
 │   ├── SignUpPage.tsx      # /signup — 회원가입 방법 선택
-│   └── SignUpFormPage.tsx  # /signup/email — 가입 정보 입력
+│   ├── SignUpFormPage.tsx  # /signup/email · /signup/kakao — 가입 정보 입력 (provider prop으로 구분)
+│   └── KakaoCallbackPage.tsx # /oauth/kakao — 카카오 인가 코드를 받는 Redirect URI
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
 │   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
@@ -41,7 +42,7 @@ src/
 │   │   └── index.ts        # Public API
 │   ├── auth/               # 로그인
 │   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel · SignUpForm
-│   │   ├── api/            # mocks.ts — 목업 계정·로그인·회원가입
+│   │   ├── api/            # mocks.ts — 목업 계정·로그인, kakaoAuth.ts — 카카오 인가 URL 이동
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/

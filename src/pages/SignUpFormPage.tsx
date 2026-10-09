@@ -1,10 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { SignUpForm, useAuth, useLoginModal } from '@/features/auth';
+import {
+  redirectToKakaoAuth,
+  SignUpForm,
+  useAuth,
+  useLoginModal,
+  type SocialProvider,
+} from '@/features/auth';
 import { Modal, PageHeader, Sidebar } from '@/shared/ui';
 
-// /signup/email — 가입 정보 입력
-export function SignUpFormPage() {
+interface SignUpFormPageProps {
+  // /signup/kakao처럼 소셜 계정으로 가입할 때
+  provider?: SocialProvider;
+}
+
+// /signup/email · /signup/kakao — 가입 정보 입력
+export function SignUpFormPage({ provider }: SignUpFormPageProps) {
   const { currentUser } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
@@ -21,6 +32,14 @@ export function SignUpFormPage() {
   const handleCompleteModalOpenChange = (open: boolean) => {
     setIsCompleteModalOpen(open);
     if (!open) navigate('/', { replace: true });
+  };
+
+  // 카카오 가입자는 비밀번호가 없어 이메일 로그인 모달 대신 카카오 로그인으로 보낸다.
+  // 방금 카카오에 로그인했으니 대부분 카카오 화면 없이 바로 돌아온다
+  // TODO: API 연동 후에는 카카오 가입이 끝나면 완료 모달 없이 바로 로그인시킨다
+  const handleLogin = () => {
+    if (provider === 'kakao') redirectToKakaoAuth({ returnPath: '/' });
+    else openLoginModal();
   };
 
   return (
@@ -44,7 +63,7 @@ export function SignUpFormPage() {
         </p>
       </section>
       <main className="flex w-full flex-col items-center">
-        <SignUpForm onSuccess={() => setIsCompleteModalOpen(true)} />
+        <SignUpForm provider={provider} onSuccess={() => setIsCompleteModalOpen(true)} />
       </main>
       {/* 로그인 모달은 RootLayout에 있어 메인으로 이동해도 닫히지 않는다 */}
       <Modal
@@ -53,7 +72,7 @@ export function SignUpFormPage() {
         title="회원가입이 완료되었습니다!"
         cancelLabel="확인"
         confirmLabel="로그인하기"
-        onConfirm={openLoginModal}
+        onConfirm={handleLogin}
       />
     </div>
   );
