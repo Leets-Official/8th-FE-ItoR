@@ -1,4 +1,5 @@
 import type { MouseEventHandler, ReactNode } from 'react';
+import { Link } from 'react-router';
 import { Button } from './Button';
 import { IconButton } from './IconButton';
 import { cn } from '@/shared/lib/utils';
@@ -39,9 +40,13 @@ export function PageHeader({
     >
       <div className="flex h-10 w-[125px] items-center gap-2">
         <IconButton icon="reorder" label="메뉴" onClick={onMenu} />
-        <div className="flex h-10 w-[77px] items-center justify-center">
+        <Link
+          to="/"
+          aria-label="메인으로 이동"
+          className="flex h-10 w-[77px] items-center justify-center"
+        >
           <span className="font-smooch text-[20px] leading-7 text-black">GITLOG</span>
-        </div>
+        </Link>
       </div>
 
       {variant === 'main' && (
