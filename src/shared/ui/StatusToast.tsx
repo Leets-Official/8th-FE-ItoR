@@ -18,13 +18,13 @@ export function StatusToast({ status, message }: StatusToastProps) {
     <div
       role={isError ? 'alert' : 'status'}
       className={cn(
-        'inline-flex min-h-9 items-center gap-1.5 rounded-full border bg-white px-3 py-1.5 text-xs shadow-sm',
+        'mx-auto flex min-h-10 w-max max-w-full items-center gap-1 rounded-full border bg-white/90 px-3 py-2 font-auth text-sm leading-6 backdrop-blur-[2px]',
         isError
           ? 'border-gitlog-danger text-gitlog-danger'
           : 'border-gitlog-success text-gitlog-success',
       )}
     >
-      <Icon className="size-4" aria-hidden="true" />
+      <Icon className="size-6 shrink-0 [&_path]:fill-current" aria-hidden="true" />
       <span>{message}</span>
     </div>
   );

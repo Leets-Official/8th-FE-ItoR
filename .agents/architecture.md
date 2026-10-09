@@ -13,6 +13,9 @@ src/
     App.tsx                # 앱 조립
     routes/                # URL에 연결되는 페이지
     layouts/               # 여러 페이지가 공유하는 레이아웃
+      AppLayout.tsx        # 상태 훅 호출과 화면 조립
+      header/              # 공통 헤더와 페이지별 버튼
+      hooks/               # 레이아웃 로그인 흐름·스크롤
     providers/
       QueryProvider.tsx    # TanStack Query 전역 provider
     styles/global.css      # Tailwind, shadcn 테마, 디자인 토큰
@@ -68,6 +71,14 @@ src/
 - shadcn/ui CLI가 생성한 기본 요소 → `shared/ui/primitives/`
 - URL에 연결되는 페이지 → 라우터 도입 후 `app/routes/`
 - 여러 페이지의 외곽 레이아웃 → `app/layouts/`
+
+### Layout Composition
+
+- `app/layouts/AppLayout.tsx`는 훅을 호출하고 `AppHeader`, `Outlet`, `Toaster`를 조립한다.
+- `app/layouts/header/`의 `AppHeader`는 공통 메뉴와 로그인 창을 조립하고, 페이지별 버튼은 `HomeHeaderActions`, `WriteHeaderActions`, `PostHeaderActions`로 나눈다. 버튼 동작은 콜백으로 전달한다.
+- `app/layouts/hooks/`에는 로그인 후 글쓰기 이동을 관리하는 `useLayoutAuth`와 페이지 이동 시 스크롤을 처리하는 `useRouteScroll`을 둔다.
+- 게시글·댓글 미리보기 상태는 각 기능의 `model/`에 있는 `usePreviewPosts`, `usePreviewComments`가 관리하고, 게시글 이미지 URL은 `posts/model/usePostImageUrls`가 관리한다.
+- 상태 훅은 `AppLayout`에서 한 번씩 호출하고 결과를 `Outlet context`로 전달해 페이지들이 같은 상태를 공유한다. API 연결 시 서버 상태는 기능별 Query 훅으로 관리한다.
 
 ### Feature Folder Convention
 
