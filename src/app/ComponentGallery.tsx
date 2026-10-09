@@ -376,7 +376,7 @@ export function ComponentGallery() {
 
         <PreviewSection title="페이지네이션">
           <div className="flex flex-col gap-6 bg-gitlog-preview p-2">
-            <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
+            <Pagination currentPage={page} totalPages={9} onPageChange={setPage} />
             <div className="flex gap-4">
               <Pagination currentPage={1} totalPages={5} onPageChange={setPage} />
               <Pagination currentPage={3} totalPages={5} onPageChange={setPage} />

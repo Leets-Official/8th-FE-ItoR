@@ -1,6 +1,8 @@
 import { NavigateBeforeIcon } from '@/shared/assets/icons';
 import { cn } from '@/shared/utils/cn';
 
+const PAGE_GROUP_SIZE = 5;
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -10,14 +12,16 @@ interface PaginationProps {
 
 export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
   const page = Math.min(Math.max(1, currentPage), Math.max(1, totalPages));
-  const pages = Array.from({ length: Math.max(0, totalPages) }, (_, index) => index + 1);
+  const startPage = Math.floor((page - 1) / PAGE_GROUP_SIZE) * PAGE_GROUP_SIZE + 1;
+  const visiblePageCount = Math.min(PAGE_GROUP_SIZE, Math.max(0, totalPages - startPage + 1));
+  const pages = Array.from({ length: visiblePageCount }, (_, index) => startPage + index);
 
   return (
-    <nav aria-label="페이지 탐색" className={cn('flex flex-wrap items-center gap-2', className)}>
+    <nav aria-label="페이지 탐색" className={cn('flex items-center gap-2', className)}>
       <PaginationControl
-        label="이전 페이지"
-        disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
+        label="이전 페이지 그룹"
+        disabled={startPage === 1}
+        onClick={() => onPageChange(startPage - PAGE_GROUP_SIZE)}
       >
         <NavigateBeforeIcon aria-hidden="true" className="size-3" />
       </PaginationControl>
@@ -32,9 +36,9 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
         </PaginationControl>
       ))}
       <PaginationControl
-        label="다음 페이지"
-        disabled={page >= totalPages}
-        onClick={() => onPageChange(page + 1)}
+        label="다음 페이지 그룹"
+        disabled={startPage + PAGE_GROUP_SIZE > totalPages}
+        onClick={() => onPageChange(startPage + PAGE_GROUP_SIZE)}
       >
         <NavigateBeforeIcon aria-hidden="true" className="size-3 rotate-180" />
       </PaginationControl>
