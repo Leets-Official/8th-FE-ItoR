@@ -5,7 +5,7 @@ import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/pos
 import { Blank, Button, PageHeader, useSidebar } from '@/shared/ui';
 import { useAuth, useLoginModal } from '@/features/auth';
 import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
-import { UserProfile } from '@/features/user';
+import { getUserPath, UserProfile } from '@/features/user';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';
@@ -54,7 +54,11 @@ export function BlogDetailPage() {
       <main>
         <section className={`${SECTION_CLASS} bg-white`}>
           <Blank size={64} />
-          <PostTitleSection post={post} className="max-w-[688px]" />
+          <PostTitleSection
+            post={post}
+            authorHref={getUserPath(author.nickname)}
+            className="max-w-[688px]"
+          />
         </section>
 
         <section className={`${SECTION_CLASS} bg-white`}>

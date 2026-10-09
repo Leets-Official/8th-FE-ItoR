@@ -8,6 +8,7 @@ import {
   useAuth,
   useLoginModal,
 } from '@/features/auth';
+import { getUserPath } from '@/features/user';
 import { Modal, Sidebar, SidebarContext, type SidebarContextValue } from '@/shared/ui';
 
 const SIGN_UP_PATH = '/signup';
@@ -63,7 +64,7 @@ function SidebarLayout({ children }: SidebarLayoutProps) {
   function handleMyBlog() {
     if (!currentUser) return;
     setIsSidebarOpen(false);
-    navigate(`/users/${encodeURIComponent(currentUser.nickname)}`);
+    navigate(getUserPath(currentUser.nickname));
   }
 
   function handleLogout() {

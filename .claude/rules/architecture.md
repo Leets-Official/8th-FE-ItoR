@@ -48,7 +48,7 @@ src/
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/
-│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile, api/mocks.ts (MOCK_USERS)
+│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile, api/mocks.ts (MOCK_USERS), lib/getUserPath.ts
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
 │   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
@@ -68,7 +68,7 @@ src/
   | `model/`  | 도메인 타입, 상태를 소유하고 나눠 주는 Provider·Context·훅 | `types`, `AuthProvider`, `useLoginModal` |
   | `lib/`    | 그 도메인에서만 쓰는 유틸 함수                             | `submitOnModifierEnter`                  |
   - Provider는 JSX를 렌더링하더라도 역할이 상태 소유라 `model/`에 둡니다.
-  - 필요한 하위 폴더만 만듭니다. (예: `user`는 `model/`·`ui/`만 있음)
+  - 필요한 하위 폴더만 만듭니다. (예: `post`는 `lib/`가 없음)
 
 - 도메인 폴더는 처음 필요해질 때 만들고, 빈 폴더를 미리 만들지 않습니다.
 - **`pages`에는 하위 폴더를 만들지 않고 `{이름}Page.tsx` 파일만 둡니다.** 페이지는 상태 관리와 조립만 하고, 화면 조각은 `features`·`shared`에 둡니다.
