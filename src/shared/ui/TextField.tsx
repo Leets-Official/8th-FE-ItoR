@@ -19,17 +19,26 @@ interface TextFieldProps extends Omit<ComponentProps<'input'>, 'size'> {
 }
 
 // Figma 상태 defalt / input / click / Disabled = placeholder 표시 / 값 입력 / focus / disabled
-export function TextField({ size = 14, disabled = false, className, ...props }: TextFieldProps) {
+// readOnly: 내 프로필 설정처럼 값을 보여주기만 하는 칸 — 수정할 수 없다는 걸 알 수 있게 글자를 회색으로 둔다
+export function TextField({
+  size = 14,
+  disabled = false,
+  readOnly = false,
+  className,
+  ...props
+}: TextFieldProps) {
   return (
     <input
       disabled={disabled}
+      readOnly={readOnly}
       className={cn(
         'w-full rounded-sm border px-4 outline-none',
         SIZE_CLASS[size],
         disabled
           ? 'border-gray-90 bg-gray-90 text-gray-56 placeholder:text-gray-56'
           : [
-              'border-gray-90 bg-white text-black focus:border-gray-33',
+              'border-gray-90 bg-white focus:border-gray-33',
+              readOnly ? 'text-gray-56' : 'text-black',
               PLACEHOLDER_COLOR_CLASS[size],
             ],
         className,
