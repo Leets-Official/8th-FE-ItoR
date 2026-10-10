@@ -4,6 +4,15 @@ import { Blank, Button, Icon, showToast, TextFieldSet } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
 import type { SignUpInput, SocialProvider } from '../model/types';
 import { useAuth } from '../model/useAuth';
+import {
+  EMAIL_PATTERN,
+  formatBirthDate,
+  NICKNAME_MAX_LENGTH,
+  PROFILE_ERROR_MESSAGE,
+  readAsDataUrl,
+  SOCIAL_PROVIDER_LABEL,
+  validateProfile,
+} from '../lib/profileFields';
 
 type SignUpField =
   'email' | 'password' | 'passwordConfirm' | 'name' | 'birthDate' | 'nickname' | 'introduction';
@@ -20,86 +29,31 @@ const SIGN_UP_FIELDS: SignUpField[] = [
   'introduction',
 ];
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const BIRTH_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const NAME_MAX_LENGTH = 10;
-const NICKNAME_MAX_LENGTH = 20;
-const INTRODUCTION_MAX_LENGTH = 30;
-
-// 시안 플로우의 "조건이 맞지 않는 폼" 문구. 로그인 모달과 같은 "*…." 형식으로 맞춘다
-const ERROR_MESSAGE = {
-  required: '*반드시 입력해야하는 필수 사항입니다.',
-  invalidEmail: '*이메일 형식이 적합하지 않습니다.',
-  duplicateEmail: '*사용중인 이메일입니다.',
-  passwordMismatch: '*비밀번호가 일치하지 않습니다.',
-  nameTooLong: `*이름은 최대 ${NAME_MAX_LENGTH}글자 입니다.`,
-  invalidBirthDate: '*생년월일 형식이 적합하지 않습니다.',
-  nicknameTooLong: `*닉네임은 최대 ${NICKNAME_MAX_LENGTH}글자 입니다.`,
-  introductionTooLong: `* 한 줄 소개는 최대 ${INTRODUCTION_MAX_LENGTH}글자입니다.`,
-};
-
 // 시안의 각 입력 영역은 최대 688px 너비에 좌우 16px·위아래 12px 여백
 const SECTION_CLASS = 'w-full max-w-[688px]';
 
-// 숫자만 남기고 YYYY-MM-DD 모양으로 하이픈을 끼워 넣는다
-function formatBirthDate(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)].filter(Boolean).join('-');
-}
-
-// 한 줄 소개는 선택 항목, 소셜 가입은 비밀번호 칸이 없어 필수에서 뺀다
-const OPTIONAL_FIELDS: SignUpField[] = ['introduction'];
+// 소셜 가입은 비밀번호 칸이 없어 필수 검사에서 뺀다
 const PASSWORD_FIELDS: SignUpField[] = ['password', 'passwordConfirm'];
-
-const SOCIAL_PROVIDER_LABEL: Record<SocialProvider, string> = {
-  kakao: '카카오 로그인',
-};
-
-function getRequiredFields(provider?: SocialProvider) {
-  return SIGN_UP_FIELDS.filter(
-    (field) => !OPTIONAL_FIELDS.includes(field) && !(provider && PASSWORD_FIELDS.includes(field)),
-  );
-}
 
 type SignUpValues = Required<Omit<SignUpInput, 'profileImageUrl' | 'provider'>> & {
   passwordConfirm: string;
 };
 
-// 입력 순서대로 검사해, 조건이 맞지 않는 칸마다 하나의 문구를 돌려준다
+// 이름·생년월일·닉네임·한 줄 소개는 프로필 수정과 같은 조건으로 검사하고, 계정 칸만 따로 검사한다
 function validateSignUp(values: SignUpValues, provider?: SocialProvider): SignUpFieldErrors {
-  const errors: SignUpFieldErrors = {};
-  getRequiredFields(provider).forEach((field) => {
-    if (!values[field]) errors[field] = ERROR_MESSAGE.required;
+  const errors: SignUpFieldErrors = validateProfile(values);
+  const accountFields: SignUpField[] = provider ? ['email'] : ['email', ...PASSWORD_FIELDS];
+  accountFields.forEach((field) => {
+    if (!values[field]) errors[field] = PROFILE_ERROR_MESSAGE.required;
   });
 
   if (!errors.email && !EMAIL_PATTERN.test(values.email)) {
-    errors.email = ERROR_MESSAGE.invalidEmail;
+    errors.email = PROFILE_ERROR_MESSAGE.invalidEmail;
   }
   if (!provider && !errors.passwordConfirm && values.password !== values.passwordConfirm) {
-    errors.passwordConfirm = ERROR_MESSAGE.passwordMismatch;
-  }
-  if (!errors.name && values.name.length > NAME_MAX_LENGTH) {
-    errors.name = ERROR_MESSAGE.nameTooLong;
-  }
-  if (!errors.birthDate && !BIRTH_DATE_PATTERN.test(values.birthDate)) {
-    errors.birthDate = ERROR_MESSAGE.invalidBirthDate;
-  }
-  if (!errors.nickname && values.nickname.length > NICKNAME_MAX_LENGTH) {
-    errors.nickname = ERROR_MESSAGE.nicknameTooLong;
-  }
-  if (values.introduction.length > INTRODUCTION_MAX_LENGTH) {
-    errors.introduction = ERROR_MESSAGE.introductionTooLong;
+    errors.passwordConfirm = PROFILE_ERROR_MESSAGE.passwordMismatch;
   }
   return errors;
-}
-
-function readAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
 }
 
 interface SignUpFormProps {
@@ -112,7 +66,6 @@ interface SignUpFormProps {
 export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) {
   const { signUp } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // 새로고침 후에도 사이드바 프로필에 보이도록 object URL 대신 data URL로 보관한다
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
   const [birthDate, setBirthDate] = useState('');
   const [errors, setErrors] = useState<SignUpFieldErrors>({});
@@ -171,7 +124,7 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
         introduction: values.introduction || undefined,
         profileImageUrl,
       });
-      if (error === 'duplicate-email') nextErrors.email = ERROR_MESSAGE.duplicateEmail;
+      if (error === 'duplicate-email') nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
     }
 
     setErrors(nextErrors);

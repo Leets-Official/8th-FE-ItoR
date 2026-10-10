@@ -1,10 +1,8 @@
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { TextField, TextFieldSet } from '@/shared/ui';
 import { cn } from '@/shared/lib/utils';
+import { NICKNAME_MAX_LENGTH } from '../lib/profileFields';
 import type { AuthUser } from '../model/types';
-
-// 회원가입 폼과 같은 닉네임 글자 수 제한 — 수정 페이지에서 지켜야 할 조건을 미리 보여준다
-const NICKNAME_MAX_LENGTH = 20;
 
 // 시안의 각 입력 영역은 최대 688px 너비에 좌우 16px·위아래 12px 여백
 const SECTION_CLASS = 'w-full max-w-[688px]';
@@ -14,7 +12,7 @@ interface AccountInfoProps {
   className?: string;
 }
 
-// 내 프로필 설정 — 가입 정보를 보여주기만 하고, 고치는 건 수정하기 페이지에서 한다
+// 내 프로필 설정 — 가입 정보를 보여주기만 하고, 고치는 건 수정하기를 누르면 바뀌는 ProfileEditForm에서 한다
 export function AccountInfo({ user, className }: AccountInfoProps) {
   const { email, name, birthDate, nickname, introduction, profileImageUrl, provider } = user;
 

@@ -30,3 +30,14 @@ export interface SignUpInput {
 }
 
 export type SignUpError = 'duplicate-email';
+
+// 내 프로필 설정에서 고칠 수 있는 항목. 가입 방식은 바꾸지 않는다
+export interface ProfileUpdateInput extends Pick<
+  AuthUser,
+  'email' | 'name' | 'birthDate' | 'nickname' | 'introduction' | 'profileImageUrl'
+> {
+  // 있으면 비밀번호를 바꾼다. 소셜 가입 계정은 비밀번호가 없어 넘기지 않는다
+  password?: string;
+}
+
+export type ProfileUpdateError = 'duplicate-email';

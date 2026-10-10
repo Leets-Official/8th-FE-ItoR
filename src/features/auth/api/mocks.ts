@@ -1,4 +1,11 @@
-import type { AuthUser, LoginError, SignUpError, SignUpInput } from '../model/types';
+import type {
+  AuthUser,
+  LoginError,
+  ProfileUpdateError,
+  ProfileUpdateInput,
+  SignUpError,
+  SignUpInput,
+} from '../model/types';
 
 type MockAccount = AuthUser & Partial<SignUpInput>;
 
@@ -48,4 +55,27 @@ export function signUpWithMockAccount(
   const account: MockAccount = { ...input };
   MOCK_ACCOUNTS.push(account);
   return { user: toAuthUser(account) };
+}
+
+// 목업 계정에도 반영해 두어야 로그아웃 후 다시 로그인했을 때 바뀐 프로필이 유지된다.
+// 새로고침하면 목업 계정은 초기화되지만 로그인은 sessionStorage로 유지되므로, 계정이 없어도 user를 기준으로 돌려준다
+export function updateMockAccount(
+  user: AuthUser,
+  input: ProfileUpdateInput,
+): { user: AuthUser } | { error: ProfileUpdateError } {
+  // 내 계정은 바꾸기 전 이메일로 찾고, 바꿀 이메일을 다른 계정이 쓰고 있으면 막는다
+  if (
+    MOCK_ACCOUNTS.some(
+      (candidate) => candidate.email !== user.email && candidate.email === input.email,
+    )
+  ) {
+    return { error: 'duplicate-email' };
+  }
+
+  const { password, ...profile } = input;
+  const account = MOCK_ACCOUNTS.find((candidate) => candidate.email === user.email);
+  if (account) Object.assign(account, profile, password ? { password } : {});
+
+  // 비밀번호는 로그인 상태(sessionStorage)에 남기지 않는다
+  return { user: { ...user, ...profile } };
 }

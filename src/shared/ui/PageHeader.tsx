@@ -11,7 +11,12 @@ import { IconButton } from './IconButton';
 import { cn } from '@/shared/lib/utils';
 
 // basic: 메뉴·로고만 있는 헤더 (회원가입 등), profile: 수정하기 버튼이 있는 헤더 (내 프로필 설정)
-export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic' | 'profile';
+// profile-edit: 내 프로필 설정에서 수정하기를 누르면 바뀌는 취소하기·저장하기 헤더
+export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic' | 'profile' | 'profile-edit';
+
+// write·profile·profile-edit 헤더 오른쪽의 글자 버튼. 글자색은 버튼마다 따로 붙인다
+const TEXT_BUTTON_CLASS =
+  'flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 hover:bg-gray-90 active:bg-gray-90';
 
 interface PageHeaderProps {
   variant?: PageHeaderVariant;
@@ -23,6 +28,8 @@ interface PageHeaderProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onPublish?: MouseEventHandler<HTMLButtonElement>;
+  onCancel?: MouseEventHandler<HTMLButtonElement>;
+  onSave?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
 }
 
@@ -35,13 +42,16 @@ export function PageHeader({
   onDelete,
   onPublish,
   onEdit,
+  onCancel,
+  onSave,
   className,
 }: PageHeaderProps) {
   return (
     <header
       className={cn(
         'flex h-[72px] w-full items-center justify-between bg-white/90 py-4 pr-4 pl-3 backdrop-blur-[2px]',
-        (variant === 'write' || variant === 'basic') && 'border-b border-gray-96',
+        (variant === 'write' || variant === 'basic' || variant === 'profile-edit') &&
+          'border-b border-gray-96',
         className,
       )}
     >
@@ -92,16 +102,12 @@ export function PageHeader({
         <div className="flex h-[38px] items-start justify-end gap-2.5">
           <button
             type="button"
-            className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-negative hover:bg-gray-90 active:bg-gray-90"
+            className={cn(TEXT_BUTTON_CLASS, 'text-negative')}
             onClick={() => onDelete?.()}
           >
             삭제하기
           </button>
-          <button
-            type="button"
-            className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-black hover:bg-gray-90 active:bg-gray-90"
-            onClick={onPublish}
-          >
+          <button type="button" className={cn(TEXT_BUTTON_CLASS, 'text-black')} onClick={onPublish}>
             게시하기
           </button>
         </div>
@@ -110,11 +116,26 @@ export function PageHeader({
       {variant === 'profile' && (
         <button
           type="button"
-          className="flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 text-black hover:bg-gray-90 active:bg-gray-90"
+          className={cn(TEXT_BUTTON_CLASS, 'text-black')}
           onClick={() => onEdit?.()}
         >
           수정하기
         </button>
+      )}
+
+      {variant === 'profile-edit' && (
+        <div className="flex h-[38px] items-start justify-end gap-2.5">
+          <button
+            type="button"
+            className={cn(TEXT_BUTTON_CLASS, 'text-negative')}
+            onClick={onCancel}
+          >
+            취소하기
+          </button>
+          <button type="button" className={cn(TEXT_BUTTON_CLASS, 'text-black')} onClick={onSave}>
+            저장하기
+          </button>
+        </div>
       )}
     </header>
   );

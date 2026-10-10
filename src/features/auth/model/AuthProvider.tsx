@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue } from './authContext';
-import { loginWithMockAccount, signUpWithMockAccount } from '../api/mocks';
+import { loginWithMockAccount, signUpWithMockAccount, updateMockAccount } from '../api/mocks';
 import type { AuthUser } from './types';
 
 // 새로고침해도 로그인이 풀리지 않도록 탭 단위로 보관한다 (탭을 닫으면 로그아웃)
@@ -45,6 +45,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       signUp(input) {
         const result = signUpWithMockAccount(input);
         return 'error' in result ? result.error : undefined;
+      },
+      updateProfile(input) {
+        if (!currentUser) return undefined;
+
+        const result = updateMockAccount(currentUser, input);
+        if ('error' in result) return result.error;
+
+        setCurrentUser(result.user);
+        writeStoredUser(result.user);
+        return undefined;
       },
       logout() {
         setCurrentUser(undefined);

@@ -10,6 +10,7 @@ export {
 } from './api/kakaoAuth';
 export { LoginFields } from './ui/LoginFields';
 export { LoginModalProvider } from './model/LoginModalProvider';
+export { ProfileEditForm } from './ui/ProfileEditForm';
 export { SignUpForm } from './ui/SignUpForm';
 export { SignUpPanel } from './ui/SignUpPanel';
 export type { AuthUser, SocialProvider } from './model/types';
