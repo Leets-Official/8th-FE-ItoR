@@ -15,11 +15,11 @@ import {
 } from '@/shared/ui/primitives/dialog';
 import { TextField } from '@/shared/ui/TextField';
 
-import { MOCK_ACCOUNT } from '../model/mockAccount';
+import type { LoginHandler } from '../model/login';
 import { AuthDivider, EmailAuthButton, KakaoAuthButton } from './AuthMethodButtons';
 import { AuthPanel } from './AuthPanel';
 
-function LoginForm({ onSignup, onLogin }: { onSignup: () => void; onLogin: () => void }) {
+function LoginForm({ onSignup, onLogin }: { onSignup: () => void; onLogin: LoginHandler }) {
   const [message, setMessage] = useState('');
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
@@ -29,11 +29,10 @@ function LoginForm({ onSignup, onLogin }: { onSignup: () => void; onLogin: () =>
       .trim()
       .toLowerCase();
     const password = String(data.get('password') ?? '');
-    if (email !== MOCK_ACCOUNT.email || password !== MOCK_ACCOUNT.password) {
+    if (!onLogin('email', { email, password })) {
       setMessage('이메일 또는 비밀번호를 확인해주세요.');
       return;
     }
-    onLogin();
   }
 
   return (
@@ -70,9 +69,7 @@ function LoginForm({ onSignup, onLogin }: { onSignup: () => void; onLogin: () =>
         </div>
       </form>
       <AuthDivider dark />
-      <KakaoAuthButton onClick={() => setMessage('카카오 로그인은 준비 중입니다.')}>
-        카카오로 로그인
-      </KakaoAuthButton>
+      <KakaoAuthButton onClick={() => onLogin('kakao')}>카카오로 로그인</KakaoAuthButton>
       <p className="py-1 text-center text-xs leading-5 text-neutral-400">
         또는{' '}
         <Link
@@ -100,7 +97,7 @@ interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: ReactNode;
-  onLogin: () => void;
+  onLogin: LoginHandler;
 }
 
 export function LoginDialog({ open, onOpenChange, trigger, onLogin }: LoginDialogProps) {
