@@ -22,6 +22,11 @@ const SignupPage = lazy(() =>
 const SignupDetailsPage = lazy(() =>
   import('./routes/SignupDetailsPage').then((module) => ({ default: module.SignupDetailsPage })),
 );
+const ProfileSettingsPage = lazy(() =>
+  import('./routes/ProfileSettingsPage').then((module) => ({
+    default: module.ProfileSettingsPage,
+  })),
+);
 
 export function App() {
   return (
@@ -38,10 +43,13 @@ export function App() {
             <Route index element={<HomePage />} />
             <Route path="components" element={<ComponentGallery />} />
             <Route path="posts/new" element={<PostWritePage />} />
+            <Route path="posts/:postId/edit" element={<PostWritePage />} />
             <Route path="posts/:postId" element={<PostDetailsPage />} />
             <Route path="mypage/signup" element={<SignupPage />} />
             <Route path="mypage/signup/email" element={<SignupDetailsPage method="email" />} />
             <Route path="mypage/signup/kakao" element={<SignupDetailsPage method="kakao" />} />
+            <Route path="mypage/settings" element={<ProfileSettingsPage />} />
+            <Route path="mypage/settings/edit" element={<ProfileSettingsPage editing />} />
             <Route
               path="*"
               element={
