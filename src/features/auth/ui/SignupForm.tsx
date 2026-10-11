@@ -62,9 +62,10 @@ function SignupField({ name, label, error, hint, ...props }: SignupFieldProps) {
 interface SignupFormProps {
   method: SignupMethod;
   onLogin: () => void;
+  onComplete: () => void;
 }
 
-export function SignupForm({ method, onLogin }: SignupFormProps) {
+export function SignupForm({ method, onLogin, onComplete }: SignupFormProps) {
   const [values, setValues] = useState<SignupValues>({
     email: '',
     password: '',
@@ -257,7 +258,10 @@ export function SignupForm({ method, onLogin }: SignupFormProps) {
       <AuthNoticeDialog
         kind="signupComplete"
         open={completionOpen}
-        onOpenChange={setCompletionOpen}
+        onOpenChange={(open) => {
+          setCompletionOpen(open);
+          if (!open) onComplete();
+        }}
         onAction={onLogin}
       />
     </form>
