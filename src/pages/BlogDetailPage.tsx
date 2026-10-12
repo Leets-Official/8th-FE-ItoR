@@ -1,8 +1,8 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router';
-import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
-import { Blank, Button, PageHeader, useSidebar } from '@/shared/ui';
+import { Link, useNavigate, useParams } from 'react-router';
+import { deleteMockPost, getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
+import { Blank, Button, Modal, PageHeader, showToast, useSidebar } from '@/shared/ui';
 import { useAuth, useLoginModal } from '@/features/auth';
 import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
 import { getUserPath, UserProfile } from '@/features/user';
@@ -17,15 +17,24 @@ export function BlogDetailPage() {
   const { currentUser } = useAuth();
   const { openLoginModal } = useLoginModal();
   const { openSidebar } = useSidebar();
+  const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { data: comments = [] } = useQuery({
     queryKey: commentQueryKeys.list(Number(postId)),
     queryFn: () => getComments(Number(postId)),
     enabled: Boolean(post),
   });
 
-  // TODO: 게시글 수정 페이지·삭제 API가 생기면 연결한다
-  function handleEdit() {}
-  function handleDelete() {}
+  function handleEdit() {
+    navigate(`/posts/${postId}/edit`);
+  }
+
+  function handleDeleteConfirm() {
+    deleteMockPost(Number(postId));
+    showToast('positive', '삭제가 완료되었습니다!');
+    // 뒤로 가기로 지운 글에 돌아오지 않게 바꿔 끼운다
+    navigate('/', { replace: true });
+  }
 
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -46,6 +55,8 @@ export function BlogDetailPage() {
   }
 
   const { content, author } = post;
+  // API 연동 전에는 작성자 id가 없어 닉네임으로 내 글인지 판단한다
+  const isMine = currentUser?.nickname === author.nickname;
 
   return (
     <div className="min-h-svh bg-white">
@@ -54,9 +65,9 @@ export function BlogDetailPage() {
         className="sticky top-0 z-10"
         onMenu={openSidebar}
         onChat={handleChat}
-        // 로그인하지 않았으면 더보기 버튼을 숨긴다
-        onEdit={currentUser ? handleEdit : undefined}
-        onDelete={currentUser ? handleDelete : undefined}
+        // 내 글이 아니면 수정·삭제할 수 없어 더보기 버튼을 숨긴다
+        onEdit={isMine ? handleEdit : undefined}
+        onDelete={isMine ? () => setIsDeleteModalOpen(true) : undefined}
       />
       <main>
         <section className={`${SECTION_CLASS} bg-white`}>
@@ -93,6 +104,15 @@ export function BlogDetailPage() {
           <UserProfile user={author} className="max-w-[688px]" />
         </section>
       </main>
+      <Modal
+        variant="destructive"
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        title="해당 블로그를 삭제하시겠어요?"
+        description="삭제된 블로그는 다시 확인할 수 없어요."
+        confirmLabel="삭제하기"
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
