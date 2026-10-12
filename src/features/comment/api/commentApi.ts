@@ -32,6 +32,11 @@ const mockCommentStore = new Map<number, PostComment[]>([
   ],
 ]);
 
+// 게시글 목업이 목록·상세에 댓글 수를 채울 때 쓴다. 실제 API에서는 게시글 응답에 댓글 수가 담겨 온다
+export function countMockComments(postId: number) {
+  return mockCommentStore.get(postId)?.length ?? 0;
+}
+
 export async function getComments(postId: number): Promise<PostComment[]> {
   return [...(mockCommentStore.get(postId) ?? [])];
 }

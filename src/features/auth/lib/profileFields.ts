@@ -83,13 +83,3 @@ export function formatBirthDate(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 8);
   return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)].filter(Boolean).join('-');
 }
-
-// 새로고침 후에도 사이드바 프로필에 보이도록 object URL 대신 data URL로 바꿔 보관한다
-export function readAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}

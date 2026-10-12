@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_90.svg';
 import { Blank, Button, Icon, showToast, TextFieldSet } from '@/shared/ui';
+import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
 import { cn } from '@/shared/lib/utils';
 import type { SignUpInput, SocialProvider } from '../model/types';
 import { useAuth } from '../model/useAuth';
@@ -9,7 +10,6 @@ import {
   formatBirthDate,
   NICKNAME_MAX_LENGTH,
   PROFILE_ERROR_MESSAGE,
-  readAsDataUrl,
   SOCIAL_PROVIDER_LABEL,
   validateProfile,
 } from '../lib/profileFields';

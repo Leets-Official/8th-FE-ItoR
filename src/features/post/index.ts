@@ -1,5 +1,18 @@
-export { getMockPostDetail, MOCK_POSTS } from './api/mocks';
-export type { PostAuthor, PostContentBlock, PostDetail, PostSummary } from './model/types';
+export {
+  createMockPost,
+  deleteMockPost,
+  getMockPostDetail,
+  getMockPosts,
+  updateMockPost,
+} from './api/mocks';
+export type {
+  PostAuthor,
+  PostContentBlock,
+  PostCreateInput,
+  PostDetail,
+  PostSummary,
+} from './model/types';
+export { PostEditor } from './ui/PostEditor';
 export { PostContent } from './ui/PostContent';
 export { PostListItem } from './ui/PostListItem';
 export { PostMeta } from './ui/PostMeta';

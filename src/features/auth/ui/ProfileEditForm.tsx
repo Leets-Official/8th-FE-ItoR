@@ -1,13 +1,13 @@
 import { useRef, useState, type ChangeEvent, type Ref, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Icon, showToast, TextField, TextFieldSet } from '@/shared/ui';
+import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
 import { cn } from '@/shared/lib/utils';
 import {
   EMAIL_PATTERN,
   formatBirthDate,
   NICKNAME_MAX_LENGTH,
   PROFILE_ERROR_MESSAGE,
-  readAsDataUrl,
   SOCIAL_PROVIDER_LABEL,
   validateProfile,
   type ProfileField,

@@ -142,18 +142,15 @@ export function PageHeader({
 }
 
 interface CompactPageHeaderProps {
-  createLabel?: ReactNode;
-  openLabel?: ReactNode;
-  onCreate?: MouseEventHandler<HTMLButtonElement>;
-  onOpen?: MouseEventHandler<HTMLButtonElement>;
+  // 가운데에 32px 간격으로 놓을 글자 버튼들 (예: 사진 추가하기, 깃로그 시작하기·불러오기)
+  children: ReactNode;
+  label?: string;
   className?: string;
 }
 
 export function CompactPageHeader({
-  createLabel = '깃로그 시작하기',
-  openLabel = '깃로그 불러오기',
-  onCreate,
-  onOpen,
+  children,
+  label = '깃로그 메뉴',
   className,
 }: CompactPageHeaderProps) {
   return (
@@ -163,23 +160,8 @@ export function CompactPageHeader({
         className,
       )}
     >
-      <nav aria-label="깃로그 메뉴" className="flex items-center gap-8">
-        <Button
-          variant="text"
-          icon="add_photo_alternate"
-          className="h-[25px] w-[103px] whitespace-nowrap"
-          onClick={onCreate}
-        >
-          {createLabel}
-        </Button>
-        <Button
-          variant="text"
-          icon="folder_open"
-          className="h-[25px] w-[103px] whitespace-nowrap"
-          onClick={onOpen}
-        >
-          {openLabel}
-        </Button>
+      <nav aria-label={label} className="flex items-center gap-8">
+        {children}
       </nav>
     </header>
   );

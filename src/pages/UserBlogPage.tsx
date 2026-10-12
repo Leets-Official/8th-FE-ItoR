@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
-import { useAuth } from '@/features/auth';
-import { MOCK_POSTS, PostListItem } from '@/features/post';
+import { Link, useNavigate, useParams } from 'react-router';
+import { useAuth, useLoginModal } from '@/features/auth';
+import { getMockPosts, PostListItem } from '@/features/post';
 import { UserProfile } from '@/features/user';
 import { Blank, Button, PageHeader, Pagination, useSidebar } from '@/shared/ui';
 
@@ -13,11 +13,13 @@ export function UserBlogPage() {
   const { nickname } = useParams();
   const { currentUser } = useAuth();
   const { openSidebar } = useSidebar();
+  const { openLoginModal } = useLoginModal();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
   const isMine = Boolean(currentUser) && currentUser?.nickname === nickname;
   // API 연동 전에는 작성자 id가 없어 닉네임으로 그 사용자의 글을 찾는다
-  const userPosts = MOCK_POSTS.filter(({ author }) => author.nickname === nickname);
+  const userPosts = getMockPosts().filter(({ author }) => author.nickname === nickname);
   // 내 정보는 로그인 정보에서, 다른 사용자 정보는 그 사람이 쓴 글의 작성자 정보에서 가져온다
   const user = isMine ? currentUser : userPosts[0]?.author;
 
@@ -29,9 +31,23 @@ export function UserBlogPage() {
     window.scrollTo({ top: 0 });
   };
 
+  // 글쓰기는 로그인한 사용자만 할 수 있어 비로그인이면 로그인 모달을 연다
+  function handleCreate() {
+    if (!currentUser) {
+      openLoginModal();
+      return;
+    }
+    navigate('/write');
+  }
+
   return (
     <div className="min-h-svh bg-white">
-      <PageHeader variant="main" className="sticky top-0 z-10" onMenu={openSidebar} />
+      <PageHeader
+        variant="main"
+        className="sticky top-0 z-10"
+        onMenu={openSidebar}
+        onCreate={handleCreate}
+      />
       {user ? (
         <main>
           {/* 배경이 gray96이라 흰 배경인 Blank 대신 py-16으로 위아래 64px 여백을 준다 */}

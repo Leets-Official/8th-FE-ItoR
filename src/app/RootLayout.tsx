@@ -63,8 +63,13 @@ function SidebarLayout({ children }: SidebarLayoutProps) {
 
   function handleMyBlog() {
     if (!currentUser) return;
+    navigateFromSidebar(getUserPath(currentUser.nickname));
+  }
+
+  // 사이드바를 닫고 이동한다. 로그인한 상태에서만 보이는 버튼들이다
+  function navigateFromSidebar(path: string) {
     setIsSidebarOpen(false);
-    navigate(getUserPath(currentUser.nickname));
+    navigate(path);
   }
 
   function handleLogout() {
@@ -81,6 +86,8 @@ function SidebarLayout({ children }: SidebarLayoutProps) {
         profile={currentUser}
         onStart={handleStart}
         onMyBlog={handleMyBlog}
+        onWrite={() => navigateFromSidebar('/write')}
+        onSettings={() => navigateFromSidebar('/profile')}
         onLogout={() => setIsLogoutModalOpen(true)}
       />
       <Modal

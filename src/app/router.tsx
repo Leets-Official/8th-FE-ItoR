@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import { BlogDetailPage } from '@/pages/BlogDetailPage';
 import { BlogSearchPage } from '@/pages/BlogSearchPage';
 import { KakaoCallbackPage } from '@/pages/KakaoCallbackPage';
+import { PostWritePage } from '@/pages/PostWritePage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { KAKAO_CALLBACK_PATH } from '@/features/auth';
 import { SignUpFormPage } from '@/pages/SignUpFormPage';
@@ -15,6 +16,8 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <BlogSearchPage /> },
       { path: '/posts/:postId', element: <BlogDetailPage /> },
+      { path: '/write', element: <PostWritePage /> },
+      { path: '/posts/:postId/edit', element: <PostWritePage /> },
       { path: '/users/:nickname', element: <UserBlogPage /> },
       { path: '/profile', element: <ProfilePage /> },
       { path: '/signup', element: <SignUpPage /> },

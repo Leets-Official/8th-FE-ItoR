@@ -25,3 +25,4 @@ export { showToast } from './showToast';
 export { Toast, type ToastType } from './Toast';
 export { Toaster } from './Toaster';
 export { useSidebar } from './useSidebar';
+export { useToastOffset } from './useToastOffset';

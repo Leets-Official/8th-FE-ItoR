@@ -97,7 +97,7 @@ app → pages → features → shared
 
 - **도메인 폴더는 `index.ts`로만 공개합니다.** 바깥에서는 도메인 폴더 루트로 import하고, 내부 파일 경로로 들어가지 않습니다.
   ```ts
-  import { MOCK_POSTS, PostListItem } from '@/features/post'; // ✅
+  import { getMockPosts, PostListItem } from '@/features/post'; // ✅
   import { PostListItem } from '@/features/post/ui/PostListItem'; // ❌ 내부 경로 직접 접근
   ```
 - `index.ts`에는 바깥에서 쓰는 것(컴포넌트, 도메인 타입, API 함수, 외부에서 쓰는 변형 타입)만 이름을 하나씩 나열해 re-export합니다. `export *`는 쓰지 않고, 내부 전용 상수·Props 타입·하위 컴포넌트는 공개하지 않습니다. 타입만 공개할 때는 `export type { … }`을 씁니다.
