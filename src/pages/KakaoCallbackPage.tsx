@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import {
-  getKakaoReturnPath,
   KAKAO_SIGN_UP_PATH,
   KAKAO_SIGN_UP_PROMPT_STATE,
+  takeKakaoReturnPath,
 } from '@/features/auth';
 import { showToast } from '@/shared/ui';
 
@@ -19,7 +19,7 @@ export function KakaoCallbackPage() {
     isHandledRef.current = true;
 
     // 인가 코드가 담긴 주소가 히스토리에 남지 않게 모두 교체한다
-    const returnPath = getKakaoReturnPath(searchParams.get('state'));
+    const returnPath = takeKakaoReturnPath();
 
     // 사용자가 동의 화면에서 취소하면 code 대신 error=access_denied로 돌아온다
     if (searchParams.get('error') || !searchParams.get('code')) {

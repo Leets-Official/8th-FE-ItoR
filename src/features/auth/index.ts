@@ -1,12 +1,12 @@
 export { AccountInfo } from './ui/AccountInfo';
 export { AuthProvider } from './model/AuthProvider';
 export {
-  getKakaoReturnPath,
   hasKakaoSignUpPrompt,
   KAKAO_CALLBACK_PATH,
   KAKAO_SIGN_UP_PATH,
   KAKAO_SIGN_UP_PROMPT_STATE,
   redirectToKakaoAuth,
+  takeKakaoReturnPath,
 } from './api/kakaoAuth';
 export { LoginFields } from './ui/LoginFields';
 export { LoginModalProvider } from './model/LoginModalProvider';

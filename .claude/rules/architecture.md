@@ -35,7 +35,7 @@ src/
 │   ├── ProfilePage.tsx     # /profile — 내 프로필 설정 (보기 전용)
 │   ├── SignUpPage.tsx      # /signup — 회원가입 방법 선택
 │   ├── SignUpFormPage.tsx  # /signup/email · /signup/kakao — 가입 정보 입력 (provider prop으로 구분)
-│   └── KakaoCallbackPage.tsx # /oauth/kakao — 카카오 인가 코드를 받는 Redirect URI
+│   └── KakaoCallbackPage.tsx # /oauth/kakao/success — 카카오 인가 코드를 받는 Redirect URI
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
 │   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
