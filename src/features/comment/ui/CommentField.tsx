@@ -1,6 +1,6 @@
 import { useRef, useState, type FocusEvent, type SubmitEvent } from 'react';
 import { CommentAuthor } from './CommentAuthor';
-import { submitOnModifierEnter } from './submitOnModifierEnter';
+import { submitOnModifierEnter } from '../lib/submitOnModifierEnter';
 import type { User } from '@/features/user';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui';

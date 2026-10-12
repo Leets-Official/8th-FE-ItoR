@@ -1,62 +1,43 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { LoginModal, useAuth } from '@/features/auth';
-import { MOCK_POSTS, PostListItem } from '@/features/post';
-import { Blank, Modal, PageHeader, Pagination, Sidebar } from '@/shared/ui';
+import { useAuth, useLoginModal } from '@/features/auth';
+import { getMockPosts, PostListItem } from '@/features/post';
+import { Blank, PageHeader, Pagination, useSidebar } from '@/shared/ui';
 
 const POSTS_PER_PAGE = 10;
 
 export function BlogSearchPage() {
+  const { openSidebar } = useSidebar();
+  const { currentUser } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  const pageCount = Math.ceil(MOCK_POSTS.length / POSTS_PER_PAGE);
-  const posts = MOCK_POSTS.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+  const allPosts = getMockPosts();
+  const pageCount = Math.ceil(allPosts.length / POSTS_PER_PAGE);
+  const posts = allPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0 });
   };
 
-  const handleStart = () => {
-    setIsSidebarOpen(false);
-    setIsLoginModalOpen(true);
-  };
-
-  const handleLogout = () => {
-    logout();
-    setIsSidebarOpen(false);
-  };
+  // 글쓰기는 로그인한 사용자만 할 수 있어 비로그인이면 로그인 모달을 연다
+  function handleCreate() {
+    if (!currentUser) {
+      openLoginModal();
+      return;
+    }
+    navigate('/write');
+  }
 
   return (
     <div className="min-h-svh bg-white">
       <PageHeader
         variant="main"
         className="sticky top-0 z-10"
-        onMenu={() => setIsSidebarOpen(true)}
-      />
-      <Sidebar
-        open={isSidebarOpen}
-        onOpenChange={setIsSidebarOpen}
-        profile={currentUser}
-        onStart={handleStart}
-        onLogout={() => setIsLogoutModalOpen(true)}
-      />
-      <LoginModal
-        open={isLoginModalOpen}
-        onOpenChange={setIsLoginModalOpen}
-        onSignUp={() => navigate('/signup')}
-      />
-      <Modal
-        open={isLogoutModalOpen}
-        onOpenChange={setIsLogoutModalOpen}
-        title="로그아웃을 진행할게요"
-        confirmLabel="로그아웃"
-        onConfirm={handleLogout}
+        onMenu={openSidebar}
+        onCreate={handleCreate}
       />
       <main className="mx-auto flex w-full max-w-[688px] flex-col items-center">
         <Blank size={32} />

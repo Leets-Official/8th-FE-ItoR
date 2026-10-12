@@ -1,3 +1,4 @@
+import add from '@/shared/assets/icons/add.svg';
 import add_photo_alternate from '@/shared/assets/icons/add_photo_alternate.svg';
 import chat from '@/shared/assets/icons/chat.svg';
 import clear from '@/shared/assets/icons/clear.svg';
@@ -16,6 +17,7 @@ import settings from '@/shared/assets/icons/settings.svg';
 import { cn } from '@/shared/lib/utils';
 
 const ICONS = {
+  add,
   add_photo_alternate,
   chat,
   clear,

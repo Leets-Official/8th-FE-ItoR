@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CommentAuthor } from './CommentAuthor';
-import type { PostComment } from './types';
+import type { PostComment } from '../model/types';
+import { getUserPath } from '@/features/user';
 import {
   Blank,
   DropdownMenu,
@@ -28,6 +29,7 @@ export function CommentItem({ comment, onDelete }: CommentItemProps) {
           nickname={author.nickname}
           profileImageUrl={author.profileImageUrl}
           createdAt={createdAt}
+          authorHref={getUserPath(author.nickname)}
           className="flex-1 px-4 py-3"
         />
         {onDelete && (

@@ -18,8 +18,11 @@ export {
   type PaginationDirection,
 } from './Pagination';
 export { Sidebar } from './Sidebar';
+export { SidebarContext, type SidebarContextValue } from './sidebarContext';
 export { TextBlock, type TextBlockProps, type TextBlockVariant } from './TextBlock';
 export { TextField, TextFieldSet, type TextFieldSize } from './TextField';
 export { showToast } from './showToast';
 export { Toast, type ToastType } from './Toast';
 export { Toaster } from './Toaster';
+export { useSidebar } from './useSidebar';
+export { useToastOffset } from './useToastOffset';

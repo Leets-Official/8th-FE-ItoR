@@ -17,8 +17,6 @@ interface SidebarProps {
   // 있으면 로그인 상태(프로필 + 나의 깃로그·쓰기·설정·로그아웃), 없으면 비로그인 상태(시작하기)
   profile?: SidebarProfile;
   description?: ReactNode;
-  // 로그인 상태에서 프로필 영역(로고·닉네임·소개)을 누르면 호출 — 계정 설정 페이지로 이동
-  onProfileClick?: ButtonClickHandler;
   onStart?: ButtonClickHandler;
   onMyBlog?: ButtonClickHandler;
   onWrite?: ButtonClickHandler;
@@ -36,7 +34,6 @@ export function Sidebar({
   onOpenChange,
   profile,
   description = 'You can make anything by writing',
-  onProfileClick,
   onStart,
   onMyBlog,
   onWrite,
@@ -58,21 +55,17 @@ export function Sidebar({
           <DialogPrimitive.Title className="sr-only">메뉴</DialogPrimitive.Title>
           <div className="flex flex-col py-6">
             {profile ? (
-              <button
-                type="button"
-                className="flex cursor-pointer flex-col text-left outline-none focus-visible:bg-gray-90"
-                onClick={onProfileClick}
-              >
-                <span className="flex px-4">
+              <div className="flex flex-col">
+                <div className="flex px-4">
                   <img src={logo} alt="" className="size-16" />
-                </span>
-                <span className="flex flex-col gap-3 px-5 py-3">
-                  <span className="text-24 font-medium text-black">{profile.nickname}</span>
+                </div>
+                <div className="flex flex-col gap-3 px-5 py-3">
+                  <p className="text-24 font-medium text-black">{profile.nickname}</p>
                   {profile.introduction && (
-                    <span className="text-14 font-light text-gray-20">{profile.introduction}</span>
+                    <p className="text-14 font-light text-gray-20">{profile.introduction}</p>
                   )}
-                </span>
-              </button>
+                </div>
+              </div>
             ) : (
               <>
                 <div className="flex px-4">

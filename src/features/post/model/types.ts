@@ -20,3 +20,9 @@ export type PostContentBlock = { type: 'text'; text: string } | { type: 'image';
 export interface PostDetail extends PostSummary {
   content: PostContentBlock[];
 }
+
+// 글쓰기에서 게시하기를 누르면 넘기는 값. 작성자·작성일은 저장하는 쪽에서 붙인다
+export interface PostCreateInput {
+  title: string;
+  content: PostContentBlock[];
+}
