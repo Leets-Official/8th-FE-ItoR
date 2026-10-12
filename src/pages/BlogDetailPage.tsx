@@ -6,6 +6,7 @@ import { Blank, Button, Modal, PageHeader, showToast, useSidebar } from '@/share
 import { useAuth, useLoginModal } from '@/features/auth';
 import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
 import { getUserPath, UserProfile } from '@/features/user';
+import { cn } from '@/shared/lib/utils';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';
@@ -70,7 +71,7 @@ export function BlogDetailPage() {
         onDelete={isMine ? () => setIsDeleteModalOpen(true) : undefined}
       />
       <main>
-        <section className={`${SECTION_CLASS} bg-white`}>
+        <section className={cn(SECTION_CLASS, 'bg-white')}>
           <Blank size={64} />
           <PostTitleSection
             post={post}
@@ -79,7 +80,7 @@ export function BlogDetailPage() {
           />
         </section>
 
-        <section className={`${SECTION_CLASS} bg-white`}>
+        <section className={cn(SECTION_CLASS, 'bg-white')}>
           <Blank size={32} />
           <div className={CONTENT_CLASS}>
             <PostContent content={content} />
@@ -87,7 +88,7 @@ export function BlogDetailPage() {
           <Blank size={32} />
         </section>
 
-        <section ref={commentSectionRef} className={`${SECTION_CLASS} scroll-mt-[72px] bg-white`}>
+        <section ref={commentSectionRef} className={cn(SECTION_CLASS, 'scroll-mt-[72px] bg-white')}>
           <div className={CONTENT_CLASS}>
             <CommentSection
               postId={post.id}
@@ -100,7 +101,7 @@ export function BlogDetailPage() {
         </section>
 
         {/* 배경이 gray96이라 흰 배경인 Blank 대신 py-16으로 위아래 64px 여백을 준다 */}
-        <section className={`${SECTION_CLASS} bg-gray-96 py-16`}>
+        <section className={cn(SECTION_CLASS, 'bg-gray-96 py-16')}>
           <UserProfile user={author} className="max-w-[688px]" />
         </section>
       </main>
