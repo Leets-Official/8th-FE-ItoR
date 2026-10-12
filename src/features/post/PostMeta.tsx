@@ -1,6 +1,6 @@
-import { formatPostDate } from '../lib/formatPostDate';
-import type { PostSummary } from '../model/types';
+import type { PostSummary } from './types';
 import defaultProfile from '@/shared/assets/images/profile_20.svg';
+import { formatDate } from '@/shared/lib/formatDate';
 import { cn } from '@/shared/lib/utils';
 
 function MetaDivider() {
@@ -34,7 +34,7 @@ export function PostMeta({ post, className }: PostMetaProps) {
       </div>
       <MetaDivider />
       <time dateTime={createdAt} className="leading-5 font-light text-gray-56">
-        {formatPostDate(createdAt)}
+        {formatDate(createdAt)}
       </time>
       <MetaDivider />
       <span className="leading-5 font-light text-gray-56">댓글{commentCount}</span>

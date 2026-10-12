@@ -3,7 +3,8 @@ import { Button } from './Button';
 import { IconButton } from './IconButton';
 import { cn } from '@/shared/lib/utils';
 
-export type PageHeaderVariant = 'main' | 'detail' | 'write';
+// basic: 메뉴·로고만 있는 헤더 (회원가입 등)
+export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic';
 
 interface PageHeaderProps {
   variant?: PageHeaderVariant;
@@ -32,7 +33,7 @@ export function PageHeader({
     <header
       className={cn(
         'flex h-[72px] w-full items-center justify-between bg-white/90 py-4 pr-4 pl-3 backdrop-blur-[2px]',
-        variant === 'write' && 'border-b border-gray-96',
+        (variant === 'write' || variant === 'basic') && 'border-b border-gray-96',
         className,
       )}
     >

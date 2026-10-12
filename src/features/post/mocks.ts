@@ -1,9 +1,13 @@
-import type { PostContentBlock, PostDetail, PostSummary } from '../model/types';
+import type { PostContentBlock, PostDetail, PostSummary } from './types';
+import blogDetailPhoto from '@/shared/assets/images/blog_detail_photo.svg';
+import blogDetailText from '@/shared/assets/images/blog_detail_text.svg';
 import blogPhoto from '@/shared/assets/images/blog_photo.svg';
 
 const SHORT_EXCERPT = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.';
 const LONG_EXCERPT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
+const SECOND_CONTENT_TEXT =
+  'It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.';
 
 // 시안의 목록 순서: (썸네일, 긴 요약) (썸네일, 짧은 요약) (없음, 긴 요약) (없음, 짧은 요약) (썸네일, 짧은 요약)
 const PATTERN = [
@@ -21,7 +25,7 @@ export const MOCK_POSTS: PostSummary[] = Array.from({ length: 25 }, (_, index) =
 
   return {
     id,
-    title: '16 Title one line',
+    title: '32 Title one line',
     excerpt,
     author: { nickname: '닉네임', introduction: '한 줄 소개' },
     createdAt: new Date(2025, 1, 17).toISOString(),
@@ -33,9 +37,9 @@ export const MOCK_POSTS: PostSummary[] = Array.from({ length: 25 }, (_, index) =
 // 시안의 본문 순서: 글 → 사진 → 글 → 사진
 const createMockContent = (): PostContentBlock[] => [
   { type: 'text', text: LONG_EXCERPT },
-  { type: 'image', imageUrl: blogPhoto },
-  { type: 'text', text: SHORT_EXCERPT },
-  { type: 'image', imageUrl: blogPhoto },
+  { type: 'image', imageUrl: blogDetailText },
+  { type: 'text', text: SECOND_CONTENT_TEXT },
+  { type: 'image', imageUrl: blogDetailPhoto },
 ];
 
 // API 연동 후 게시글 상세 요청 함수로 바꿉니다

@@ -1,4 +1,4 @@
-import type { PostSummary } from '../model/types';
+import type { PostSummary } from './types';
 import { PostMeta } from './PostMeta';
 
 interface PostListItemProps {

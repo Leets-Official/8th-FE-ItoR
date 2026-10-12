@@ -28,7 +28,10 @@ export function TextField({ size = 14, disabled = false, className, ...props }: 
         SIZE_CLASS[size],
         disabled
           ? 'border-gray-90 bg-gray-90 text-gray-56 placeholder:text-gray-56'
-          : ['border-gray-90 text-black focus:border-gray-33', PLACEHOLDER_COLOR_CLASS[size]],
+          : [
+              'border-gray-90 bg-white text-black focus:border-gray-33',
+              PLACEHOLDER_COLOR_CLASS[size],
+            ],
         className,
       )}
       {...props}

@@ -1,4 +1,4 @@
-import type { PostContentBlock } from '../model/types';
+import type { PostContentBlock } from './types';
 import { TextBlock } from '@/shared/ui';
 
 interface PostContentProps {

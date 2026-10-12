@@ -6,6 +6,7 @@ import delete_forever from '@/shared/assets/icons/delete_forever.svg';
 import done from '@/shared/assets/icons/done.svg';
 import error_outline from '@/shared/assets/icons/error_outline.svg';
 import folder_open from '@/shared/assets/icons/folder_open.svg';
+import kakao from '@/shared/assets/icons/kakao.svg';
 import more_vert from '@/shared/assets/icons/more_vert.svg';
 import navigate_before from '@/shared/assets/icons/navigate_before.svg';
 import pagination_left from '@/shared/assets/icons/pagination_left.svg';
@@ -23,6 +24,7 @@ const ICONS = {
   done,
   error_outline,
   folder_open,
+  kakao,
   more_vert,
   navigate_before,
   pagination_left,

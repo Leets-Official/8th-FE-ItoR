@@ -1,6 +1,6 @@
-export interface PostAuthor {
-  nickname: string;
-  profileImageUrl?: string;
+import type { User } from '@/features/user';
+
+export interface PostAuthor extends User {
   introduction?: string;
 }
 

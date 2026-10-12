@@ -22,6 +22,7 @@
 - 컴포넌트는 `function` 선언으로 작성하고, Props는 시그니처에서 구조 분해하며 기본값도 그 자리에서 지정합니다. (`function Button({ variant = 'point', ...props }: ButtonProps)`)
 - 네이티브 요소를 감싸는 컴포넌트는 `ComponentProps<'button'>` 등을 확장하고 나머지 props를 `{...props}`로 전달합니다.
 - 변형·상태별 클래스는 `Record<Variant, string>` 맵(`BOX_CLASS`, `TOAST_STYLE`)으로 분기하고, 조합이 복잡하면 `cva`를 사용합니다. `className`은 항상 `cn()`으로 합칩니다.
+- 이벤트 타입은 실제 이벤트에 맞춰 씁니다. `FormEvent`는 실제로 없는 이벤트라 `@types/react`에서 deprecated이므로 `onSubmit`에는 `SubmitEvent`, `onChange`에는 `ChangeEvent`, `onInput`에는 `InputEvent`를 씁니다. (`FormEventHandler`도 마찬가지로 `SubmitEventHandler` 등을 씁니다.)
 - 코드 주석은 "왜"를 적습니다. 시안 수치나 라이브러리 제약처럼 코드만 봐서 알 수 없는 이유를 남깁니다.
 
 ## 네이밍 컨벤션
@@ -45,22 +46,13 @@
 | 컴포넌트 파일        | 컴포넌트 이름과 같은 `PascalCase.tsx`  | `Button.tsx`, `PostListItem.tsx`                       |
 | 페이지 파일          | `{이름}Page.tsx` (`pages/` 바로 아래)  | `pages/BlogSearchPage.tsx`                             |
 | 컴포넌트가 아닌 모듈 | camelCase (JSX가 있으면 `.tsx`)        | `showToast.tsx`, `utils.ts`, `instance.ts`, `mocks.ts` |
-| 세그먼트 폴더        | FSD 세그먼트 이름 그대로               | `ui/`, `model/`, `api/`, `lib/`, `config/`             |
-| 도메인 타입 파일     | `model/types.ts`                       | `entities/post/model/types.ts`                         |
-| Public API · barrel  | `index.ts`                             | `entities/post/index.ts`, `shared/ui/index.ts`         |
+| 도메인 타입 파일     | `{도메인}/types.ts`                    | `features/post/types.ts`                               |
+| Public API · barrel  | `index.ts`                             | `features/post/index.ts`, `shared/ui/index.ts`         |
 | 에셋(SVG·이미지)     | snake_case, 아이콘은 Figma 레이어 이름 | `error_outline.svg`, `profile_20.svg`                  |
 
-### 슬라이스(폴더) 이름
+### 도메인 폴더 이름
 
-모든 슬라이스 폴더는 **kebab-case 소문자**입니다.
-
-| 계층       | 규칙                           | 예시                                        |
-| ---------- | ------------------------------ | ------------------------------------------- |
-| `widgets`  | 화면 블록 이름 (명사)          | `post-list`, `site-header`                  |
-| `features` | **동사-대상** 형태의 행동 이름 | `search-post`, `write-comment`, `like-post` |
-| `entities` | **단수형** 도메인 명사         | `post`, `comment`, `user`                   |
-
-feature를 `post`처럼 명사로 짓지 않습니다. 명사 이름은 entity와 구분되지 않습니다.
+`features/` 아래 도메인 폴더는 **kebab-case 소문자 단수형 명사**입니다. (`post`, `comment`, `auth`, `user`) 행동(`write-comment`)이 아니라 도메인 단위로 묶고, 글쓰기·검색 같은 행동도 해당 도메인 폴더 안에 둡니다.
 
 - 한 파일에는 공개 컴포넌트 하나를 두는 것이 기본입니다. 그 컴포넌트에서만 쓰는 작은 하위 컴포넌트(예: `PostListItem`의 `MetaDivider`)는 같은 파일에 export 없이 둡니다.
 - 밀접한 짝 컴포넌트(`PageHeader`/`CompactPageHeader`, `TextField`/`TextFieldSet`)는 한 파일에서 함께 export할 수 있습니다.

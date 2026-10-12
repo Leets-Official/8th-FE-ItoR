@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, HTMLAttributes, ReactElement } from 'react';
 import { cva } from 'class-variance-authority';
 import { Slot } from 'radix-ui';
 import { cn } from '@/shared/lib/utils';
@@ -25,21 +25,41 @@ const buttonVariants = cva(
       {
         variant: ['outline', 'white'],
         pressed: false,
-        className: 'bg-white hover:bg-gray-90 active:bg-gray-90',
+        className: 'bg-white not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90',
       },
-      { variant: 'text', pressed: false, className: 'hover:bg-gray-90 active:bg-gray-90' },
+      {
+        variant: 'text',
+        pressed: false,
+        className: 'not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90',
+      },
       { variant: ['outline', 'white', 'text'], pressed: true, className: 'bg-gray-90' },
     ],
     defaultVariants: { variant: 'point', pressed: false },
   },
 );
 
-interface ButtonProps extends ComponentProps<'button'> {
+interface CommonButtonProps {
   variant?: ButtonVariant;
   icon?: IconName;
   pressed?: boolean;
-  asChild?: boolean;
 }
+
+interface NativeButtonProps extends ComponentProps<'button'>, CommonButtonProps {
+  asChild?: false;
+}
+
+// 버튼 전용 속성과 button ref는 자식의 실제 요소에 맞게 자식에서 지정한다.
+type ButtonOnlyProps = Exclude<keyof ComponentProps<'button'>, keyof HTMLAttributes<HTMLElement>>;
+
+type ChildButtonProps = CommonButtonProps &
+  HTMLAttributes<HTMLElement> & {
+    asChild: true;
+    children: ReactElement;
+  } & {
+    [Key in ButtonOnlyProps]?: never;
+  };
+
+type ButtonProps = NativeButtonProps | ChildButtonProps;
 
 export function Button({
   variant = 'point',

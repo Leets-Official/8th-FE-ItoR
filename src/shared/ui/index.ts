@@ -9,7 +9,7 @@ export {
 export { Icon, type IconName, type IconSize } from './Icon';
 export { IconButton } from './IconButton';
 export { Menu } from './Menu';
-export { Modal } from './Modal';
+export { Modal, type ModalVariant } from './Modal';
 export { CompactPageHeader, PageHeader, type PageHeaderVariant } from './PageHeader';
 export {
   Pagination,
@@ -17,6 +17,7 @@ export {
   PaginationItem,
   type PaginationDirection,
 } from './Pagination';
+export { Sidebar } from './Sidebar';
 export { TextBlock, type TextBlockProps, type TextBlockVariant } from './TextBlock';
 export { TextField, TextFieldSet, type TextFieldSize } from './TextField';
 export { showToast } from './showToast';

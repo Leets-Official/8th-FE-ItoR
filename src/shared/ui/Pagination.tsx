@@ -82,6 +82,8 @@ export function PaginationArrowButton({
   );
 }
 
+const PAGES_PER_BLOCK = 5;
+
 interface PaginationProps {
   pageCount: number;
   currentPage?: number;
@@ -90,16 +92,23 @@ interface PaginationProps {
 }
 
 export function Pagination({ pageCount, currentPage, onPageChange, className }: PaginationProps) {
-  const pages = Array.from({ length: pageCount }, (_, index) => index + 1);
-  const previousDisabled = currentPage === undefined || currentPage <= 1;
-  const nextDisabled = currentPage !== undefined && currentPage >= pageCount;
+  // 페이지가 많아져도 버튼이 무한히 늘어나지 않도록 현재 페이지가 속한 5개 블록만 보여준다
+  const blockStart =
+    currentPage === undefined
+      ? 1
+      : Math.floor((currentPage - 1) / PAGES_PER_BLOCK) * PAGES_PER_BLOCK + 1;
+  const blockEnd = Math.min(blockStart + PAGES_PER_BLOCK - 1, pageCount);
+  const pages = Array.from({ length: blockEnd - blockStart + 1 }, (_, index) => blockStart + index);
+
+  const previousDisabled = currentPage === undefined || blockStart <= 1;
+  const nextDisabled = currentPage !== undefined && blockEnd >= pageCount;
 
   return (
     <nav aria-label="페이지 탐색" className={cn('inline-flex items-center gap-2', className)}>
       <PaginationArrowButton
         direction="previous"
         disabled={previousDisabled}
-        onClick={() => currentPage !== undefined && onPageChange?.(currentPage - 1)}
+        onClick={() => currentPage !== undefined && onPageChange?.(blockStart - 1)}
       />
       {pages.map((page) => (
         <PaginationItem
@@ -112,7 +121,7 @@ export function Pagination({ pageCount, currentPage, onPageChange, className }: 
       <PaginationArrowButton
         direction="next"
         disabled={nextDisabled}
-        onClick={() => currentPage !== undefined && onPageChange?.(currentPage + 1)}
+        onClick={() => currentPage !== undefined && onPageChange?.(blockEnd + 1)}
       />
     </nav>
   );

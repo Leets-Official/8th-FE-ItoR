@@ -1,9 +1,11 @@
 import { useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { getMockPostDetail, PostContent, PostTitleSection } from '@/entities/post';
+import { useQuery } from '@tanstack/react-query';
+import { Link, useParams } from 'react-router';
+import { getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Blank, Button, PageHeader } from '@/shared/ui';
-import { CommentSection } from '@/widgets/comment-section';
+import { useAuth } from '@/features/auth';
+import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
 
 const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96';
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';
@@ -12,6 +14,12 @@ export function BlogDetailPage() {
   const { postId } = useParams();
   const commentSectionRef = useRef<HTMLElement>(null);
   const post = getMockPostDetail(Number(postId));
+  const { currentUser } = useAuth();
+  const { data: comments = [] } = useQuery({
+    queryKey: commentQueryKeys.list(Number(postId)),
+    queryFn: () => getComments(Number(postId)),
+    enabled: Boolean(post),
+  });
 
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -31,7 +39,7 @@ export function BlogDetailPage() {
     );
   }
 
-  const { content, author, commentCount } = post;
+  const { content, author } = post;
 
   return (
     <div className="min-h-svh bg-white">
@@ -52,7 +60,7 @@ export function BlogDetailPage() {
 
         <section ref={commentSectionRef} className={`${SECTION_CLASS} scroll-mt-[72px] bg-white`}>
           <div className={CONTENT_CLASS}>
-            <CommentSection commentCount={commentCount} />
+            <CommentSection postId={post.id} comments={comments} currentUser={currentUser} />
           </div>
           <Blank size={64} />
         </section>
