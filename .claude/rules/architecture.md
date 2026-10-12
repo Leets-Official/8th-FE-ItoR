@@ -31,6 +31,7 @@ src/
 ├── pages/                  # 라우트 하나 = 파일 하나 (하위 폴더 없음)
 │   ├── BlogSearchPage.tsx  # / — 블로그 찾기
 │   ├── BlogDetailPage.tsx  # /posts/:postId — 블로그 상세
+│   ├── PostWritePage.tsx   # /write · /posts/:postId/edit — 게시글 작성·수정 (postId 유무로 구분)
 │   ├── UserBlogPage.tsx    # /users/:nickname — 사용자 프로필·작성 글 (내 것이면 마이페이지)
 │   ├── ProfilePage.tsx     # /profile — 내 프로필 설정 (보기 전용)
 │   ├── SignUpPage.tsx      # /signup — 회원가입 방법 선택
