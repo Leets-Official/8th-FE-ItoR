@@ -13,6 +13,7 @@ import type { Profile, ProfileDraft } from '@/features/profile/model/profile';
 import { Toaster } from '@/shared/ui/primitives/sonner';
 import { notify } from '@/shared/ui/StatusToast';
 import { cn } from '@/shared/utils/cn';
+import { GitlogButton } from '@/shared/ui/GitlogButton';
 
 import { AppHeader } from './header/AppHeader';
 import { AppSidebar } from './AppSidebar';
@@ -23,7 +24,6 @@ export interface AppLayoutContext {
   openLogin: () => void;
   previewUser: Profile | null;
   updateProfile: (draft: ProfileDraft) => boolean;
-  setPreviewSignedIn: (signedIn: boolean) => void;
   posts: Post[];
   publishPost: (draft: PostDraft) => Post | null;
   updatePost: (id: string, draft: PostDraft) => Post | null;
@@ -37,10 +37,11 @@ export interface AppLayoutContext {
 export function AppLayout() {
   const {
     loginOpen,
-    profiles,
     previewUser,
     updateProfile,
-    setPreviewSignedIn,
+    isRestoring,
+    authError,
+    retryAuth,
     openLogin,
     changeLoginOpen,
     completeLogin,
@@ -62,7 +63,7 @@ export function AppLayout() {
     restoreMenuFocus.current = true;
     setSidebarOpen(false);
   }
-  const users = Object.values(profiles);
+  const users = previewUser ? [previewUser] : [];
   const { posts, publishPost, updatePost, deletePost } = usePreviewPosts(previewUser, users);
   const { trackImage, releaseImage } = usePostImageUrls();
   const { commentsByPost, setPostComments } = usePreviewComments(users);
@@ -144,24 +145,39 @@ export function AppLayout() {
         }}
         onDeletePost={removeCurrentPost}
       />
-      <Outlet
-        context={
-          {
-            openLogin,
-            previewUser,
-            updateProfile,
-            setPreviewSignedIn,
-            posts,
-            publishPost,
-            updatePost: savePost,
-            startWriting,
-            trackImage,
-            releaseImage,
-            commentsByPost,
-            setPostComments,
-          } satisfies AppLayoutContext
-        }
-      />
+      {isRestoring ? (
+        <p role="status" className="p-8 text-center">
+          로그인 정보를 불러오고 있습니다.
+        </p>
+      ) : authError ? (
+        <main className="p-8 text-center">
+          <p role="alert">{authError}</p>
+          <GitlogButton onClick={retryAuth} className="mt-4">
+            다시 시도
+          </GitlogButton>
+          <GitlogButton onClick={logout} className="mt-4">
+            로그아웃
+          </GitlogButton>
+        </main>
+      ) : (
+        <Outlet
+          context={
+            {
+              openLogin,
+              previewUser,
+              updateProfile,
+              posts,
+              publishPost,
+              updatePost: savePost,
+              startWriting,
+              trackImage,
+              releaseImage,
+              commentsByPost,
+              setPostComments,
+            } satisfies AppLayoutContext
+          }
+        />
+      )}
       <Toaster offset={88} mobileOffset={88} />
     </div>
   );

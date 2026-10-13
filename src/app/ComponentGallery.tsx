@@ -32,6 +32,7 @@ import { ProfileCard } from '@/shared/ui/ProfileCard';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { StatusToast, notify } from '@/shared/ui/StatusToast';
 import { TextField } from '@/shared/ui/TextField';
+import { PREVIEW_USER } from '@/shared/mocks/previewUser';
 import { Heading, Text } from '@/shared/ui/Typography';
 
 import type { AppLayoutContext } from './layouts/AppLayout';
@@ -64,14 +65,10 @@ function PreviewSection({ title, children }: { title: string; children: ReactNod
 
 export function ComponentGallery() {
   const navigate = useNavigate();
-  const {
-    openLogin,
-    previewUser,
-    setPreviewSignedIn,
-    startWriting,
-    commentsByPost,
-    setPostComments,
-  } = useOutletContext<AppLayoutContext>();
+  const { openLogin, startWriting, commentsByPost, setPostComments } =
+    useOutletContext<AppLayoutContext>();
+  const [previewSignedIn, setPreviewSignedIn] = useState(false);
+  const previewUser = previewSignedIn ? PREVIEW_USER : null;
   const [authNoticeKind, setAuthNoticeKind] = useState<AuthNoticeKind>('signupComplete');
   const [authNoticeOpen, setAuthNoticeOpen] = useState(false);
   const [dialogKind, setDialogKind] = useState<'withDescription' | 'simple' | null>(null);
@@ -123,8 +120,8 @@ export function ComponentGallery() {
             </Button>
           </div>
           <p className="mb-4 text-xs text-neutral-600">
-            화면 확인용 로그인 상태로 댓글과 글쓰기에 함께 적용됩니다. 작성한 글과 댓글은 새로고침
-            전까지만 유지됩니다.
+            이 로그인 미리보기는 이 화면의 댓글에만 적용됩니다. 실제 글쓰기는 로그인 후 이용할 수
+            있습니다.
           </p>
           <div className="bg-white font-auth">
             <CommentSection

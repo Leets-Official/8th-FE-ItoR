@@ -5,4 +5,4 @@ export interface LoginCredentials {
   password: string;
 }
 
-export type LoginHandler = (method: SignupMethod, credentials?: LoginCredentials) => boolean;
+export type LoginHandler = (method: SignupMethod, credentials?: LoginCredentials) => Promise<void>;

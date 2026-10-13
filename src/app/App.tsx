@@ -22,6 +22,9 @@ const SignupPage = lazy(() =>
 const SignupDetailsPage = lazy(() =>
   import('./routes/SignupDetailsPage').then((module) => ({ default: module.SignupDetailsPage })),
 );
+const KakaoCallbackPage = lazy(() =>
+  import('./routes/KakaoCallbackPage').then((module) => ({ default: module.KakaoCallbackPage })),
+);
 const ProfileSettingsPage = lazy(() =>
   import('./routes/ProfileSettingsPage').then((module) => ({
     default: module.ProfileSettingsPage,
@@ -39,6 +42,7 @@ export function App() {
         }
       >
         <Routes>
+          <Route path="oauth/kakao/success" element={<KakaoCallbackPage />} />
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />
             <Route path="components" element={<ComponentGallery />} />

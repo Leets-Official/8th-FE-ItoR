@@ -21,7 +21,7 @@ export function ProfileSettingsPage({ editing = false }: { editing?: boolean }) 
     );
   function save(draft: ProfileDraft) {
     if (!updateProfile(draft)) {
-      notify.error('프로필을 저장할 수 없습니다. 입력 내용과 로그인을 확인해주세요.');
+      notify.error('프로필 변경 기능은 준비 중입니다. 아직 변경 내용을 저장할 수 없습니다.');
       return;
     }
     navigate('/?view=mine');
