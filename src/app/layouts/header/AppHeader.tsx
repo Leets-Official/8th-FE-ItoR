@@ -1,22 +1,30 @@
-import { useLocation, useNavigate } from 'react-router';
+import type { Ref } from 'react';
+
+import { useLocation, useMatch } from 'react-router';
 
 import { LoginDialog } from '@/features/auth/ui/LoginDialog';
+import type { LoginHandler } from '@/features/auth/model/login';
 import { ReorderIcon } from '@/shared/assets/icons';
-import { ActionMenu } from '@/shared/ui/ActionMenu';
 import { IconButton } from '@/shared/ui/IconButton';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 import { HomeHeaderActions } from './HomeHeaderActions';
 import { PostHeaderActions } from './PostHeaderActions';
 import { WriteHeaderActions } from './WriteHeaderActions';
+import { ProfileHeaderActions } from './ProfileHeaderActions';
 
 interface AppHeaderProps {
   signedIn: boolean;
   loginOpen: boolean;
   onLoginOpenChange: (open: boolean) => void;
-  onLogin: () => void;
-  onOpenLogin: () => void;
+  onLogin: LoginHandler;
   onWrite: () => void;
+  canManagePost: boolean;
+  onEditPost: () => void;
+  onDeletePost: () => void;
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
+  menuButtonRef: Ref<HTMLButtonElement>;
 }
 
 export function AppHeader({
@@ -24,52 +32,62 @@ export function AppHeader({
   loginOpen,
   onLoginOpenChange,
   onLogin,
-  onOpenLogin,
   onWrite,
+  canManagePost,
+  onEditPost,
+  onDeletePost,
+  sidebarOpen,
+  onToggleSidebar,
+  menuButtonRef,
 }: AppHeaderProps) {
-  const navigate = useNavigate();
-  const { pathname, search } = useLocation();
-  const isWritingPage = pathname === '/posts/new';
-  const isPostPage = pathname.startsWith('/posts/') && !isWritingPage;
+  const { pathname } = useLocation();
+  const editMatch = useMatch('/posts/:postId/edit');
+  const isWritingPage = pathname === '/posts/new' || editMatch !== null;
+  const isPostPage = useMatch('/posts/:postId') !== null && !isWritingPage;
   const isBlogPage = pathname === '/' || isPostPage || isWritingPage;
+  const isSignupPage = pathname === '/mypage/signup' || pathname.startsWith('/mypage/signup/');
+  const isProfilePage = pathname === '/mypage/settings' || pathname === '/mypage/settings/edit';
 
   return (
     <PageHeader
+      showLogo={!sidebarOpen}
       className={
-        isBlogPage
-          ? `h-18 bg-white/90 py-4 font-auth backdrop-blur-[2px] ${isWritingPage ? 'border-b border-neutral-100' : ''}`
+        isBlogPage || isProfilePage
+          ? `h-18 bg-white/90 py-4 font-auth backdrop-blur-[2px] ${isWritingPage || isProfilePage ? 'border-b border-neutral-100' : ''}`
           : undefined
       }
       menu={
-        <ActionMenu
-          label="메뉴 열기"
-          trigger={
-            <IconButton label="메뉴 열기">
-              <ReorderIcon aria-hidden="true" />
-            </IconButton>
-          }
-          items={[
-            { id: 'home', label: '홈', onSelect: () => navigate('/') },
-            { id: 'write', label: '깃로그 쓰기', onSelect: onWrite },
-            { id: 'signup', label: '회원가입', onSelect: () => navigate('/mypage/signup') },
-          ]}
-        />
+        !sidebarOpen && (
+          <IconButton
+            ref={menuButtonRef}
+            label="메뉴 열기"
+            aria-expanded={false}
+            onClick={onToggleSidebar}
+          >
+            <ReorderIcon aria-hidden="true" />
+          </IconButton>
+        )
       }
       actions={
         <>
-          {isWritingPage && signedIn && <WriteHeaderActions />}
+          {isWritingPage && signedIn && <WriteHeaderActions editing={editMatch !== null} />}
           {pathname === '/' && <HomeHeaderActions onWrite={onWrite} />}
+          {isProfilePage && signedIn && (
+            <ProfileHeaderActions editing={pathname.endsWith('/edit')} />
+          )}
           {isPostPage && (
             <PostHeaderActions
-              onBackToList={() => navigate({ pathname: '/', search })}
-              onLogin={onOpenLogin}
+              key={pathname}
+              canManage={canManagePost}
+              onEdit={onEditPost}
+              onDelete={onDeletePost}
             />
           )}
           <LoginDialog
             open={loginOpen}
             onOpenChange={onLoginOpenChange}
             onLogin={onLogin}
-            trigger={isBlogPage ? null : undefined}
+            trigger={isBlogPage || isSignupPage || isProfilePage ? null : undefined}
           />
         </>
       }

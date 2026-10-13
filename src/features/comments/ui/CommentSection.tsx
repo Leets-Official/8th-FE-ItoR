@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { useCurrentTime } from '@/shared/hooks/useCurrentTime';
+import { notify } from '@/shared/ui/StatusToast';
 
 import type { CommentAuthor, PostComment } from '../model/comment';
 import { CommentForm } from './CommentForm';
@@ -38,7 +39,12 @@ export function CommentSection({
   }
 
   function editComment(id: string, content: string) {
-    if (!currentUser || !content.trim()) return;
+    if (
+      !currentUser ||
+      !content.trim() ||
+      !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
+    )
+      return;
     onCommentsChange(
       comments.map((comment) =>
         comment.id === id && comment.author.id === currentUser.id
@@ -46,16 +52,22 @@ export function CommentSection({
           : comment,
       ),
     );
-    setMessage('댓글을 수정했습니다.');
+    setMessage('');
+    notify.success('저장되었습니다!');
     heading.current?.focus({ preventScroll: true });
   }
 
   function deleteComment(id: string) {
-    if (!currentUser) return;
+    if (
+      !currentUser ||
+      !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
+    )
+      return;
     onCommentsChange(
       comments.filter((comment) => comment.id !== id || comment.author.id !== currentUser.id),
     );
-    setMessage('댓글을 삭제했습니다.');
+    setMessage('');
+    notify.success('삭제가 완료되었습니다!');
     heading.current?.focus({ preventScroll: true });
   }
   return (

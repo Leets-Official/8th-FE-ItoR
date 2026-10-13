@@ -1,5 +1,28 @@
-import type { PostContentBlock } from '../model/post';
+import type { Post, PostContentBlock } from '../model/post';
 import type { PostDraft, PostDraftBlock } from '../model/postDraft';
+
+export function createPostDraft(post: Post): PostDraft {
+  const blocks: PostDraftBlock[] = [{ id: 'first-text', type: 'text', text: '' }];
+  post.content.forEach((block, index) => {
+    if (index === 0 && block.type === 'text') blocks[0] = { ...block, id: 'first-text' };
+    else blocks.push({ ...block, id: `block-${index}` });
+  });
+  if (blocks.at(-1)?.type === 'image') blocks.push({ id: 'last-text', type: 'text', text: '' });
+  return { title: post.title, blocks };
+}
+
+export function buildPostFields(draft: PostDraft) {
+  const content = buildPostContent(draft.blocks);
+  return {
+    title: draft.title.trim(),
+    summary: content
+      .filter((block) => block.type === 'text')
+      .map((block) => block.text)
+      .join(' '),
+    content,
+    thumbnailUrl: content.find((block) => block.type === 'image')?.src,
+  };
+}
 
 export function getPostDraftError({ title, blocks }: PostDraft): 'title' | 'content' | null {
   if (!title.trim()) return 'title';

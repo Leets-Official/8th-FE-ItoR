@@ -1,6 +1,6 @@
 import { Button } from '@/shared/ui/primitives/button';
 
-export function WriteHeaderActions() {
+export function WriteHeaderActions({ editing = false }: { editing?: boolean }) {
   return (
     <>
       <Button
@@ -17,7 +17,7 @@ export function WriteHeaderActions() {
         variant="ghost"
         className="h-10 px-2 text-sm font-normal text-black sm:px-3"
       >
-        게시하기
+        {editing ? '저장하기' : '게시하기'}
       </Button>
     </>
   );
