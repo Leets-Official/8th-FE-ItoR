@@ -41,6 +41,8 @@
   --gitlog-danger: #e44d4a;
   --gitlog-success: #51c967;
   --gitlog-preview: #e7e2ff;
+  --kakao-bg: #f7e64b;
+  --kakao-text: #191919;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -56,6 +58,9 @@
   --color-gitlog-danger: var(--gitlog-danger);
   --color-gitlog-success: var(--gitlog-success);
   --color-gitlog-preview: var(--gitlog-preview);
+  --color-kakao-bg: var(--kakao-bg);
+  --color-kakao-text: var(--kakao-text);
+  --font-auth: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);

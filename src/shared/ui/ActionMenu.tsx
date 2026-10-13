@@ -23,9 +23,16 @@ interface ActionMenuProps {
   items: ActionMenuItem[];
   trigger?: ReactElement;
   appearance?: 'floating' | 'flat';
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
-export function ActionMenu({ label, items, trigger, appearance = 'floating' }: ActionMenuProps) {
+export function ActionMenu({
+  label,
+  items,
+  trigger,
+  appearance = 'floating',
+  onCloseAutoFocus,
+}: ActionMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -36,6 +43,7 @@ export function ActionMenu({ label, items, trigger, appearance = 'floating' }: A
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
+        onCloseAutoFocus={onCloseAutoFocus}
         align="start"
         className={cn(
           'min-w-36 bg-white p-1 text-neutral-900',

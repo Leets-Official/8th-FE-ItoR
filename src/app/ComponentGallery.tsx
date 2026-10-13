@@ -1,4 +1,10 @@
 import { useState, type ReactNode } from 'react';
+
+import { useNavigate, useOutletContext } from 'react-router';
+
+import { AuthNoticeDialog, type AuthNoticeKind } from '@/features/auth/ui/AuthNoticeDialog';
+import { previewComments } from '@/features/comments/model/previewComments';
+import { CommentSection } from '@/features/comments/ui/CommentSection';
 import {
   AddPhotoAlternateIcon,
   ChatIcon,
@@ -15,7 +21,6 @@ import {
 } from '@/shared/assets/icons';
 
 import { Button } from '@/shared/ui/primitives/button';
-import { Toaster } from '@/shared/ui/primitives/sonner';
 import { ActionMenu } from '@/shared/ui/ActionMenu';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { GitlogButton } from '@/shared/ui/GitlogButton';
@@ -28,6 +33,8 @@ import { Skeleton } from '@/shared/ui/Skeleton';
 import { StatusToast, notify } from '@/shared/ui/StatusToast';
 import { TextField } from '@/shared/ui/TextField';
 import { Heading, Text } from '@/shared/ui/Typography';
+
+import type { AppLayoutContext } from './layouts/AppLayout';
 
 const iconPreviews = [
   { name: 'reorder.svg', Icon: ReorderIcon },
@@ -56,6 +63,17 @@ function PreviewSection({ title, children }: { title: string; children: ReactNod
 }
 
 export function ComponentGallery() {
+  const navigate = useNavigate();
+  const {
+    openLogin,
+    previewUser,
+    setPreviewSignedIn,
+    startWriting,
+    commentsByPost,
+    setPostComments,
+  } = useOutletContext<AppLayoutContext>();
+  const [authNoticeKind, setAuthNoticeKind] = useState<AuthNoticeKind>('signupComplete');
+  const [authNoticeOpen, setAuthNoticeOpen] = useState(false);
   const [dialogKind, setDialogKind] = useState<'withDescription' | 'simple' | null>(null);
   const [page, setPage] = useState(1);
   const demoItems = [
@@ -77,6 +95,71 @@ export function ComponentGallery() {
             제공된 이미지의 구성과 상태를 확인하기 위한 미리보기입니다.
           </p>
         </div>
+
+        <PreviewSection title="로그인과 댓글 미리보기">
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Button type="button" onClick={() => setPreviewSignedIn(!previewUser)}>
+              {previewUser ? '미리보기 로그아웃' : '미리보기 로그인'}
+            </Button>
+            <Button type="button" variant="outline" onClick={startWriting}>
+              깃로그 쓰기
+            </Button>
+            <Button type="button" variant="outline" onClick={() => setPostComments('preview', [])}>
+              빈 댓글 상태
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPostComments('preview', previewComments)}
+            >
+              댓글 2개 상태
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/posts/1#post-comments')}
+            >
+              상세에서 댓글 확인
+            </Button>
+          </div>
+          <p className="mb-4 text-xs text-neutral-600">
+            화면 확인용 로그인 상태로 댓글과 글쓰기에 함께 적용됩니다. 작성한 글과 댓글은 새로고침
+            전까지만 유지됩니다.
+          </p>
+          <div className="bg-white font-auth">
+            <CommentSection
+              currentUser={previewUser}
+              comments={commentsByPost.preview}
+              onCommentsChange={(comments) => setPostComments('preview', comments)}
+              onLogin={openLogin}
+            />
+          </div>
+        </PreviewSection>
+
+        <PreviewSection title="인증 안내 모달">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setAuthNoticeKind('signupComplete');
+                setAuthNoticeOpen(true);
+              }}
+            >
+              가입 완료 모달 보기
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setAuthNoticeKind('unregisteredAccount');
+                setAuthNoticeOpen(true);
+              }}
+            >
+              미가입 계정 모달 보기
+            </Button>
+          </div>
+        </PreviewSection>
 
         <PreviewSection title="페이지 헤더">
           <div className="space-y-4">
@@ -293,7 +376,7 @@ export function ComponentGallery() {
 
         <PreviewSection title="페이지네이션">
           <div className="flex flex-col gap-6 bg-gitlog-preview p-2">
-            <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
+            <Pagination currentPage={page} totalPages={9} onPageChange={setPage} />
             <div className="flex gap-4">
               <Pagination currentPage={1} totalPages={5} onPageChange={setPage} />
               <Pagination currentPage={3} totalPages={5} onPageChange={setPage} />
@@ -364,6 +447,15 @@ export function ComponentGallery() {
           </PreviewSection>
         </div>
       </main>
+      <AuthNoticeDialog
+        kind={authNoticeKind}
+        open={authNoticeOpen}
+        onOpenChange={setAuthNoticeOpen}
+        onAction={() => {
+          if (authNoticeKind === 'signupComplete') openLogin();
+          else navigate('/mypage/signup');
+        }}
+      />
       <ConfirmDialog
         open={dialogKind !== null}
         onOpenChange={(open) => {
@@ -382,7 +474,6 @@ export function ComponentGallery() {
           notify.success('확인했습니다.');
         }}
       />
-      <Toaster />
     </div>
   );
 }
