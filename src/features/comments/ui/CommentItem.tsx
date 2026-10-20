@@ -24,7 +24,8 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
   const menuButton = useRef<HTMLButtonElement>(null);
   const selectedAction = useRef<'edit' | 'delete' | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
-  const owned = currentUser !== null && currentUser.id === comment.author.id;
+  const owned =
+    currentUser !== null && currentUser.id !== undefined && currentUser.id === comment.author.id;
 
   return (
     <li className="pb-5">

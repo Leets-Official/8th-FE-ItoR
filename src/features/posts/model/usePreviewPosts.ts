@@ -7,10 +7,9 @@ import { buildPostFields, getPostDraftError } from '../lib/postDraft';
 import { isPostAuthor } from '../lib/postOwnership';
 import type { Post } from './post';
 import type { PostDraft } from './postDraft';
-import { previewPosts } from './previewPosts';
 
 export function usePreviewPosts(currentUser: User | null, users: readonly User[]) {
-  const [posts, setPosts] = useState(previewPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   function publishPost(draft: PostDraft): Post | null {
     if (!currentUser || getPostDraftError(draft)) return null;

@@ -111,12 +111,8 @@ export function ComponentGallery() {
             >
               댓글 2개 상태
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/posts/1#post-comments')}
-            >
-              상세에서 댓글 확인
+            <Button type="button" variant="outline" onClick={() => navigate('/')}>
+              실제 게시물 목록 보기
             </Button>
           </div>
           <p className="mb-4 text-xs text-neutral-600">

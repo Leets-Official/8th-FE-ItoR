@@ -11,7 +11,7 @@ interface CommentSectionProps {
   onLogin: () => void;
   currentUser: CommentAuthor | null;
   comments: PostComment[];
-  onCommentsChange: (comments: PostComment[]) => void;
+  onCommentsChange?: (comments: PostComment[]) => void;
 }
 
 export function CommentSection({
@@ -23,9 +23,10 @@ export function CommentSection({
   const [message, setMessage] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
   const now = useCurrentTime();
+  const readOnly = !onCommentsChange;
 
   function addComment(content: string) {
-    if (!currentUser || !content.trim()) return;
+    if (!currentUser || !content.trim() || !onCommentsChange) return;
     onCommentsChange([
       ...comments,
       {
@@ -41,6 +42,7 @@ export function CommentSection({
   function editComment(id: string, content: string) {
     if (
       !currentUser ||
+      !onCommentsChange ||
       !content.trim() ||
       !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
     )
@@ -60,6 +62,7 @@ export function CommentSection({
   function deleteComment(id: string) {
     if (
       !currentUser ||
+      !onCommentsChange ||
       !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
     )
       return;
@@ -96,7 +99,7 @@ export function CommentSection({
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                currentUser={currentUser}
+                currentUser={readOnly ? null : currentUser}
                 now={now}
                 onEdit={editComment}
                 onDelete={deleteComment}
@@ -108,7 +111,11 @@ export function CommentSection({
           {message}
         </p>
         <div className="px-4 py-3">
-          {currentUser ? (
+          {readOnly && currentUser ? (
+            <p className="text-sm leading-6 text-neutral-400">
+              댓글 작성·수정·삭제 기능은 준비 중입니다.
+            </p>
+          ) : currentUser ? (
             <CommentForm key={currentUser.id} author={currentUser} onSubmit={addComment} />
           ) : (
             <button
