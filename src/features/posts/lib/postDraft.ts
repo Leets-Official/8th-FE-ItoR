@@ -11,19 +11,6 @@ export function createPostDraft(post: Post): PostDraft {
   return { title: post.title, blocks };
 }
 
-export function buildPostFields(draft: PostDraft) {
-  const content = buildPostContent(draft.blocks);
-  return {
-    title: draft.title.trim(),
-    summary: content
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text)
-      .join(' '),
-    content,
-    thumbnailUrl: content.find((block) => block.type === 'image')?.src,
-  };
-}
-
 export function getPostDraftError({ title, blocks }: PostDraft): 'title' | 'content' | null {
   if (!title.trim()) return 'title';
   if (!blocks.some((block) => block.type === 'image' || block.text.trim())) return 'content';

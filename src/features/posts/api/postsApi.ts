@@ -1,6 +1,7 @@
 import { api } from '@/shared/apis/client';
 import { isRecord, readApiResponse } from '@/shared/apis/response';
 
+import type { PostWriteBody } from '../model/postRequest';
 import type {
   PostContentResponse,
   PostDetailResponse,
@@ -74,7 +75,23 @@ function isPostDetail(value: unknown): value is PostDetailResponse {
   );
 }
 
+function isMutationData(value: unknown): value is Record<string, unknown> | null | undefined {
+  return value == null || isRecord(value);
+}
+
 export const postsApi = {
+  create: async (body: PostWriteBody) => {
+    const response = await api.post<unknown>('/posts', body);
+    return readApiResponse(response.data, isMutationData);
+  },
+  update: async (postId: string, body: PostWriteBody) => {
+    const response = await api.patch<unknown>('/posts', body, { params: { postId } });
+    return readApiResponse(response.data, isMutationData);
+  },
+  delete: async (postId: string) => {
+    const response = await api.delete<unknown>('/posts', { params: { postId } });
+    return readApiResponse(response.data, isMutationData);
+  },
   getList: async (params: PostListParams, authenticated: boolean, signal?: AbortSignal) => {
     const response = await api.get<unknown>(authenticated ? '/posts/all/token' : '/posts/all', {
       params,
