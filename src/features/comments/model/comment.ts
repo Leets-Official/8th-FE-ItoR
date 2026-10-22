@@ -7,4 +7,5 @@ export interface PostComment {
   author: CommentAuthor;
   content: string;
   createdAt: string;
+  isOwner: boolean;
 }

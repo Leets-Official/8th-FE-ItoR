@@ -123,7 +123,33 @@ export function ComponentGallery() {
             <CommentSection
               currentUser={previewUser}
               comments={commentsByPost.preview}
-              onCommentsChange={(comments) => setPostComments('preview', comments)}
+              onCreate={(content) => {
+                if (!previewUser) return;
+                setPostComments('preview', [
+                  ...commentsByPost.preview,
+                  {
+                    id: crypto.randomUUID(),
+                    author: previewUser,
+                    content,
+                    createdAt: new Date().toISOString(),
+                    isOwner: true,
+                  },
+                ]);
+              }}
+              onEdit={(id, content) =>
+                setPostComments(
+                  'preview',
+                  commentsByPost.preview.map((comment) =>
+                    comment.id === id ? { ...comment, content } : comment,
+                  ),
+                )
+              }
+              onDelete={(id) =>
+                setPostComments(
+                  'preview',
+                  commentsByPost.preview.filter((comment) => comment.id !== id),
+                )
+              }
               onLogin={openLogin}
             />
           </div>

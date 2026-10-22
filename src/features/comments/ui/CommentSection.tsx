@@ -11,64 +11,44 @@ interface CommentSectionProps {
   onLogin: () => void;
   currentUser: CommentAuthor | null;
   comments: PostComment[];
-  onCommentsChange?: (comments: PostComment[]) => void;
+  onCreate: (content: string) => void | Promise<void>;
+  onEdit: (id: string, content: string) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
 }
 
 export function CommentSection({
   onLogin,
   currentUser,
   comments,
-  onCommentsChange,
+  onCreate,
+  onEdit,
+  onDelete,
 }: CommentSectionProps) {
   const [message, setMessage] = useState('');
   const heading = useRef<HTMLHeadingElement>(null);
   const now = useCurrentTime();
-  const readOnly = !onCommentsChange;
 
-  function addComment(content: string) {
-    if (!currentUser || !content.trim() || !onCommentsChange) return;
-    onCommentsChange([
-      ...comments,
-      {
-        id: crypto.randomUUID(),
-        author: currentUser,
-        content: content.trim(),
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+  async function addComment(content: string) {
+    if (!currentUser) throw new Error('로그인이 필요합니다.');
+    await onCreate(content);
     setMessage('댓글을 등록했습니다.');
   }
 
-  function editComment(id: string, content: string) {
-    if (
-      !currentUser ||
-      !onCommentsChange ||
-      !content.trim() ||
-      !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
-    )
-      return;
-    onCommentsChange(
-      comments.map((comment) =>
-        comment.id === id && comment.author.id === currentUser.id
-          ? { ...comment, content: content.trim() }
-          : comment,
-      ),
-    );
+  async function editComment(id: string, content: string) {
+    if (!currentUser || !comments.some((comment) => comment.id === id && comment.isOwner)) {
+      throw new Error('작성자만 댓글을 수정할 수 있습니다.');
+    }
+    await onEdit(id, content);
     setMessage('');
     notify.success('저장되었습니다!');
     heading.current?.focus({ preventScroll: true });
   }
 
-  function deleteComment(id: string) {
-    if (
-      !currentUser ||
-      !onCommentsChange ||
-      !comments.some((comment) => comment.id === id && comment.author.id === currentUser.id)
-    )
-      return;
-    onCommentsChange(
-      comments.filter((comment) => comment.id !== id || comment.author.id !== currentUser.id),
-    );
+  async function deleteComment(id: string) {
+    if (!currentUser || !comments.some((comment) => comment.id === id && comment.isOwner)) {
+      throw new Error('작성자만 댓글을 삭제할 수 있습니다.');
+    }
+    await onDelete(id);
     setMessage('');
     notify.success('삭제가 완료되었습니다!');
     heading.current?.focus({ preventScroll: true });
@@ -99,7 +79,7 @@ export function CommentSection({
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                currentUser={readOnly ? null : currentUser}
+                currentUser={currentUser}
                 now={now}
                 onEdit={editComment}
                 onDelete={deleteComment}
@@ -111,11 +91,7 @@ export function CommentSection({
           {message}
         </p>
         <div className="px-4 py-3">
-          {readOnly && currentUser ? (
-            <p className="text-sm leading-6 text-neutral-400">
-              댓글 작성·수정·삭제 기능은 준비 중입니다.
-            </p>
-          ) : currentUser ? (
+          {currentUser ? (
             <CommentForm key={currentUser.id} author={currentUser} onSubmit={addComment} />
           ) : (
             <button

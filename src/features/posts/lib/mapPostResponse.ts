@@ -41,6 +41,7 @@ export function mapPostDetail(response: PostDetailResponse) {
     author: { nickname: comment.nickName, avatarUrl: comment.profileUrl ?? undefined },
     content: comment.content,
     createdAt: comment.createdAt,
+    isOwner: comment.isOwner,
   }));
   return {
     post: { ...post, author: { ...post.author, introduction: response.introduction ?? undefined } },

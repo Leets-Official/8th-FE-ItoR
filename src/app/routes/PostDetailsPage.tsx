@@ -1,5 +1,6 @@
 import { Link, useLocation, useOutletContext, useParams } from 'react-router';
 
+import { useCommentMutations } from '@/features/comments/api/useCommentMutations';
 import { CommentSection } from '@/features/comments/ui/CommentSection';
 import { usePostDetailQuery } from '@/features/posts/api/usePostQueries';
 import { PostAuthor } from '@/features/posts/ui/PostAuthor';
@@ -15,6 +16,7 @@ export function PostDetailsPage() {
   const { search } = useLocation();
   const { openLogin, previewUser } = useOutletContext<AppLayoutContext>();
   const detail = usePostDetailQuery(postId);
+  const commentMutations = useCommentMutations(postId);
   const post = detail.data?.post;
   const comments = detail.data?.comments ?? [];
 
@@ -25,7 +27,7 @@ export function PostDetailsPage() {
       </main>
     );
 
-  if (detail.isError)
+  if (detail.isError && !post)
     return (
       <main className="space-y-4 p-8 text-center">
         <p role="alert">{getApiErrorMessage(detail.error)}</p>
@@ -51,6 +53,12 @@ export function PostDetailsPage() {
 
   return (
     <main className="w-full font-auth">
+      {detail.isError && (
+        <div role="alert" className="space-y-2 p-4 text-center">
+          <p>최신 게시글과 댓글을 불러오지 못했습니다.</p>
+          <GitlogButton onClick={() => void detail.refetch()}>다시 시도</GitlogButton>
+        </div>
+      )}
       <article>
         <header className="border-b border-neutral-100 pt-9 sm:pt-16">
           <div className="mx-auto w-full max-w-[688px] py-3">
@@ -75,10 +83,19 @@ export function PostDetailsPage() {
         </div>
       </article>
       <CommentSection
-        key={post.id}
+        key={`${post.id}:${previewUser?.id ?? 'guest'}`}
         onLogin={openLogin}
         currentUser={previewUser}
         comments={comments}
+        onCreate={async (content) => {
+          await commentMutations.create.mutateAsync(content);
+        }}
+        onEdit={async (id, content) => {
+          await commentMutations.update.mutateAsync({ id, content });
+        }}
+        onDelete={async (id) => {
+          await commentMutations.remove.mutateAsync(id);
+        }}
       />
       <PostAuthor author={post.author} />
     </main>
