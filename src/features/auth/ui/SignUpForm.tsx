@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_90.svg';
 import { Blank, Button, Icon, showToast, TextFieldSet } from '@/shared/ui';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
 import type { SignUpInput, SocialProvider } from '../model/types';
 import { useAuth } from '../model/useAuth';
@@ -77,9 +77,9 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
     if (!file) return;
 
     try {
-      setProfileImageUrl(await readAsDataUrl(file));
+      setProfileImageUrl(await uploadImage(file));
     } catch {
-      showToast('negative', '프로필 사진을 불러오지 못했습니다.');
+      showToast('negative', '프로필 사진을 올리지 못했습니다.');
     }
   }
 

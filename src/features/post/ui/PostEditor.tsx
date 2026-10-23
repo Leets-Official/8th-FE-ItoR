@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type Ref, type SubmitEvent } from 'react';
 import type { PostContentBlock, PostCreateInput } from '../model/types';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
 import { Blank, Button, CompactPageHeader, IconButton, showToast } from '@/shared/ui';
 
@@ -104,13 +104,13 @@ export function PostEditor({
     event.target.value = '';
     if (!file) return;
 
-    // 사진을 읽는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
+    // 사진을 올리는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
     const caret = caretRef.current;
     let imageUrl: string;
     try {
-      imageUrl = await readAsDataUrl(file);
+      imageUrl = await uploadImage(file);
     } catch {
-      showToast('negative', '사진을 불러오지 못했습니다.');
+      showToast('negative', '사진을 올리지 못했습니다.');
       return;
     }
 

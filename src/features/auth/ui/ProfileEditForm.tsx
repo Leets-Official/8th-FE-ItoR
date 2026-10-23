@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent, type Ref, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Icon, showToast, TextField, TextFieldSet } from '@/shared/ui';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
 import {
   EMAIL_PATTERN,
@@ -55,9 +55,9 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
     if (!file) return;
 
     try {
-      setProfileImageUrl(await readAsDataUrl(file));
+      setProfileImageUrl(await uploadImage(file));
     } catch {
-      showToast('negative', '프로필 사진을 불러오지 못했습니다.');
+      showToast('negative', '프로필 사진을 올리지 못했습니다.');
     }
   }
 
