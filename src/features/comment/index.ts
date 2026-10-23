@@ -1,5 +1,5 @@
 export { CommentAuthor } from './ui/CommentAuthor';
 export { CommentSection } from './ui/CommentSection';
-export { countMockComments, getComments } from './api/commentApi';
-export { commentQueryKeys } from './api/commentQueries';
+export { toPostComment } from './api/commentApi';
+export type { CommentResponse } from './api/commentApi';
 export type { PostComment } from './model/types';

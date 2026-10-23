@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useAuth, useLoginModal } from '@/features/auth';
-import { getMockPosts, PostListItem } from '@/features/post';
+import { getAllPosts, getPostDetail, PostListItem, postQueryKeys } from '@/features/post';
 import { UserProfile } from '@/features/user';
 import { Blank, Button, PageHeader, Pagination, useSidebar } from '@/shared/ui';
 
@@ -18,10 +19,21 @@ export function UserBlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const isMine = Boolean(currentUser) && currentUser?.nickname === nickname;
-  // API 연동 전에는 작성자 id가 없어 닉네임으로 그 사용자의 글을 찾는다
-  const userPosts = getMockPosts().filter(({ author }) => author.nickname === nickname);
-  // 내 정보는 로그인 정보에서, 다른 사용자 정보는 그 사람이 쓴 글의 작성자 정보에서 가져온다
-  const user = isMine ? currentUser : userPosts[0]?.author;
+  // 서버에 사용자별 글 목록·프로필 API가 없어 전체 글에서 닉네임으로 그 사용자의 글을 찾는다
+  const { data: allPosts, isPending } = useQuery({
+    queryKey: postQueryKeys.everything,
+    queryFn: getAllPosts,
+  });
+  const userPosts = allPosts?.filter(({ author }) => author.nickname === nickname) ?? [];
+  // 목록 응답에는 한 줄 소개가 없어 다른 사용자는 가장 최근 글의 상세에서 작성자 정보를 가져온다
+  const latestPostId = userPosts[0]?.id;
+  const { data: latestPost } = useQuery({
+    queryKey: postQueryKeys.detail(latestPostId ?? '', currentUser?.nickname),
+    queryFn: () => getPostDetail(latestPostId ?? ''),
+    enabled: !isMine && latestPostId !== undefined,
+  });
+  // 내 정보는 로그인 정보에서 가져온다. 상세를 불러오기 전에는 목록의 작성자 정보로 먼저 보여 준다
+  const user = isMine ? currentUser : (latestPost?.author ?? userPosts[0]?.author);
 
   const pageCount = Math.ceil(userPosts.length / POSTS_PER_PAGE);
   const posts = userPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
@@ -48,7 +60,7 @@ export function UserBlogPage() {
         onMenu={openSidebar}
         onCreate={handleCreate}
       />
-      {user ? (
+      {isPending ? null : user ? (
         <main>
           {/* 배경이 gray96이라 흰 배경인 Blank 대신 py-16으로 위아래 64px 여백을 준다 */}
           <section className="flex w-full flex-col items-center border-b border-gray-96 bg-gray-96 py-16">

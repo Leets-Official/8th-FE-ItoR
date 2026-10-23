@@ -6,4 +6,6 @@ export interface PostComment {
   author: User;
   content: string;
   createdAt: string;
+  // 로그인한 사용자가 쓴 댓글이면 true. 삭제 메뉴를 보여줄지 정한다
+  isOwner: boolean;
 }
