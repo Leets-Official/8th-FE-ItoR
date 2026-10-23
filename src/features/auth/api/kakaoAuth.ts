@@ -38,6 +38,35 @@ export function takeKakaoReturnPath() {
   return returnPath?.startsWith('/') && !returnPath.startsWith('//') ? returnPath : '/';
 }
 
+// 가입되지 않은 카카오 계정이면 서버가 kakaoId를 준다. 회원가입 폼을 채우는 동안 남아 있도록 저장해 두고
+// /auth/register-oauth에 함께 보낸다
+const KAKAO_ID_KEY = 'kakaoId';
+
+export function saveKakaoId(kakaoId: number) {
+  try {
+    sessionStorage.setItem(KAKAO_ID_KEY, String(kakaoId));
+  } catch {
+    // 저장소를 쓸 수 없으면 가입할 때 카카오 로그인을 다시 거친다
+  }
+}
+
+export function readKakaoId() {
+  try {
+    const stored = sessionStorage.getItem(KAKAO_ID_KEY);
+    return stored ? Number(stored) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function clearKakaoId() {
+  try {
+    sessionStorage.removeItem(KAKAO_ID_KEY);
+  } catch {
+    // 저장소를 쓸 수 없으면 지울 값도 없다
+  }
+}
+
 export const KAKAO_SIGN_UP_PATH = '/signup/kakao';
 
 // 가입되지 않은 카카오 계정으로 돌아왔을 때, 출발한 페이지에서 회원가입 여부를 묻도록 location state로 알린다

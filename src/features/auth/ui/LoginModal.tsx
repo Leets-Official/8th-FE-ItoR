@@ -16,8 +16,8 @@ type LoginFailure = LoginError | 'invalid-email-format';
 
 const LOGIN_ERROR_MESSAGE: Record<LoginFailure, string> = {
   'invalid-email-format': '*이메일 형식이 적합하지 않습니다.',
-  'unregistered-email': '*가입되지 않은 이메일입니다.',
-  'wrong-password': '*비밀번호가 일치하지 않습니다.',
+  'invalid-credentials': '*이메일 또는 비밀번호가 일치하지 않습니다.',
+  unknown: '*로그인하지 못했습니다. 잠시 후 다시 시도해주세요.',
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +25,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: LoginModalProps) {
   const { login } = useAuth();
   const [failure, setFailure] = useState<LoginFailure>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleOpenChange(nextOpen: boolean) {
     // 다시 열었을 때 이전 실패 메시지가 남지 않게 한다
@@ -38,8 +39,10 @@ export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: Login
     onSignUp?.();
   }
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    // 응답을 기다리는 동안 Enter를 다시 눌러 요청이 겹치지 않게 한다
+    if (isSubmitting) return;
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get('email') ?? '').trim();
     const password = String(formData.get('password') ?? '');
@@ -50,7 +53,9 @@ export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: Login
       return;
     }
 
-    const error = login(email, password);
+    setIsSubmitting(true);
+    const error = await login(email, password);
+    setIsSubmitting(false);
     if (error) {
       setFailure(error);
       return;
@@ -87,12 +92,13 @@ export function LoginModal({ open, onOpenChange, onKakaoLogin, onSignUp }: Login
             <div className="h-[33px] w-full max-w-[344px] min-w-60" />
             <LoginFields
               errorMessage={failure && LOGIN_ERROR_MESSAGE[failure]}
-              invalidField={failure === 'wrong-password' ? 'password' : 'email'}
+              invalidField={failure === 'invalid-credentials' ? 'password' : 'email'}
             />
             <div className="w-full max-w-[344px] min-w-60 px-4 py-1">
               <button
                 type="submit"
-                className="flex h-[45px] w-full cursor-pointer items-center justify-center rounded-[6px] bg-point px-3.5 text-14 text-white hover:brightness-95 active:brightness-90"
+                disabled={isSubmitting}
+                className="flex h-[45px] w-full cursor-pointer items-center justify-center rounded-[6px] bg-point px-3.5 text-14 text-white hover:brightness-95 active:brightness-90 disabled:cursor-default disabled:opacity-60"
               >
                 이메일로 로그인
               </button>
