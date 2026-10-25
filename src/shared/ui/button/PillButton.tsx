@@ -15,6 +15,8 @@ export type PillButtonProps = {
   height?: number;
   /** 버튼을 눌렀을 때 실행할 동작입니다. */
   onClick?: () => void;
+  /** 버튼 동작을 비활성화합니다. */
+  disabled?: boolean;
 };
 
 const variantStyles = {
@@ -33,15 +35,17 @@ export function PillButton({
   width,
   height,
   onClick,
+  disabled = false,
 }: PillButtonProps) {
   const fillsAvailableWidth = width === 'fill';
 
   return (
     <button
       type={type}
+      disabled={disabled}
       onClick={onClick}
       style={{ width: typeof width === 'number' ? width : undefined, height }}
-      className={`text-14-regular inline-flex h-10 items-center justify-center gap-1 whitespace-nowrap rounded-[25px] px-3 py-2 ${fillsAvailableWidth ? 'flex-1' : 'w-fit'} ${variantStyles[variant]}`}
+      className={`text-14-regular inline-flex h-10 items-center justify-center gap-1 whitespace-nowrap rounded-[25px] px-3 py-2 disabled:cursor-not-allowed disabled:opacity-60 ${fillsAvailableWidth ? 'flex-1' : 'w-fit'} ${variantStyles[variant]}`}
     >
       {icon && (
         <span aria-hidden="true">

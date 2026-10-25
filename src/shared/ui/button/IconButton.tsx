@@ -7,15 +7,31 @@ export type IconButtonProps = {
   label: string;
   /** 버튼을 눌렀을 때 실행할 동작입니다. */
   onClick?: () => void;
+  /** 버튼이 제어하는 팝업 요소의 id입니다. */
+  ariaControls?: string;
+  /** 버튼이 제어하는 팝업의 열림 상태입니다. */
+  ariaExpanded?: boolean;
+  /** 버튼이 여는 팝업의 종류입니다. */
+  ariaHasPopup?: 'menu' | 'dialog';
 };
 
 // TODO(UI): 내비게이션 전환 명세가 확정되면 300ms ease-out 이동 애니메이션을 적용합니다.
 /** 40px 클릭 영역에 24px 아이콘을 표시하는 접근 가능한 아이콘 버튼입니다. */
-export function IconButton({ icon, label, onClick }: IconButtonProps) {
+export function IconButton({
+  icon,
+  label,
+  onClick,
+  ariaControls,
+  ariaExpanded,
+  ariaHasPopup,
+}: IconButtonProps) {
   return (
     <button
       type="button"
       aria-label={label}
+      aria-controls={ariaControls}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHasPopup}
       onClick={onClick}
       className="inline-flex h-10 w-10 shrink-0 items-center justify-center transition-colors duration-300 ease-out active:rounded-[4px] active:bg-gray-90"
     >
