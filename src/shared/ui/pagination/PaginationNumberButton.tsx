@@ -19,7 +19,6 @@ export function PaginationNumberButton({
   return (
     <button
       type="button"
-      aria-label={`${pageNumber}페이지`}
       aria-current={isCurrent ? 'page' : undefined}
       className="group flex h-8 min-w-8 items-center justify-center rounded-[2px] border border-neutral-5 bg-neutral-1 px-[7px] py-px font-roboto text-sm font-normal leading-[22px] tracking-normal transition-colors duration-100 ease-out enabled:hover:border-primary-6"
       disabled={disabled}

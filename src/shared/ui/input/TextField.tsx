@@ -20,6 +20,10 @@ export type TextFieldProps = {
   backgroundColor?: string;
   /** placeholder와 다른 접근성 이름이 필요할 때 사용합니다. */
   ariaLabel?: string;
+  /** 입력값이 유효하지 않은 상태인지 보조 기술에 전달합니다. */
+  ariaInvalid?: boolean;
+  /** 입력 상태를 설명하는 요소의 id를 연결합니다. */
+  ariaDescribedBy?: string;
   /** 변경된 문자열 값을 전달받습니다. */
   onChange?: (value: string) => void;
 };
@@ -39,12 +43,16 @@ export function TextField({
   readOnly = false,
   backgroundColor,
   ariaLabel,
+  ariaInvalid,
+  ariaDescribedBy,
   onChange,
 }: TextFieldProps) {
   return (
     <input
       type={inputType}
       aria-label={ariaLabel ?? placeholder}
+      aria-invalid={ariaInvalid}
+      aria-describedby={ariaDescribedBy}
       className={`h-fit w-[656px] max-w-full rounded-[4px] border border-gray-90 bg-transparent px-4 py-3 text-black transition-colors duration-100 ease-out placeholder:text-gray-56 focus:border-gray-33 focus:outline-none disabled:bg-gray-90 disabled:text-gray-56 ${textStyles[variant]}`}
       placeholder={placeholder}
       value={value}

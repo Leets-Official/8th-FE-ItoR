@@ -22,6 +22,7 @@ React, TypeScript, Tailwind CSS 코드를 작성하거나 수정할 때 적용�
 - 이벤트로 처리할 수 있는 로직은 Effect로 옮기지 않습니다.
 - Hook은 컴포넌트 최상위에서 조건 없이 호출합니다.
 - React Compiler를 사용하므로 근거 없이 `memo`, `useMemo`, `useCallback`을 추가하지 않습니다.
+- DOM 접근, 포커스, 파일 입력, 커서 위치처럼 렌더링과 무관한 값을 보존할 때만 `useRef`를 사용합니다.
 - 목록 렌더링에는 항목을 안정적으로 식별하는 `key`를 사용합니다.
 - 입력 컴포넌트는 controlled와 uncontrolled 사용 방식을 섞지 않습니다.
 
@@ -54,6 +55,17 @@ React, TypeScript, Tailwind CSS 코드를 작성하거나 수정할 때 적용�
 - 장식용 아이콘은 보조 기술에서 숨깁니다.
 - 오류나 주의 문구는 상황에 맞는 `role`과 입력 요소의 연결 상태를 함께 고려합니다.
 - `disabled`, focus, hover, active 상태는 의미와 디자인을 모두 반영합니다.
+- 모달과 드로어는 열린 영역 안에 포커스를 유지하고 Escape 닫기와 이전 포커스 복원을 지원합니다.
+- 드롭다운 메뉴는 키보드 방향키와 Escape로 이동하고 닫을 수 있어야 합니다.
+
+## 성능
+
+- 라우트 컴포넌트는 TanStack Router의 자동 코드 분할을 사용합니다.
+- 루트 레이아웃의 조건부 모달·드로어처럼 라우트 밖의 큰 UI만 React `lazy`로 지연합니다.
+- 반복 목록과 화면 아래 이미지는 `loading="lazy"`, `decoding="async"`를 적용합니다.
+- 첫 화면의 주요 이미지만 `eager`와 높은 fetch priority를 사용합니다.
+- 이미지의 표시 크기를 아는 경우 `width`와 `height` 속성을 함께 제공합니다.
+- 공개 메인·회원가입 화면은 `pnpm audit:lighthouse`로 네 항목 모두 90점 이상인지 확인합니다.
 
 ## 검증
 

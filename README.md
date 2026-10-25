@@ -88,6 +88,10 @@ pnpm typecheck
 pnpm lint
 pnpm build
 pnpm format:check
+pnpm audit:lighthouse
 ```
+
+`pnpm audit:lighthouse`는 모바일 환경의 메인·회원가입 공개 화면에서 Performance,
+Accessibility, Best Practices, SEO 점수가 각각 90점 이상인지 검사합니다.
 
 폴더 구조는 추후 UI 구현 단계에서 적용합니다.

@@ -7,7 +7,7 @@ export function RegisterIntroSection() {
   return (
     <section className="flex h-fit w-full flex-col items-center justify-center border-b border-b-gray-96 bg-gray-96">
       <Spacer variant="32" />
-      <TextContent variant="24" title="회원가입" />
+      <TextContent variant="24" title="회원가입" headingLevel={1} />
       <Spacer variant="20" />
     </section>
   );

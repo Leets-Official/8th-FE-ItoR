@@ -2,19 +2,16 @@
 
 import { useNavigate } from '@tanstack/react-router';
 
+import { useAuth } from '@/shared/auth/hooks/useAuth';
 import { SettingsIcon } from '@/shared/assets/icons/icons';
 import { Spacer } from '@/shared/ui/spacing/Spacer';
 import { ActionButton } from '@/shared/ui/button/ActionButton';
 import { Avatar } from '@/shared/ui/avatar/Avatar';
 import { TextContent } from '@/shared/ui/text/TextContent';
 
-type MyProfileSectionProps = {
-  nickname: string;
-  introduction: string;
-};
-
-export function MyProfileSection({ nickname, introduction }: MyProfileSectionProps) {
+export function MyProfileSection() {
   const navigate = useNavigate();
+  const { auth } = useAuth();
 
   function openProfileEditPage() {
     void navigate({ to: '/my/edit' });
@@ -25,10 +22,15 @@ export function MyProfileSection({ nickname, introduction }: MyProfileSectionPro
       <Spacer variant="64" />
 
       <div className="flex h-fit w-full max-w-[688px] gap-2.5 px-4 py-3">
-        <Avatar size="medium" />
+        <Avatar size="medium" src={auth?.profilePicture ?? undefined} />
       </div>
 
-      <TextContent variant="24" title={nickname} subtitle={introduction} />
+      <TextContent
+        variant="24"
+        title={auth?.nickname ?? ''}
+        subtitle={auth?.introduction ?? ''}
+        headingLevel={1}
+      />
 
       <div className="flex h-fit w-full max-w-[688px] gap-2.5 px-4 py-3">
         <ActionButton

@@ -11,6 +11,7 @@ ItoR은 React와 TypeScript로 구현하는 반응형 웹 애플리케이션입�
 작업을 시작하기 전에 현재 코드와 변경 사항을 확인하고, 필요한 규칙만 읽습니다.
 
 - 구조, 의존성, 라우팅: `codex/rules/architecture.md`
+- API 계약, 인증, 서버 상태: `codex/rules/api.md`
 - 이름, 파일 구성, 주석: `codex/rules/conventions.md`
 - React, TypeScript, 스타일 작성: `codex/rules/code-style.md`
 - 브랜치, 커밋, PR: `codex/rules/git.md`
@@ -21,6 +22,7 @@ ItoR은 React와 TypeScript로 구현하는 반응형 웹 애플리케이션입�
 - 기존 디자인 토큰, 공통 컴포넌트, 반응형 기준을 먼저 재사용합니다.
 - `src/app/routeTree.gen.ts`는 생성 파일이므로 직접 수정하지 않습니다.
 - 구조나 컨벤션을 바꾸기 전에 기존 구현과 관련 설정을 확인합니다.
+- 리팩터링에서는 요청이 없는 한 기존 DOM 구조, 스타일 클래스와 사용자 문구를 유지합니다.
 - 작업 중 반복해서 필요한 규칙이나 PR 리뷰에서 확인된 규칙은 관련 문서에 반영합니다.
 - 오래되었거나 서로 충돌하는 규칙은 발견한 작업에서 함께 정리합니다.
 
