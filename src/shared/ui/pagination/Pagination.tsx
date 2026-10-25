@@ -21,7 +21,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   );
 
   return (
-    <div className="flex h-fit w-fit items-center justify-center gap-2">
+    <nav aria-label="페이지네이션" className="flex h-fit w-fit items-center justify-center gap-2">
       <PaginationArrowButton
         direction="previous"
         disabled={firstPageInGroup === 1}
@@ -40,6 +40,6 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         disabled={firstPageInGroup + PAGE_GROUP_SIZE > totalPages}
         onClick={() => onPageChange(firstPageInGroup + PAGE_GROUP_SIZE)}
       />
-    </div>
+    </nav>
   );
 }

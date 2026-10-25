@@ -20,15 +20,18 @@ function createImage(file: File): ArticleImage {
     id: crypto.randomUUID(),
     src: URL.createObjectURL(file),
     alt: file.name,
+    file,
   };
 }
 
 /** @returns 텍스트와 이미지 블록의 순서, 입력 위치, 이미지 파일을 관리하는 본문 편집 상태 */
-export function useArticleEditor() {
+export function useArticleEditor(initialBlocks?: readonly ArticleBlock[]) {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const imageUrlsRef = useRef(new Set<string>());
   const insertionPointRef = useRef<TextInsertionPoint | null>(null);
-  const [blocks, setBlocks] = useState<ArticleBlock[]>(() => [createTextBlock()]);
+  const [blocks, setBlocks] = useState<ArticleBlock[]>(() =>
+    initialBlocks?.length ? [...initialBlocks] : [createTextBlock()],
+  );
   const [focusTextBlockId, setFocusTextBlockId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +47,9 @@ export function useArticleEditor() {
   }
 
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    const images = Array.from(event.currentTarget.files ?? []).map(createImage);
+    const images = Array.from(event.currentTarget.files ?? [])
+      .filter((file) => file.type.startsWith('image/'))
+      .map(createImage);
 
     if (images.length === 0) return;
 
@@ -52,7 +57,6 @@ export function useArticleEditor() {
 
     const nextTextBlock = createTextBlock();
 
-    // TODO(API): 본문 블록 API 연결 시 현재 입력 순서를 서버 전송 형식으로 직렬화합니다.
     setBlocks((currentBlocks) => {
       const insertionPoint = insertionPointRef.current;
       const targetIndex = insertionPoint

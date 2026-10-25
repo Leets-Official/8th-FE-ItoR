@@ -12,6 +12,6 @@ const heightStyles = {
 /** 부모 배경을 그대로 보이며 모바일에서는 비율에 맞춰 줄어드는 세로 여백입니다. */
 export function Spacer({ variant }: SpacerProps) {
   return (
-    <div aria-hidden="true" className={`w-[688px] max-w-full shrink-0 ${heightStyles[variant]}`} />
+    <div aria-hidden="true" className={`w-full max-w-[688px] shrink-0 ${heightStyles[variant]}`} />
   );
 }

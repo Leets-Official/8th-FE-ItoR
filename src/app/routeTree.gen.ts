@@ -10,22 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DetailRouteImport } from './routes/detail'
 import { Route as MyRouteRouteImport } from './routes/my/route'
 import { Route as WriteRouteImport } from './routes/write'
 import { Route as MyIndexRouteImport } from './routes/my/index'
 import { Route as MyEditRouteImport } from './routes/my/edit'
+import { Route as PostsPostIdRouteImport } from './routes/posts/$postId'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
-import { Route as RegisterEmailRouteImport } from './routes/register/email'
+import { Route as RegisterFormRouteImport } from './routes/register/form'
+import { Route as OauthKakaoSuccessRouteImport } from './routes/oauth/kakao/success'
+import { Route as PostsPostIdEditRouteImport } from './routes/posts_/$postId/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DetailRoute = DetailRouteImport.update({
-  id: '/detail',
-  path: '/detail',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyRouteRoute = MyRouteRouteImport.update({
@@ -48,86 +45,115 @@ const MyEditRoute = MyEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => MyRouteRoute,
 } as any)
+const PostsPostIdRoute = PostsPostIdRouteImport.update({
+  id: '/posts/$postId',
+  path: '/posts/$postId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterIndexRoute = RegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegisterEmailRoute = RegisterEmailRouteImport.update({
-  id: '/register/email',
-  path: '/register/email',
+const RegisterFormRoute = RegisterFormRouteImport.update({
+  id: '/register/form',
+  path: '/register/form',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthKakaoSuccessRoute = OauthKakaoSuccessRouteImport.update({
+  id: '/oauth/kakao/success',
+  path: '/oauth/kakao/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostsPostIdEditRoute = PostsPostIdEditRouteImport.update({
+  id: '/posts_/$postId/edit',
+  path: '/posts/$postId/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/my': typeof MyRouteRouteWithChildren
-  '/detail': typeof DetailRoute
   '/write': typeof WriteRoute
   '/my/edit': typeof MyEditRoute
-  '/register/email': typeof RegisterEmailRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/register/form': typeof RegisterFormRoute
   '/my/': typeof MyIndexRoute
   '/register/': typeof RegisterIndexRoute
+  '/oauth/kakao/success': typeof OauthKakaoSuccessRoute
+  '/posts/$postId/edit': typeof PostsPostIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/detail': typeof DetailRoute
   '/write': typeof WriteRoute
   '/my/edit': typeof MyEditRoute
-  '/register/email': typeof RegisterEmailRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/register/form': typeof RegisterFormRoute
   '/my': typeof MyIndexRoute
   '/register': typeof RegisterIndexRoute
+  '/oauth/kakao/success': typeof OauthKakaoSuccessRoute
+  '/posts/$postId/edit': typeof PostsPostIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/my': typeof MyRouteRouteWithChildren
-  '/detail': typeof DetailRoute
   '/write': typeof WriteRoute
   '/my/edit': typeof MyEditRoute
-  '/register/email': typeof RegisterEmailRoute
+  '/posts/$postId': typeof PostsPostIdRoute
+  '/register/form': typeof RegisterFormRoute
   '/my/': typeof MyIndexRoute
   '/register/': typeof RegisterIndexRoute
+  '/oauth/kakao/success': typeof OauthKakaoSuccessRoute
+  '/posts_/$postId/edit': typeof PostsPostIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/my'
-    | '/detail'
     | '/write'
     | '/my/edit'
-    | '/register/email'
+    | '/posts/$postId'
+    | '/register/form'
     | '/my/'
     | '/register/'
+    | '/oauth/kakao/success'
+    | '/posts/$postId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/detail'
     | '/write'
     | '/my/edit'
-    | '/register/email'
+    | '/posts/$postId'
+    | '/register/form'
     | '/my'
     | '/register'
+    | '/oauth/kakao/success'
+    | '/posts/$postId/edit'
   id:
     | '__root__'
     | '/'
     | '/my'
-    | '/detail'
     | '/write'
     | '/my/edit'
-    | '/register/email'
+    | '/posts/$postId'
+    | '/register/form'
     | '/my/'
     | '/register/'
+    | '/oauth/kakao/success'
+    | '/posts_/$postId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MyRouteRoute: typeof MyRouteRouteWithChildren
-  DetailRoute: typeof DetailRoute
   WriteRoute: typeof WriteRoute
-  RegisterEmailRoute: typeof RegisterEmailRoute
+  PostsPostIdRoute: typeof PostsPostIdRoute
+  RegisterFormRoute: typeof RegisterFormRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
+  OauthKakaoSuccessRoute: typeof OauthKakaoSuccessRoute
+  PostsPostIdEditRoute: typeof PostsPostIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -137,13 +163,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/detail': {
-      id: '/detail'
-      path: '/detail'
-      fullPath: '/detail'
-      preLoaderRoute: typeof DetailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my': {
@@ -174,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyEditRouteImport
       parentRoute: typeof MyRouteRoute
     }
+    '/posts/$postId': {
+      id: '/posts/$postId'
+      path: '/posts/$postId'
+      fullPath: '/posts/$postId'
+      preLoaderRoute: typeof PostsPostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register/': {
       id: '/register/'
       path: '/register'
@@ -181,11 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/register/email': {
-      id: '/register/email'
-      path: '/register/email'
-      fullPath: '/register/email'
-      preLoaderRoute: typeof RegisterEmailRouteImport
+    '/register/form': {
+      id: '/register/form'
+      path: '/register/form'
+      fullPath: '/register/form'
+      preLoaderRoute: typeof RegisterFormRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/kakao/success': {
+      id: '/oauth/kakao/success'
+      path: '/oauth/kakao/success'
+      fullPath: '/oauth/kakao/success'
+      preLoaderRoute: typeof OauthKakaoSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/posts_/$postId/edit': {
+      id: '/posts_/$postId/edit'
+      path: '/posts/$postId/edit'
+      fullPath: '/posts/$postId/edit'
+      preLoaderRoute: typeof PostsPostIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -207,10 +247,12 @@ const MyRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MyRouteRoute: MyRouteRouteWithChildren,
-  DetailRoute: DetailRoute,
   WriteRoute: WriteRoute,
-  RegisterEmailRoute: RegisterEmailRoute,
+  PostsPostIdRoute: PostsPostIdRoute,
+  RegisterFormRoute: RegisterFormRoute,
   RegisterIndexRoute: RegisterIndexRoute,
+  OauthKakaoSuccessRoute: OauthKakaoSuccessRoute,
+  PostsPostIdEditRoute: PostsPostIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

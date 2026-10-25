@@ -50,6 +50,7 @@ export function ArticleImageBlock({
           className="h-auto w-full rounded-[4px] object-contain"
           src={image.src}
           alt={image.alt}
+          decoding="async"
         />
       </button>
     </figure>

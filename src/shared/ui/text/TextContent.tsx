@@ -19,35 +19,67 @@ type TextVariantProps = {
   subtitle?: never;
 };
 
-export type TextContentProps = Title24VariantProps | Title16VariantProps | TextVariantProps;
+type HeadingLevelProps = {
+  /** 제목의 문서 구조 단계입니다. 페이지 제목에는 `1`을 사용합니다. */
+  headingLevel?: 1 | 2 | 3;
+};
+
+export type TextContentProps =
+  | (Title24VariantProps & HeadingLevelProps)
+  | (Title16VariantProps & HeadingLevelProps)
+  | TextVariantProps;
 
 type Title24ContentProps = {
   title: string;
   subtitle?: string;
+  headingLevel: 1 | 2 | 3;
 };
 
 type Title16ContentProps = {
   title: string;
   subtitle?: string;
+  headingLevel: 1 | 2 | 3;
 };
 
 type TextOnlyContentProps = {
   text: string;
 };
 
-function Title24Content({ title, subtitle }: Title24ContentProps) {
+type ContentHeadingProps = {
+  level: 1 | 2 | 3;
+  className: string;
+  children: string;
+};
+
+function ContentHeading({ level, className, children }: ContentHeadingProps) {
+  if (level === 1) {
+    return <h1 className={className}>{children}</h1>;
+  }
+
+  if (level === 3) {
+    return <h3 className={className}>{children}</h3>;
+  }
+
+  return <h2 className={className}>{children}</h2>;
+}
+
+function Title24Content({ title, subtitle, headingLevel }: Title24ContentProps) {
   return (
     <div className="flex h-fit w-[688px] max-w-full flex-col justify-center gap-3 px-4 py-3">
-      <h2 className="text-24-medium line-clamp-1 text-black">{title}</h2>
+      <ContentHeading level={headingLevel} className="text-24-medium line-clamp-1 text-black">
+        {title}
+      </ContentHeading>
       {subtitle && <p className="text-14-light line-clamp-1 text-gray-20">{subtitle}</p>}
     </div>
   );
 }
 
-function Title16Content({ title, subtitle }: Title16ContentProps) {
+function Title16Content({ title, subtitle, headingLevel }: Title16ContentProps) {
   return (
     <div className="flex h-fit w-full flex-col justify-center gap-2 px-4 py-3">
-      <h2 className="text-16-medium line-clamp-1 text-black">{title}</h2>
+      <ContentHeading level={headingLevel} className="text-16-medium line-clamp-1 text-black">
+        {title}
+      </ContentHeading>
       {subtitle && <p className="text-14-light line-clamp-2 text-gray-20">{subtitle}</p>}
     </div>
   );
@@ -73,8 +105,20 @@ export function TextContent(props: TextContentProps) {
   }
 
   if (props.variant === '24') {
-    return <Title24Content title={props.title} subtitle={props.subtitle} />;
+    return (
+      <Title24Content
+        title={props.title}
+        subtitle={props.subtitle}
+        headingLevel={props.headingLevel ?? 2}
+      />
+    );
   }
 
-  return <Title16Content title={props.title} subtitle={props.subtitle} />;
+  return (
+    <Title16Content
+      title={props.title}
+      subtitle={props.subtitle}
+      headingLevel={props.headingLevel ?? 2}
+    />
+  );
 }

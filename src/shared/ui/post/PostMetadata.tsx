@@ -31,8 +31,12 @@ export function PostMetadata({
           <img
             alt=""
             aria-hidden="true"
+            width={20}
+            height={20}
+            loading="lazy"
+            decoding="async"
             className="h-5 w-5 rounded-full object-cover"
-            src={profileImageUrl}
+            src={toSecureImageUrl(profileImageUrl)}
           />
         ) : (
           <span aria-hidden="true" className="h-5 w-5 rounded-full bg-black" />
@@ -47,3 +51,4 @@ export function PostMetadata({
     </div>
   );
 }
+import { toSecureImageUrl } from '@/shared/utils/image';
