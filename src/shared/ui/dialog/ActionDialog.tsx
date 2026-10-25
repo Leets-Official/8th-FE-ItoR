@@ -1,10 +1,13 @@
 import { useId, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useModalFocus } from './hooks/useModalFocus';
+
 type DialogButtonProps = {
   variant: 'cancel' | 'negative' | 'point';
   text: string;
   onClick?: () => void;
+  disabled?: boolean;
 };
 
 const dialogButtonStyles = {
@@ -13,12 +16,13 @@ const dialogButtonStyles = {
   point: 'bg-point text-white',
 };
 
-function DialogButton({ variant, text, onClick }: DialogButtonProps) {
+function DialogButton({ variant, text, onClick, disabled = false }: DialogButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`text-14-regular flex h-fit w-full items-center justify-center gap-2 rounded-[2px] border border-gray-96 px-3 py-2 ${dialogButtonStyles[variant]}`}
+      disabled={disabled}
+      className={`text-14-regular flex h-fit w-full items-center justify-center gap-2 rounded-[2px] border border-gray-96 px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50 ${dialogButtonStyles[variant]}`}
     >
       {text}
     </button>
@@ -40,6 +44,8 @@ export type ActionDialogProps = {
   onCancel: () => void;
   /** 확인 버튼을 눌렀을 때 실행합니다. */
   onConfirm: () => void;
+  /** 비동기 확인 동작이 진행 중일 때 중복 실행을 막습니다. */
+  confirmDisabled?: boolean;
 };
 
 /** 취소와 확인이 필요한 작업에 사용하는 전역 대화상자입니다. 딤드 클릭도 취소로 처리합니다. */
@@ -51,9 +57,11 @@ export function ActionDialog({
   confirmVariant = 'negative',
   onCancel,
   onConfirm,
+  confirmDisabled = false,
 }: ActionDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const dialogRef = useModalFocus<HTMLDivElement>(onCancel);
 
   function handleBackdropClick(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
@@ -67,10 +75,12 @@ export function ActionDialog({
       onClick={handleBackdropClick}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
+        tabIndex={-1}
         className="flex h-fit w-[326px] flex-col gap-6 rounded-[4px] bg-white px-4 pb-4 pt-6 shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
       >
         <div className="flex h-fit w-full flex-col gap-2 rounded-xl px-1">
@@ -86,7 +96,12 @@ export function ActionDialog({
 
         <div className="flex h-fit w-full items-center justify-center gap-3">
           <DialogButton variant="cancel" text={cancelLabel} onClick={onCancel} />
-          <DialogButton variant={confirmVariant} text={confirmLabel} onClick={onConfirm} />
+          <DialogButton
+            variant={confirmVariant}
+            text={confirmLabel}
+            onClick={onConfirm}
+            disabled={confirmDisabled}
+          />
         </div>
       </div>
     </div>,
