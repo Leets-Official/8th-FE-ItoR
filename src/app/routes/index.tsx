@@ -3,5 +3,5 @@ import MainPage from '@/pages/main/MainPage';
 
 export const Route = createFileRoute('/')({
   component: MainPage,
-  staticData: { headerVariant: 'ver1' },
+  staticData: { headerVariant: 'main' },
 });

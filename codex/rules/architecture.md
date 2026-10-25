@@ -5,8 +5,8 @@
 ## 계층
 
 - `src/app`: 앱 초기화, 전역 레이아웃, 라우터와 전역 스타일
-- `src/pages`: URL 단위 화면 구성
-- `src/features`: 사용자 기능 단위의 상태, 로직, 전용 UI
+- `src/pages`: URL 단위 페이지 파일과 화면 조합
+- `src/features`: 페이지와 같은 이름의 폴더에서 관리하는 UI, 상태, 로직
 - `src/shared`: 여러 페이지와 기능에서 재사용하는 UI, 자산, 유틸리티
 
 의존성은 `app → pages → features → shared` 방향을 따릅니다.
@@ -18,14 +18,31 @@
 
 ## 페이지와 기능
 
-- 페이지는 화면의 배치와 기능 조합을 담당합니다.
-- 페이지 파일에서 해당 화면의 feature 섹션과 공통 UI를 직접 조립합니다.
-- 페이지 전체 UI를 그대로 대신 렌더링하는 대리 컴포넌트를 `features`에 만들지 않습니다.
-- 비즈니스 규칙과 재사용 가능한 기능 로직은 `features`로 분리합니다.
+- `pages/{페이지 경로}`에는 `*Page.tsx`만 두고 같은 경로의 feature Section을 조립합니다.
+- `features`는 `main`, `detail`, `my/edit`, `register/email`처럼 페이지 URL 계층을 따릅니다.
+- `sections`는 작은 UI를 조립해 페이지의 큰 영역을 구성합니다.
+- `components`는 Section에서 사용하는 카드, 폼 요소, 목록 항목 같은 작은 UI를 둡니다.
+- React Hook은 `features/{페이지명}/hooks`에 두고 `use` 접두사를 사용합니다.
+- Hook이 아닌 함수나 모듈에는 `use` 접두사를 붙이지 않습니다.
+- 도메인 타입과 모델은 필요할 때 `features/{페이지명}/model`에 둡니다.
 - 페이지에 필요한 로직이 여러 책임을 가지면 이미지 업로드, 입력 검증처럼 기능이 드러나는
   이름의 hook으로 나눕니다.
 - 공통 UI는 도메인 데이터나 라우트에 직접 의존하지 않도록 작성합니다.
 - 한 파일에서만 쓰이는 작은 구현은 가까운 위치에 두고 불필요하게 파일을 늘리지 않습니다.
+
+## 목 데이터
+
+- API 응답으로 교체할 게시글, 댓글, 작성자, 프로필 예시는 feature의 `mocks`에 둡니다.
+- 목 데이터는 `posts.mock.ts`, `comments.mock.ts`처럼 데이터 종류가 드러나는 이름을 사용합니다.
+- 목 데이터 타입은 UI props가 아니라 feature의 `model`에서 가져옵니다.
+- Section은 목 데이터를 직접 import하지 않고 페이지에서 props로 전달받습니다.
+- 폼 초기값, 정규식, 글자 수 제한, placeholder와 메시지는 목 데이터로 분류하지 않습니다.
+
+## 앱 레이아웃
+
+- `MainLayout`은 전역 Provider, `AppHeader`, `Outlet`만 조립합니다.
+- 공통 헤더 셸과 탐색 패널은 `app/layout`에서 관리합니다.
+- 로그인, 삭제, 작성, 프로필 수정 같은 헤더 행동은 해당 페이지 feature가 소유합니다.
 
 ## 라우팅
 
@@ -53,3 +70,11 @@ TanStack Router의 파일 기반 라우팅을 사용합니다.
 - 현재 구조로 해결하기 어려운 구체적인 이유가 있을 때만 구조를 변경합니다.
 - 구조 변경은 관련 import, 라우트 생성 결과, 타입 검사를 함께 확인합니다.
 - 생성 파일과 사용자 작업 중인 변경 사항을 직접 덮어쓰지 않습니다.
+
+## 블로그 본문 블록 TODO
+
+- UI 단계에서는 현재 작성·상세 페이지 구조를 유지합니다.
+- API 스키마가 확정되면 텍스트와 이미지 블록 배열을 입력 순서대로 직렬화합니다.
+- UI 컴포넌트는 `ArticleTextBlock`, `ArticleImageBlock` 이름을 사용합니다.
+- 데이터 타입은 `ArticleTextBlockData`, `ArticleImageBlockData`, `ArticleBlockData` 이름을 사용합니다.
+- 작성과 상세 화면은 블록 데이터와 순서를 공유하고 렌더링 컴포넌트는 각각 분리합니다.

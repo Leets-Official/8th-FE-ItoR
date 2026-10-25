@@ -52,7 +52,7 @@ export function useArticleEditor() {
 
     const nextTextBlock = createTextBlock();
 
-    // TODO API 연동 시 커서만 이동한 경우의 삽입 위치 동기화와 블록 순서 직렬화를 보완합니다.
+    // TODO(API): 본문 블록 API 연결 시 현재 입력 순서를 서버 전송 형식으로 직렬화합니다.
     setBlocks((currentBlocks) => {
       const insertionPoint = insertionPointRef.current;
       const targetIndex = insertionPoint
@@ -102,6 +102,10 @@ export function useArticleEditor() {
     insertionPointRef.current = { blockId, offset };
   }
 
+  function updateInsertionPoint(blockId: string, offset: number) {
+    insertionPointRef.current = { blockId, offset };
+  }
+
   function removeImageBlock(imageId: string) {
     const targetBlock = blocks.find(
       (block) => block.type === 'image' && block.image.id === imageId,
@@ -138,6 +142,7 @@ export function useArticleEditor() {
     openImagePicker,
     handleImageChange,
     updateTextBlock,
+    updateInsertionPoint,
     removeImageBlock,
   };
 }

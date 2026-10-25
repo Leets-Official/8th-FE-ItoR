@@ -1,11 +1,14 @@
-type PostMetadataProps = {
+export type PostMetadataProps = {
+  /** 작성자 이름입니다. */
   nickname: string;
+  /** 화면에 표시할 형식으로 변환된 작성일입니다. */
   createdAt: string;
+  /** 게시글의 댓글 수입니다. */
   commentCount: number;
+  /** 작성자 프로필 이미지 URL입니다. 생략하면 기본 원형을 표시합니다. */
   profileImageUrl?: string;
 };
 
-/** @returns 작성 정보 사이에 표시하는 장식용 구분점 */
 function MetadataDivider() {
   return (
     <span aria-hidden="true" className="flex h-5 w-3 items-center justify-center">
@@ -14,7 +17,7 @@ function MetadataDivider() {
   );
 }
 
-/** @returns 작성자의 프로필, 닉네임, 작성일과 댓글 수를 표시하는 공통 UI */
+/** 게시글 작성자의 프로필, 닉네임, 작성일과 댓글 수를 한 줄로 표시합니다. */
 export function PostMetadata({
   nickname,
   createdAt,

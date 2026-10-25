@@ -1,14 +1,11 @@
-import { BlogPostList } from '@/features/main/components/BlogPostList';
-import { CustomBlank } from '@/shared/ui/blank/CustomBlank';
+import { MAIN_POSTS_MOCK, MAIN_TOTAL_PAGES_MOCK } from '@/features/main/mocks/posts.mock';
+import { MainPostListSection } from '@/features/main/sections/MainPostListSection';
 
 /** @returns 메인 페이지 UI가 배치될 반응형 콘텐츠 틀 */
-function MainPage() {
+export default function MainPage() {
   return (
     <section className="flex w-full flex-1 flex-col items-center">
-      <CustomBlank variant="32" />
-      <BlogPostList />
+      <MainPostListSection posts={MAIN_POSTS_MOCK} totalPages={MAIN_TOTAL_PAGES_MOCK} />
     </section>
   );
 }
-
-export default MainPage;

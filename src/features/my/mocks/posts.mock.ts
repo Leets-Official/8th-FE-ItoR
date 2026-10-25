@@ -1,0 +1,60 @@
+import type { MyPost } from '../model/my';
+
+export const MY_POSTS_MOCK: readonly MyPost[] = [
+  {
+    id: 'my-post-1',
+    title: 'TanStack Router를 처음 적용하며 배운 점',
+    subtitle: '파일 기반 라우팅 구조를 구성하고 타입 안전한 경로를 사용해봤습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 27.2026.',
+    commentCount: 3,
+  },
+  {
+    id: 'my-post-2',
+    title: '공통 UI 컴포넌트 설계 기록',
+    subtitle: '반복되는 버튼과 입력 컴포넌트의 책임을 나누는 기준을 정리했습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 26.2026.',
+    commentCount: 5,
+  },
+  {
+    id: 'my-post-3',
+    title: 'React에서 입력 상태 관리하기',
+    subtitle: 'controlled input을 사용하며 알게 된 상태 관리 방식을 공유합니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 25.2026.',
+    commentCount: 1,
+  },
+  {
+    id: 'my-post-4',
+    title: '접근 가능한 아이콘 버튼 만들기',
+    subtitle: '스크린 리더가 버튼의 동작을 이해할 수 있도록 접근 가능한 이름을 추가했습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 24.2026.',
+    commentCount: 8,
+  },
+  {
+    id: 'my-post-5',
+    title: 'Tailwind CSS 디자인 토큰 정리',
+    subtitle: '색상과 타이포그래피를 프로젝트 전반에서 일관되게 사용하는 방법을 기록했습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 23.2026.',
+    commentCount: 2,
+  },
+  {
+    id: 'my-post-6',
+    title: '블로그 상세 페이지 UI 구현',
+    subtitle: '본문과 댓글, 작성자 정보를 섹션 단위로 조립했습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 22.2026.',
+    commentCount: 4,
+  },
+  {
+    id: 'my-post-7',
+    title: '텍스트와 이미지 블록 다루기',
+    subtitle: '작성 순서를 유지하는 블록 기반 본문 편집 구조를 실험했습니다.',
+    nickname: '이병준',
+    createdAt: 'Sep 21.2026.',
+    commentCount: 7,
+  },
+];
