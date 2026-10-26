@@ -79,12 +79,19 @@ function reissueOnce() {
   return reissuePromise;
 }
 
-// 서버는 토큰이 만료되거나 잘못되면 HTTP 401 대신 200에 본문 code 401로 응답하기도 해서 둘 다 본다
+// 서버는 토큰이 만료되거나 잘못되면 HTTP 401 대신 200에 본문 code 401로 응답하기도 해서 둘 다 본다.
+// 토큰이 필요한 일부 API(/posts/token 등)는 만료된 토큰에 500과 'JWT expired …' 메시지로 응답해 이것도 만료로 본다
 function isUnauthorized(response?: AxiosResponse) {
   if (!response) return false;
   const body: unknown = response.data;
   const bodyCode = typeof body === 'object' && body !== null && 'code' in body && body.code;
-  return response.status === 401 || bodyCode === 401;
+  const bodyMessage =
+    typeof body === 'object' && body !== null && 'message' in body && body.message;
+  const isJwtExpired =
+    response.status === 500 &&
+    typeof bodyMessage === 'string' &&
+    bodyMessage.startsWith('JWT expired');
+  return response.status === 401 || bodyCode === 401 || isJwtExpired;
 }
 
 function toAxiosError(failure: AxiosResponse | AxiosError) {
