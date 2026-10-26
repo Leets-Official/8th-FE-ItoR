@@ -28,12 +28,13 @@ export function redirectToKakaoAuth({
 // 저장해 둔 경로는 한 번 쓰고 지운다. 주소창 조작 등으로 바뀔 수 있으므로
 // 앱 안의 경로(/로 시작, //는 다른 사이트)만 받아들인다
 export function takeKakaoReturnPath() {
-  let returnPath: string | null = null;
+  let returnPath: string | null;
   try {
     returnPath = sessionStorage.getItem(RETURN_PATH_KEY);
     sessionStorage.removeItem(RETURN_PATH_KEY);
   } catch {
-    // 저장소를 쓸 수 없으면 홈으로 보낸다
+    // 저장소를 쓸 수 없으면 홈으로 보낸다. 읽기만 하고 지우지 못했어도 남은 경로를 쓰지 않는다
+    return '/';
   }
   return returnPath?.startsWith('/') && !returnPath.startsWith('//') ? returnPath : '/';
 }
