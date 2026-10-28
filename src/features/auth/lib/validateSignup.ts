@@ -21,6 +21,11 @@ export function validateSignup(
 
   if (method === 'email') {
     if (!values.password) errors.password = REQUIRED_MESSAGE;
+    else if (
+      !/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$/.test(values.password)
+    ) {
+      errors.password = '* 비밀번호는 8~64자이며 영문, 숫자, 특수문자(@$!%*?&)를 포함해야 합니다.';
+    }
     if (!values.passwordConfirmation) {
       errors.passwordConfirmation = REQUIRED_MESSAGE;
     } else if (values.password !== values.passwordConfirmation) {
@@ -29,6 +34,9 @@ export function validateSignup(
   }
 
   if (!values.name.trim()) errors.name = REQUIRED_MESSAGE;
+  else if (!/^[가-힣]{1,20}$/.test(values.name.trim())) {
+    errors.name = '* 이름은 한글로 최대 20글자까지 입력해주세요.';
+  }
 
   const birthDate = values.birthDate.replace(/\s/g, '');
   if (!birthDate) {
@@ -47,8 +55,8 @@ export function validateSignup(
 
   if (!values.nickname.trim()) {
     errors.nickname = REQUIRED_MESSAGE;
-  } else if (Array.from(values.nickname.trim()).length > 20) {
-    errors.nickname = '* 닉네임은 최대 20글자입니다.';
+  } else if (!/^[a-zA-Z0-9]{3,20}$/.test(values.nickname.trim())) {
+    errors.nickname = '* 닉네임은 영문과 숫자로 3~20글자까지 입력해주세요.';
   }
 
   if (Array.from(values.introduction).length > 30) {

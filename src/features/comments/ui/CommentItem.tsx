@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
 
-import { formatPublishedTime } from '@/shared/utils/formatPublishedTime';
 import { MoreVertIcon } from '@/shared/assets/icons';
 import { ActionMenu } from '@/shared/ui/ActionMenu';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { IconButton } from '@/shared/ui/IconButton';
 import { ProfileAvatar } from '@/shared/ui/ProfileAvatar';
+import { formatPublishedTime } from '@/shared/utils/formatPublishedTime';
 
 import type { CommentAuthor, PostComment } from '../model/comment';
 import { CommentForm } from './CommentForm';
@@ -19,10 +20,11 @@ interface CommentItemProps {
 
 export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: CommentItemProps) {
   const [editing, setEditing] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const selectedAction = useRef<'edit' | 'delete' | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
-  const owned = currentUser?.id === comment.author.id;
+  const owned = currentUser !== null && currentUser.id === comment.author.id;
 
   return (
     <li className="pb-5">
@@ -45,11 +47,11 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
           {owned && (
             <div className="pr-2">
               <ActionMenu
+                appearance="post"
                 onCloseAutoFocus={(event) => {
                   if (!selectedAction.current) return;
                   event.preventDefault();
                   if (selectedAction.current === 'edit') editor.current?.focus();
-                  else document.getElementById('post-comments')?.focus({ preventScroll: true });
                   selectedAction.current = null;
                 }}
                 label="댓글 메뉴 열기"
@@ -65,7 +67,7 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
                 items={[
                   {
                     id: 'edit',
-                    label: '수정',
+                    label: '수정하기',
                     onSelect: () => {
                       selectedAction.current = 'edit';
                       setEditing(true);
@@ -73,12 +75,12 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
                   },
                   {
                     id: 'delete',
-                    label: '삭제',
+                    label: '삭제하기',
                     destructive: true,
                     onSelect: () => {
                       if (owned) {
                         selectedAction.current = 'delete';
-                        onDelete(comment.id);
+                        setDeleteOpen(true);
                       }
                     },
                   },
@@ -110,6 +112,23 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
           </p>
         )}
       </article>
+      <ConfirmDialog
+        open={deleteOpen && owned}
+        onOpenChange={setDeleteOpen}
+        title="해당 블로그를 삭제하시겠어요?"
+        description="삭제된 블로그는 다시 확인할 수 없어요."
+        confirmLabel="삭제하기"
+        confirmVariant="destructiveSolid"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          const target = menuButton.current ?? document.getElementById('post-comments');
+          target?.focus({ preventScroll: true });
+        }}
+        onConfirm={() => {
+          setDeleteOpen(false);
+          if (owned) onDelete(comment.id);
+        }}
+      />
     </li>
   );
 }

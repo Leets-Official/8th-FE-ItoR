@@ -9,16 +9,17 @@ import { getPostDraftError, insertPostImage, readPostImage } from '../lib/postDr
 import type { PostDraft, PostDraftBlock } from '../model/postDraft';
 
 interface PostEditorProps {
+  initialDraft?: PostDraft;
   onPublish: (draft: PostDraft) => boolean;
   trackImage: (url: string) => void;
   releaseImage: (url: string) => void;
 }
 
-export function PostEditor({ onPublish, trackImage, releaseImage }: PostEditorProps) {
-  const [title, setTitle] = useState('');
-  const [blocks, setBlocks] = useState<PostDraftBlock[]>([
-    { id: 'first-text', type: 'text', text: '' },
-  ]);
+export function PostEditor({ initialDraft, onPublish, trackImage, releaseImage }: PostEditorProps) {
+  const [title, setTitle] = useState(initialDraft?.title ?? '');
+  const [blocks, setBlocks] = useState<PostDraftBlock[]>(
+    initialDraft?.blocks ?? [{ id: 'first-text', type: 'text', text: '' }],
+  );
   const [loadingImage, setLoadingImage] = useState(false);
   const titleInput = useRef<HTMLInputElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -77,8 +78,7 @@ export function PostEditor({ onPublish, trackImage, releaseImage }: PostEditorPr
 
   function removePhoto(id: string, src: string) {
     setBlocks((previous) => previous.filter((block) => block.id !== id));
-    imageUrls.current.delete(src);
-    releaseImage(src);
+    if (imageUrls.current.delete(src)) releaseImage(src);
   }
 
   function submit(event: SubmitEvent<HTMLFormElement>) {
@@ -111,7 +111,7 @@ export function PostEditor({ onPublish, trackImage, releaseImage }: PostEditorPr
 
   return (
     <main className="font-auth">
-      <h1 className="sr-only">게시글 작성</h1>
+      <h1 className="sr-only">{initialDraft ? '게시글 수정' : '게시글 작성'}</h1>
       <div className="flex justify-center bg-white/90 px-4 py-3 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.01)] backdrop-blur-[2px]">
         <Button
           type="button"

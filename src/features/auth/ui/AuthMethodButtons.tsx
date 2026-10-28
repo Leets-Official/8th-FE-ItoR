@@ -21,14 +21,16 @@ export function EmailAuthButton({ className, ...props }: ComponentProps<typeof B
 interface KakaoAuthButtonProps {
   children: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
-export function KakaoAuthButton({ children, onClick }: KakaoAuthButtonProps) {
+export function KakaoAuthButton({ children, onClick, disabled }: KakaoAuthButtonProps) {
   return (
     <Button
       type="button"
       variant={null}
       onClick={onClick}
+      disabled={disabled}
       className="h-11 w-full gap-2 rounded-md bg-kakao-bg px-3.5 text-base font-semibold text-kakao-text hover:bg-kakao-bg/90"
     >
       <KakaoIcon aria-hidden="true" className="size-4" />

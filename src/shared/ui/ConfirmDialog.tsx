@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
 
 import { Button } from '@/shared/ui/primitives/button';
+import { cn } from '@/shared/utils/cn';
 
 import {
   Dialog,
@@ -19,7 +20,9 @@ interface ConfirmDialogProps {
   description?: string;
   confirmLabel: string;
   confirmVariant?: ComponentProps<typeof Button>['variant'];
+  confirmClassName?: string;
   onConfirm: () => void;
+  onCloseAutoFocus?: ComponentProps<typeof DialogContent>['onCloseAutoFocus'];
 }
 
 export function ConfirmDialog({
@@ -29,17 +32,21 @@ export function ConfirmDialog({
   description,
   confirmLabel,
   confirmVariant = 'default',
+  confirmClassName,
   onConfirm,
+  onCloseAutoFocus,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         {...(description ? {} : { 'aria-describedby': undefined })}
         showCloseButton={false}
-        className="max-w-[calc(100%-2rem)] rounded-sm bg-white p-4 sm:max-w-70"
+        onCloseAutoFocus={onCloseAutoFocus}
+        overlayClassName="bg-zinc-400/30 backdrop-blur-[2px]"
+        className="w-80 max-w-[calc(100%-2rem)] gap-6 overflow-hidden rounded-sm bg-white px-4 pt-6 pb-4 font-auth shadow-[0px_2px_8px_0px_rgba(0,0,0,0.10)] ring-0 sm:max-w-80"
       >
-        <DialogHeader className="gap-1 text-left">
-          <DialogTitle className="text-sm leading-5 font-normal whitespace-pre-line text-neutral-950">
+        <DialogHeader className="gap-2 px-1 text-left">
+          <DialogTitle className="font-auth text-sm leading-6 font-normal whitespace-pre-line text-black">
             {title}
           </DialogTitle>
           {description && (
@@ -48,12 +55,12 @@ export function ConfirmDialog({
             </DialogDescription>
           )}
         </DialogHeader>
-        <DialogFooter className="mx-0 mt-1 mb-0 flex-row gap-2 border-0 bg-transparent p-0">
+        <DialogFooter className="mx-0 mb-0 flex-row gap-3 border-0 bg-transparent p-0">
           <DialogClose asChild>
             <Button
               type="button"
               variant="outline"
-              className="h-8 flex-1 rounded-sm text-xs font-normal"
+              className="h-10 flex-1 rounded-xs border-neutral-100 bg-white px-3 py-2 text-sm leading-6 font-normal text-black hover:bg-neutral-50"
             >
               취소
             </Button>
@@ -62,7 +69,10 @@ export function ConfirmDialog({
             type="button"
             variant={confirmVariant}
             onClick={onConfirm}
-            className="h-8 flex-1 rounded-sm text-xs font-normal"
+            className={cn(
+              'h-10 flex-1 rounded-xs px-3 py-2 text-sm leading-6 font-normal',
+              confirmClassName,
+            )}
           >
             {confirmLabel}
           </Button>

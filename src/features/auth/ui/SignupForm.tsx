@@ -1,5 +1,5 @@
 import {
-  useEffect,
+  useRef,
   useState,
   type ChangeEvent,
   type ComponentProps,
@@ -12,6 +12,10 @@ import { GitlogButton } from '@/shared/ui/GitlogButton';
 import { ProfileAvatar } from '@/shared/ui/ProfileAvatar';
 import { TextField } from '@/shared/ui/TextField';
 
+import { getApiErrorMessage } from '@/shared/apis/response';
+
+import { useRegisterMutation } from '../api/useRegisterMutation';
+import { createRegisterBody } from '../lib/createRegisterBody';
 import { validateSignup } from '../lib/validateSignup';
 import type { SignupFieldName, SignupMethod, SignupValues } from '../model/signup';
 import { AuthNoticeDialog } from './AuthNoticeDialog';
@@ -62,9 +66,10 @@ function SignupField({ name, label, error, hint, ...props }: SignupFieldProps) {
 interface SignupFormProps {
   method: SignupMethod;
   onLogin: () => void;
+  onComplete: () => void;
 }
 
-export function SignupForm({ method, onLogin }: SignupFormProps) {
+export function SignupForm({ method, onLogin, onComplete }: SignupFormProps) {
   const [values, setValues] = useState<SignupValues>({
     email: '',
     password: '',
@@ -77,18 +82,15 @@ export function SignupForm({ method, onLogin }: SignupFormProps) {
   const [touched, setTouched] = useState<Partial<Record<SignupFieldName, boolean>>>({});
   const [submitted, setSubmitted] = useState(false);
   const [completionOpen, setCompletionOpen] = useState(false);
-  const [photo, setPhoto] = useState<{ file: File; url: string } | null>(null);
-  const [photoError, setPhotoError] = useState('');
+  const register = useRegisterMutation();
+  const submitting = useRef(false);
+  const [message, setMessage] = useState('');
   const errors = validateSignup(values, method);
-
-  useEffect(() => {
-    if (!photo) return;
-    return () => URL.revokeObjectURL(photo.url);
-  }, [photo]);
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.currentTarget;
     setValues((previous) => ({ ...previous, [name]: value }));
+    setMessage('');
   }
 
   function handleBlur(event: FocusEvent<HTMLInputElement>) {
@@ -103,77 +105,58 @@ export function SignupForm({ method, onLogin }: SignupFormProps) {
       error: submitted || touched[name] ? errors[name] : undefined,
       onChange: handleChange,
       onBlur: handleBlur,
+      disabled: register.isPending,
     };
   }
 
-  function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.currentTarget.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('* 이미지 파일을 선택해주세요.');
-      event.currentTarget.value = '';
-      return;
-    }
-    setPhoto({ file, url: URL.createObjectURL(file) });
-    setPhotoError('');
-  }
-
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting.current) return;
     setSubmitted(true);
+    setMessage('');
     const firstInvalidField = Object.keys(errors)[0];
     if (firstInvalidField) {
       const input = event.currentTarget.elements.namedItem(firstInvalidField);
       if (input instanceof HTMLInputElement) input.focus();
       return;
     }
-    if (photoError) return;
-    // ponytail: UI 미리보기용 완료 상태. 가입 API 연동 시 성공 응답 이후에만 연다.
-    setCompletionOpen(true);
+    if (method !== 'email') {
+      setMessage('카카오 회원가입은 준비 중입니다. 이메일로 가입해주세요.');
+      return;
+    }
+    submitting.current = true;
+    try {
+      await register.mutateAsync(createRegisterBody(values));
+      setValues((previous) => ({ ...previous, password: '', passwordConfirmation: '' }));
+      setSubmitted(false);
+      setTouched({});
+      setCompletionOpen(true);
+    } catch (error) {
+      setMessage(getApiErrorMessage(error));
+    } finally {
+      submitting.current = false;
+    }
   }
 
   return (
     <form
       noValidate
+      aria-busy={register.isPending}
       onSubmit={handleSubmit}
       className="mx-auto w-full max-w-[688px] pt-8 pb-16 font-auth"
     >
       <div className="space-y-4 px-4 py-3">
         <p className="px-1.5 text-sm leading-6 font-light text-neutral-400">프로필 사진</p>
-        <ProfileAvatar
-          alt={photo ? '선택한 프로필 사진' : '기본 프로필 사진'}
-          src={photo?.url}
-          className="size-24"
-          loading="eager"
-          onError={() => {
-            setPhoto(null);
-            setPhotoError('* 프로필 사진을 불러올 수 없습니다. 다른 이미지 파일을 선택해주세요.');
-          }}
-        />
+        <ProfileAvatar alt="기본 프로필 사진" className="size-24" loading="eager" />
         <div>
-          <label className="inline-flex cursor-pointer items-center gap-1 rounded-xs border border-neutral-200 px-2 pt-0.5 pb-1 text-xs leading-5 text-neutral-400 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-gitlog-action">
-            <input
-              type="file"
-              name="profilePhoto"
-              accept="image/*"
-              aria-label="프로필 사진 추가"
-              aria-invalid={Boolean(photoError)}
-              aria-describedby={photoError ? 'signup-photo-error' : undefined}
-              className="sr-only"
-              onChange={handlePhotoChange}
-            />
+          <label className="inline-flex items-center gap-1 rounded-xs border border-neutral-200 px-2 pt-0.5 pb-1 text-xs leading-5 text-neutral-400">
+            <input type="file" disabled aria-label="프로필 사진 추가" className="sr-only" />
             <AddPhotoAlternateIcon aria-hidden="true" className="size-3.5 opacity-40" />
             프로필 사진 추가
           </label>
-          {photoError && (
-            <p
-              id="signup-photo-error"
-              role="alert"
-              className="mt-1 text-xs leading-5 text-gitlog-danger"
-            >
-              {photoError}
-            </p>
-          )}
+          <p className="mt-1 text-xs leading-5 text-neutral-400">
+            프로필 사진 등록은 준비 중입니다. 사진 없이 가입할 수 있습니다.
+          </p>
         </div>
       </div>
       {method === 'kakao' && (
@@ -245,19 +228,27 @@ export function SignupForm({ method, onLogin }: SignupFormProps) {
         label="닉네임"
         placeholder="닉네임"
         autoComplete="nickname"
-        hint="* 20글자 이내"
+        hint="* 영문과 숫자 3~20글자"
         required
       />
       <SignupField {...getFieldProps('introduction')} label="한 줄 소개" placeholder="한 줄 소개" />
       <div className="mt-8 px-4">
-        <GitlogButton type="submit" className="w-full text-sm">
-          회원가입 완료
+        <GitlogButton type="submit" disabled={register.isPending} className="w-full text-sm">
+          {register.isPending ? '가입 중...' : '회원가입 완료'}
         </GitlogButton>
       </div>
+      {message && (
+        <p role="alert" className="mt-4 px-4 text-sm text-gitlog-danger">
+          {message}
+        </p>
+      )}
       <AuthNoticeDialog
         kind="signupComplete"
         open={completionOpen}
-        onOpenChange={setCompletionOpen}
+        onOpenChange={(open) => {
+          setCompletionOpen(open);
+          if (!open) onComplete();
+        }}
         onAction={onLogin}
       />
     </form>

@@ -9,18 +9,21 @@ interface PageHeaderProps {
   menu: ReactNode;
   actions?: ReactNode;
   className?: string;
+  showLogo?: boolean;
 }
 
-export function PageHeader({ menu, actions, className }: PageHeaderProps) {
+export function PageHeader({ menu, actions, className, showLogo = true }: PageHeaderProps) {
   return (
     <header
       className={cn('flex h-14 w-full items-center justify-between bg-white px-4', className)}
     >
       <div className="flex items-center gap-3">
         {menu}
-        <Link to="/" className="flex items-center" aria-label="Gitlog 홈">
-          <img src={gitlogLogo} alt="GITLOG" className="h-5 w-auto" />
-        </Link>
+        {showLogo && (
+          <Link to="/" className="flex items-center" aria-label="Gitlog 홈">
+            <img src={gitlogLogo} alt="GITLOG" className="h-5 w-auto" />
+          </Link>
+        )}
       </div>
       <div className="flex items-center gap-2">{actions}</div>
     </header>

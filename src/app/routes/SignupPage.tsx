@@ -1,4 +1,7 @@
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
+import { notify } from '@/shared/ui/StatusToast';
+import { startKakaoAuth } from '@/features/auth/api/startKakaoAuth';
+import { getApiErrorMessage } from '@/shared/apis/response';
 
 import {
   AuthDivider,
@@ -9,8 +12,6 @@ import { AuthPanel } from '@/features/auth/ui/AuthPanel';
 import { SignupHeader } from '@/features/auth/ui/SignupHeader';
 
 export function SignupPage() {
-  const navigate = useNavigate();
-
   return (
     <main>
       <SignupHeader />
@@ -20,7 +21,15 @@ export function SignupPage() {
             <Link to="/mypage/signup/email">이메일로 회원가입</Link>
           </EmailAuthButton>
           <AuthDivider />
-          <KakaoAuthButton onClick={() => navigate('/mypage/signup/kakao')}>
+          <KakaoAuthButton
+            onClick={() => {
+              try {
+                startKakaoAuth();
+              } catch (error) {
+                notify.error(getApiErrorMessage(error));
+              }
+            }}
+          >
             카카오로 회원가입
           </KakaoAuthButton>
         </AuthPanel>
