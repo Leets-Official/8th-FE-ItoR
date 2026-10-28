@@ -2,8 +2,8 @@ import { useState, type SubmitEvent } from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Icon } from '@/shared/ui';
 import { LoginFields } from './LoginFields';
-import type { LoginError } from './types';
-import { useAuth } from './useAuth';
+import type { LoginError } from '../model/types';
+import { useAuth } from '../model/useAuth';
 
 interface LoginModalProps {
   open: boolean;

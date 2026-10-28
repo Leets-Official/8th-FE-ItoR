@@ -21,13 +21,14 @@ export const api = axios.create({
 ```
 
 - `baseURL`은 `VITE_API_BASE_URL` 환경 변수로 주입됩니다. 로컬 개발 시 프로젝트 루트에 `.env`(`.gitignore`에 포함되어 커밋되지 않음)를 만들고 값을 설정하세요.
+- 카카오 로그인·회원가입은 서버의 `GET /auth/kakao`로 페이지를 이동시킵니다. 이 API는 JSON 대신 302로 카카오 로그인 화면에 보내므로 axios로 부르지 않고 `window.location.assign`을 씁니다. 카카오는 서버가 정한 redirect_uri `http://localhost:3000/oauth/kakao/success`로 돌아오므로 개발 서버는 3000번 포트(`vite.config.ts`)에서 띄웁니다. 인가 URL에 `state`가 없어 돌아갈 경로는 `sessionStorage`에 저장합니다. ([kakaoAuth.ts](../../src/features/auth/api/kakaoAuth.ts))
 - 새 API 요청은 `fetch`나 별도의 `axios.create()` 대신 이 인스턴스(`api`)를 재사용합니다.
 
 ## 권장 패턴: TanStack Query + Axios Interceptor
 
 이슈 템플릿의 "권장 추가 구현" 항목에서 API 연동 시 임시방편의 `fetch`/`axios` 직접 호출보다 이 조합을 우선 고려하도록 안내하고 있습니다.
 
-> **참고**: TanStack Query(`@tanstack/react-query`)는 설치되어 있고, `QueryClientProvider`는 [App.tsx](../../src/app/App.tsx)에 있습니다. 댓글([commentApi.ts](../../src/features/comment/commentApi.ts) · [commentQueries.ts](../../src/features/comment/commentQueries.ts))이 첫 적용 예시입니다 — API 연동 전에는 요청 함수가 메모리 목업 저장소로 응답하고, 등록·삭제 성공 시 목록 쿼리를 무효화합니다.
+> **참고**: TanStack Query(`@tanstack/react-query`)는 설치되어 있고, `QueryClientProvider`는 [App.tsx](../../src/app/App.tsx)에 있습니다. 댓글([commentApi.ts](../../src/features/comment/api/commentApi.ts) · [commentQueries.ts](../../src/features/comment/api/commentQueries.ts))이 첫 적용 예시입니다 — API 연동 전에는 요청 함수가 메모리 목업 저장소로 응답하고, 등록·삭제 성공 시 목록 쿼리를 무효화합니다.
 
 ### Axios Interceptor
 
@@ -45,13 +46,13 @@ api.interceptors.response.use(
 
 ### TanStack Query 사용 예시
 
-API 요청 함수는 해당 도메인 폴더(`src/features/{도메인}/`)에 작성하고, 도메인의 `index.ts`로 공개합니다. 조회(`getPosts`)와 생성·수정·삭제(`createPost`) 요청 모두 같은 도메인 폴더에 둡니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
+API 요청 함수는 해당 도메인의 `api/` 폴더(`src/features/{도메인}/api/`)에 작성하고, 도메인의 `index.ts`로 공개합니다. 조회(`getPosts`)와 생성·수정·삭제(`createPost`) 요청 모두 같은 `api/` 폴더에 둡니다. 컴포넌트/페이지에서는 `useQuery`/`useMutation`으로 감싸 사용합니다.
 
 ```ts
-// src/features/post/getPosts.ts
+// src/features/post/api/getPosts.ts
 import { api } from '@/shared/api/instance';
 
-import type { PostSummary } from './types';
+import type { PostSummary } from '../model/types';
 
 export const getPosts = () => api.get<PostSummary[]>('/posts').then((res) => res.data);
 ```

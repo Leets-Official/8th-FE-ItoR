@@ -1,14 +1,15 @@
-import type { PostSummary } from './types';
+import type { PostSummary } from '../model/types';
 import { PostMeta } from './PostMeta';
 import { cn } from '@/shared/lib/utils';
 import { Blank } from '@/shared/ui';
 
 interface PostTitleSectionProps {
   post: Pick<PostSummary, 'title' | 'author' | 'createdAt' | 'commentCount'>;
+  authorHref?: string;
   className?: string;
 }
 
-export function PostTitleSection({ post, className }: PostTitleSectionProps) {
+export function PostTitleSection({ post, authorHref, className }: PostTitleSectionProps) {
   const { title } = post;
 
   return (
@@ -17,7 +18,7 @@ export function PostTitleSection({ post, className }: PostTitleSectionProps) {
         <h1 className="w-full text-24 font-medium text-black">{title}</h1>
       </div>
       <Blank size={32} />
-      <PostMeta post={post} className="px-4 py-3" />
+      <PostMeta post={post} authorHref={authorHref} className="px-4 py-3" />
     </div>
   );
 }

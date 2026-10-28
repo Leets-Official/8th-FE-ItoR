@@ -19,17 +19,26 @@ interface TextFieldProps extends Omit<ComponentProps<'input'>, 'size'> {
 }
 
 // Figma 상태 defalt / input / click / Disabled = placeholder 표시 / 값 입력 / focus / disabled
-export function TextField({ size = 14, disabled = false, className, ...props }: TextFieldProps) {
+// readOnly: 내 프로필 설정처럼 값을 보여주기만 하는 칸 — 수정할 수 없다는 걸 알 수 있게 글자를 회색으로 둔다
+export function TextField({
+  size = 14,
+  disabled = false,
+  readOnly = false,
+  className,
+  ...props
+}: TextFieldProps) {
   return (
     <input
       disabled={disabled}
+      readOnly={readOnly}
       className={cn(
         'w-full rounded-sm border px-4 outline-none',
         SIZE_CLASS[size],
         disabled
           ? 'border-gray-90 bg-gray-90 text-gray-56 placeholder:text-gray-56'
           : [
-              'border-gray-90 bg-white text-black focus:border-gray-33',
+              'border-gray-90 bg-white focus:border-gray-33',
+              readOnly ? 'text-gray-56' : 'text-black',
               PLACEHOLDER_COLOR_CLASS[size],
             ],
         className,
@@ -42,13 +51,23 @@ export function TextField({ size = 14, disabled = false, className, ...props }: 
 interface TextFieldSetProps extends TextFieldProps {
   label: ReactNode;
   caution?: ReactNode;
+  // 있으면 주의 문구 자리에 대신 보여주고 입력창을 invalid로 표시한다
+  error?: ReactNode;
 }
 
 // 라벨(제목) + 입력창 + 주의 문구. className은 바깥 영역에, 나머지 props는 입력창에 전달된다
-export function TextFieldSet({ label, caution, id, className, ...props }: TextFieldSetProps) {
+export function TextFieldSet({
+  label,
+  caution,
+  error,
+  id,
+  className,
+  ...props
+}: TextFieldSetProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
-  const cautionId = useId();
+  const messageId = useId();
+  const message = error ?? caution;
 
   return (
     <div className={cn('flex flex-col gap-1 px-4 py-3', className)}>
@@ -56,11 +75,19 @@ export function TextFieldSet({ label, caution, id, className, ...props }: TextFi
         <label htmlFor={inputId} className="px-1.5 text-14 font-light text-gray-56">
           {label}
         </label>
-        <TextField id={inputId} aria-describedby={caution ? cautionId : undefined} {...props} />
+        <TextField
+          id={inputId}
+          aria-describedby={message ? messageId : undefined}
+          aria-invalid={error ? true : undefined}
+          {...props}
+        />
       </div>
-      {caution && (
-        <p id={cautionId} className="px-1.5 text-12 font-light text-gray-78">
-          {caution}
+      {message && (
+        <p
+          id={messageId}
+          className={cn('px-1.5 text-12 font-light', error ? 'text-negative' : 'text-gray-78')}
+        >
+          {message}
         </p>
       )}
     </div>

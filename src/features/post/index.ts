@@ -1,6 +1,19 @@
-export { getMockPostDetail, MOCK_POSTS } from './mocks';
-export type { PostAuthor, PostContentBlock, PostDetail, PostSummary } from './types';
-export { PostContent } from './PostContent';
-export { PostListItem } from './PostListItem';
-export { PostMeta } from './PostMeta';
-export { PostTitleSection } from './PostTitleSection';
+export {
+  createMockPost,
+  deleteMockPost,
+  getMockPostDetail,
+  getMockPosts,
+  updateMockPost,
+} from './api/mocks';
+export type {
+  PostAuthor,
+  PostContentBlock,
+  PostCreateInput,
+  PostDetail,
+  PostSummary,
+} from './model/types';
+export { PostEditor } from './ui/PostEditor';
+export { PostContent } from './ui/PostContent';
+export { PostListItem } from './ui/PostListItem';
+export { PostMeta } from './ui/PostMeta';
+export { PostTitleSection } from './ui/PostTitleSection';
