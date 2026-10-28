@@ -1,6 +1,13 @@
-import { useRef, useState, type ChangeEvent, type Ref, type SubmitEvent } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type Ref,
+  type SubmitEvent,
+} from 'react';
 import type { PostContentBlock, PostCreateInput } from '../model/types';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
 import { Blank, Button, CompactPageHeader, IconButton, showToast } from '@/shared/ui';
 
@@ -58,12 +65,27 @@ export function PostEditor({
 }: PostEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLTextAreaElement>(null);
-  const firstBodyRef = useRef<HTMLTextAreaElement>(null);
+  // 블록 id로 글 칸을 찾아 포커스를 옮기려고 모아 둔다
+  const textareaRefs = useRef(new Map<string, HTMLTextAreaElement>());
   const caretRef = useRef<Caret | null>(null);
+  // 렌더링이 끝난 뒤 포커스를 옮길 자리. 합쳐진 글이 화면에 반영되기 전에는 커서를 둘 수 없다
+  const pendingFocusRef = useRef<Caret | null>(null);
   const [title, setTitle] = useState(initialValue?.title ?? '');
   const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
     initialValue ? toEditorBlocks(initialValue.content) : [createTextBlock()],
   );
+
+  useLayoutEffect(() => {
+    const caret = pendingFocusRef.current;
+    if (!caret) return;
+    pendingFocusRef.current = null;
+    const textarea = textareaRefs.current.get(caret.blockId);
+    if (!textarea) return;
+    textarea.focus();
+    textarea.setSelectionRange(caret.offset, caret.offset);
+    // focus 이벤트가 옮기기 전 커서 위치를 저장하므로 다시 맞춘다
+    caretRef.current = caret;
+  }, [blocks]);
 
   function updateDirty(nextTitle: string, nextBlocks: EditorBlock[]) {
     onDirtyChange?.(
@@ -104,13 +126,13 @@ export function PostEditor({
     event.target.value = '';
     if (!file) return;
 
-    // 사진을 읽는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
+    // 사진을 올리는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
     const caret = caretRef.current;
     let imageUrl: string;
     try {
-      imageUrl = await readAsDataUrl(file);
+      imageUrl = await uploadImage(file);
     } catch {
-      showToast('negative', '사진을 불러오지 못했습니다.');
+      showToast('negative', '사진을 올리지 못했습니다.');
       return;
     }
 
@@ -146,7 +168,10 @@ export function PostEditor({
     // 사진 앞뒤는 항상 글 블록이라 사진을 빼면 둘을 한 블록으로 합친다
     if (before?.type === 'text' && after?.type === 'text') {
       const joined = [before.text, after.text].filter(Boolean).join('\n');
-      caretRef.current = { blockId: before.id, offset: before.text.length };
+      // 삭제 버튼이 사진과 함께 사라져 포커스를 잃으므로, 사진이 있던 자리에 커서를 두고 이어 쓰게 한다
+      const caret = { blockId: before.id, offset: before.text.length };
+      caretRef.current = caret;
+      pendingFocusRef.current = caret;
       changeBlocks([
         ...blocks.slice(0, index - 1),
         { ...before, text: joined },
@@ -221,7 +246,7 @@ export function PostEditor({
             onKeyDown={(event) => {
               if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
               event.preventDefault();
-              firstBodyRef.current?.focus();
+              textareaRefs.current.get(blocks[0].id)?.focus();
             }}
           />
         </div>
@@ -230,12 +255,18 @@ export function PostEditor({
       <section className="flex w-full flex-col items-center">
         <Blank size={32} />
         <div className={cn(CONTENT_CLASS, 'flex flex-col')}>
-          {blocks.map((block, index) =>
+          {blocks.map((block) =>
             block.type === 'text' ? (
               <div key={block.id} className="px-4 py-3">
                 <textarea
                   aria-label="본문"
-                  ref={index === 0 ? firstBodyRef : undefined}
+                  ref={(textarea) => {
+                    if (!textarea) return;
+                    textareaRefs.current.set(block.id, textarea);
+                    return () => {
+                      textareaRefs.current.delete(block.id);
+                    };
+                  }}
                   // 글이 하나뿐일 때만 안내 문구를 보여준다
                   placeholder={blocks.length === 1 ? '어떠한 것을 깨달았나요?' : undefined}
                   value={block.text}

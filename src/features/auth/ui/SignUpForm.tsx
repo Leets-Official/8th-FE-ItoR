@@ -1,14 +1,16 @@
 import { useRef, useState, type ChangeEvent, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_90.svg';
 import { Blank, Button, Icon, showToast, TextFieldSet } from '@/shared/ui';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
+import { KAKAO_SIGN_UP_PATH, redirectToKakaoAuth } from '../api/kakaoAuth';
 import type { SignUpInput, SocialProvider } from '../model/types';
 import { useAuth } from '../model/useAuth';
 import {
   EMAIL_PATTERN,
   formatBirthDate,
   NICKNAME_MAX_LENGTH,
+  PASSWORD_PATTERN,
   PROFILE_ERROR_MESSAGE,
   SOCIAL_PROVIDER_LABEL,
   validateProfile,
@@ -50,6 +52,9 @@ function validateSignUp(values: SignUpValues, provider?: SocialProvider): SignUp
   if (!errors.email && !EMAIL_PATTERN.test(values.email)) {
     errors.email = PROFILE_ERROR_MESSAGE.invalidEmail;
   }
+  if (!provider && !errors.password && !PASSWORD_PATTERN.test(values.password)) {
+    errors.password = PROFILE_ERROR_MESSAGE.invalidPassword;
+  }
   if (!provider && !errors.passwordConfirm && values.password !== values.passwordConfirm) {
     errors.passwordConfirm = PROFILE_ERROR_MESSAGE.passwordMismatch;
   }
@@ -69,6 +74,7 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
   const [profileImageUrl, setProfileImageUrl] = useState<string>();
   const [birthDate, setBirthDate] = useState('');
   const [errors, setErrors] = useState<SignUpFieldErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleProfileImageChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -77,9 +83,9 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
     if (!file) return;
 
     try {
-      setProfileImageUrl(await readAsDataUrl(file));
+      setProfileImageUrl(await uploadImage(file));
     } catch {
-      showToast('negative', '프로필 사진을 불러오지 못했습니다.');
+      showToast('negative', '프로필 사진을 올리지 못했습니다.');
     }
   }
 
@@ -95,8 +101,10 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
     });
   }
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    // 응답을 기다리는 동안 다시 제출해 같은 계정으로 가입 요청이 겹치지 않게 한다
+    if (isSubmitting) return;
     const form = event.currentTarget;
     const formData = new FormData(form);
     const read = (name: string) => String(formData.get(name) ?? '').trim();
@@ -114,7 +122,8 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
     const nextErrors = validateSignUp(values, provider);
     if (Object.keys(nextErrors).length === 0) {
       const { email, password, name, nickname } = values;
-      const error = signUp({
+      setIsSubmitting(true);
+      const failure = await signUp({
         email,
         password: provider ? undefined : password,
         provider,
@@ -124,7 +133,22 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
         introduction: values.introduction || undefined,
         profileImageUrl,
       });
-      if (error === 'duplicate-email') nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      setIsSubmitting(false);
+
+      if (failure?.error === 'duplicate-email') {
+        nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      } else if (failure?.error === 'kakao-auth-required') {
+        // 회원가입 페이지에서 출발하면 카카오 로그인 후 묻지 않고 이 폼으로 돌아온다 (KakaoCallbackPage)
+        showToast('negative', '카카오 로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
+        redirectToKakaoAuth({ returnPath: KAKAO_SIGN_UP_PATH });
+        return;
+      } else if (failure) {
+        showToast(
+          'negative',
+          failure.message ?? '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        );
+        return;
+      }
     }
 
     setErrors(nextErrors);
@@ -256,7 +280,7 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
 
       <Blank size={32} />
       <div className={cn(SECTION_CLASS, 'flex px-4')}>
-        <Button type="submit" className="h-[38px] flex-1">
+        <Button type="submit" disabled={isSubmitting} className="h-[38px] flex-1">
           회원가입 완료
         </Button>
       </div>

@@ -28,14 +28,44 @@ export function redirectToKakaoAuth({
 // 저장해 둔 경로는 한 번 쓰고 지운다. 주소창 조작 등으로 바뀔 수 있으므로
 // 앱 안의 경로(/로 시작, //는 다른 사이트)만 받아들인다
 export function takeKakaoReturnPath() {
-  let returnPath: string | null = null;
+  let returnPath: string | null;
   try {
     returnPath = sessionStorage.getItem(RETURN_PATH_KEY);
     sessionStorage.removeItem(RETURN_PATH_KEY);
   } catch {
-    // 저장소를 쓸 수 없으면 홈으로 보낸다
+    // 저장소를 쓸 수 없으면 홈으로 보낸다. 읽기만 하고 지우지 못했어도 남은 경로를 쓰지 않는다
+    return '/';
   }
   return returnPath?.startsWith('/') && !returnPath.startsWith('//') ? returnPath : '/';
+}
+
+// 가입되지 않은 카카오 계정이면 서버가 kakaoId를 준다. 회원가입 폼을 채우는 동안 남아 있도록 저장해 두고
+// /auth/register-oauth에 함께 보낸다
+const KAKAO_ID_KEY = 'kakaoId';
+
+export function saveKakaoId(kakaoId: number) {
+  try {
+    sessionStorage.setItem(KAKAO_ID_KEY, String(kakaoId));
+  } catch {
+    // 저장소를 쓸 수 없으면 가입할 때 카카오 로그인을 다시 거친다
+  }
+}
+
+export function readKakaoId() {
+  try {
+    const stored = sessionStorage.getItem(KAKAO_ID_KEY);
+    return stored ? Number(stored) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function clearKakaoId() {
+  try {
+    sessionStorage.removeItem(KAKAO_ID_KEY);
+  } catch {
+    // 저장소를 쓸 수 없으면 지울 값도 없다
+  }
 }
 
 export const KAKAO_SIGN_UP_PATH = '/signup/kakao';

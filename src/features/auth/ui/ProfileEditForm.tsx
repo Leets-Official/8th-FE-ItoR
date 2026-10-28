@@ -1,12 +1,13 @@
 import { useRef, useState, type ChangeEvent, type Ref, type SubmitEvent } from 'react';
 import defaultProfile from '@/shared/assets/images/profile_64.svg';
 import { Icon, showToast, TextField, TextFieldSet } from '@/shared/ui';
-import { readAsDataUrl } from '@/shared/lib/readAsDataUrl';
+import { uploadImage } from '@/shared/api/uploadImage';
 import { cn } from '@/shared/lib/utils';
 import {
   EMAIL_PATTERN,
   formatBirthDate,
   NICKNAME_MAX_LENGTH,
+  PASSWORD_PATTERN,
   PROFILE_ERROR_MESSAGE,
   SOCIAL_PROVIDER_LABEL,
   validateProfile,
@@ -15,7 +16,7 @@ import {
 import type { AuthUser } from '../model/types';
 import { useAuth } from '../model/useAuth';
 
-type ProfileEditField = ProfileField | 'email' | 'passwordConfirm';
+type ProfileEditField = ProfileField | 'email' | 'password' | 'passwordConfirm';
 type ProfileEditFieldErrors = Partial<Record<ProfileEditField, string>>;
 
 // 화면에 놓인 순서. 문구가 붙은 첫 칸으로 포커스를 옮길 때 이 순서를 따른다
@@ -23,6 +24,7 @@ const PROFILE_EDIT_FIELDS: ProfileEditField[] = [
   'nickname',
   'introduction',
   'email',
+  'password',
   'passwordConfirm',
   'name',
   'birthDate',
@@ -55,9 +57,9 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
     if (!file) return;
 
     try {
-      setProfileImageUrl(await readAsDataUrl(file));
+      setProfileImageUrl(await uploadImage(file));
     } catch {
-      showToast('negative', '프로필 사진을 불러오지 못했습니다.');
+      showToast('negative', '프로필 사진을 올리지 못했습니다.');
     }
   }
 
@@ -65,16 +67,18 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
   function handleFormChange(event: ChangeEvent<HTMLFormElement>) {
     // change 이벤트는 입력창에서 버블링되어 올라오므로 target이 입력창이다
     const { name } = event.target as unknown as HTMLInputElement;
-    const field = (name === 'password' ? 'passwordConfirm' : name) as ProfileEditField;
+    const fields = (
+      name === 'password' ? ['password', 'passwordConfirm'] : [name]
+    ) as ProfileEditField[];
     setErrors((prev) => {
-      if (!(field in prev)) return prev;
+      if (!fields.some((field) => field in prev)) return prev;
       const next = { ...prev };
-      delete next[field];
+      fields.forEach((field) => delete next[field]);
       return next;
     });
   }
 
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -94,18 +98,25 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
     if (!email) nextErrors.email = PROFILE_ERROR_MESSAGE.required;
     else if (!EMAIL_PATTERN.test(email)) nextErrors.email = PROFILE_ERROR_MESSAGE.invalidEmail;
     // 비밀번호 칸은 비워 두면 바꾸지 않는다
-    if (password !== passwordConfirm) {
+    if (password && !PASSWORD_PATTERN.test(password)) {
+      nextErrors.password = PROFILE_ERROR_MESSAGE.invalidPassword;
+    } else if (password !== passwordConfirm) {
       nextErrors.passwordConfirm = PROFILE_ERROR_MESSAGE.passwordMismatch;
     }
     if (Object.keys(nextErrors).length === 0) {
-      const error = updateProfile({
+      const failure = await updateProfile({
         ...values,
         email,
         introduction: values.introduction || undefined,
         profileImageUrl,
         password: password || undefined,
       });
-      if (error === 'duplicate-email') nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      if (failure?.error === 'duplicate-email') {
+        nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      } else if (failure) {
+        showToast('negative', failure.message ?? '저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
     }
 
     setErrors(nextErrors);
@@ -220,6 +231,7 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
               label="비밀번호"
               type="password"
               name="password"
+              error={errors.password}
               placeholder="······"
               autoComplete="new-password"
             />

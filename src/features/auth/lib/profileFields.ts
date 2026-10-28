@@ -9,6 +9,10 @@ export const NICKNAME_MAX_LENGTH = 20;
 export const INTRODUCTION_MAX_LENGTH = 30;
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// 서버 검증(회원가입·프로필 수정·비밀번호 변경 요청)과 같은 조건. 미리 막아 400 응답이 나지 않게 한다
+export const PASSWORD_PATTERN = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$/;
+const NICKNAME_PATTERN = /^[a-zA-Z0-9]{3,}$/;
+const NAME_PATTERN = /^[가-힣]+$/;
 const BIRTH_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 // 이보다 앞선 연도는 오타로 본다
 const BIRTH_YEAR_MIN = 1900;
@@ -19,13 +23,16 @@ export const PROFILE_ERROR_MESSAGE = {
   invalidEmail: '*이메일 형식이 적합하지 않습니다.',
   duplicateEmail: '*사용중인 이메일입니다.',
   nameTooLong: `*이름은 최대 ${NAME_MAX_LENGTH}글자 입니다.`,
+  invalidName: '*이름은 한글만 입력할 수 있습니다.',
   invalidBirthDate: '*생년월일 형식이 적합하지 않습니다.',
   invalidBirthDay: '*유효한 일을 입력하세요.',
   invalidBirthMonth: '*유효한 월을 입력하세요.',
   invalidBirthYear: '*유효한 연도를 입력하세요.',
   futureBirthDate: '*유효한 생년월일을 입력하세요.',
   nicknameTooLong: `*닉네임은 최대 ${NICKNAME_MAX_LENGTH}글자 입니다.`,
+  invalidNickname: '*닉네임은 영문, 숫자로 3글자 이상 입력하세요.',
   introductionTooLong: `* 한 줄 소개는 최대 ${INTRODUCTION_MAX_LENGTH}글자입니다.`,
+  invalidPassword: '*비밀번호는 영문, 숫자, 특수문자(@$!%*?&)를 모두 포함해 8~64글자로 입력하세요.',
   passwordMismatch: '*비밀번호가 일치하지 않습니다.',
 };
 
@@ -45,6 +52,8 @@ export function validateProfile(values: Record<ProfileField, string>): ProfileFi
 
   if (!errors.name && values.name.length > NAME_MAX_LENGTH) {
     errors.name = PROFILE_ERROR_MESSAGE.nameTooLong;
+  } else if (!errors.name && !NAME_PATTERN.test(values.name)) {
+    errors.name = PROFILE_ERROR_MESSAGE.invalidName;
   }
   if (!errors.birthDate && !BIRTH_DATE_PATTERN.test(values.birthDate)) {
     errors.birthDate = PROFILE_ERROR_MESSAGE.invalidBirthDate;
@@ -54,6 +63,8 @@ export function validateProfile(values: Record<ProfileField, string>): ProfileFi
   }
   if (!errors.nickname && values.nickname.length > NICKNAME_MAX_LENGTH) {
     errors.nickname = PROFILE_ERROR_MESSAGE.nicknameTooLong;
+  } else if (!errors.nickname && !NICKNAME_PATTERN.test(values.nickname)) {
+    errors.nickname = PROFILE_ERROR_MESSAGE.invalidNickname;
   }
   if (values.introduction.length > INTRODUCTION_MAX_LENGTH) {
     errors.introduction = PROFILE_ERROR_MESSAGE.introductionTooLong;
