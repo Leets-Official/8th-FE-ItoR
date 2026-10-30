@@ -20,8 +20,9 @@ interface AppHeaderProps {
   onLogin: LoginHandler;
   onWrite: () => void;
   canManagePost: boolean;
+  postPending: boolean;
   onEditPost: () => void;
-  onDeletePost: () => void;
+  onDeletePost: () => Promise<boolean>;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   menuButtonRef: Ref<HTMLButtonElement>;
@@ -34,6 +35,7 @@ export function AppHeader({
   onLogin,
   onWrite,
   canManagePost,
+  postPending,
   onEditPost,
   onDeletePost,
   sidebarOpen,
@@ -70,7 +72,9 @@ export function AppHeader({
       }
       actions={
         <>
-          {isWritingPage && signedIn && <WriteHeaderActions editing={editMatch !== null} />}
+          {isWritingPage && signedIn && (
+            <WriteHeaderActions editing={editMatch !== null} pending={postPending} />
+          )}
           {pathname === '/' && <HomeHeaderActions onWrite={onWrite} />}
           {isProfilePage && signedIn && (
             <ProfileHeaderActions editing={pathname.endsWith('/edit')} />
@@ -79,6 +83,7 @@ export function AppHeader({
             <PostHeaderActions
               key={pathname}
               canManage={canManagePost}
+              pending={postPending}
               onEdit={onEditPost}
               onDelete={onDeletePost}
             />

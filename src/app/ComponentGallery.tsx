@@ -111,12 +111,8 @@ export function ComponentGallery() {
             >
               댓글 2개 상태
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/posts/1#post-comments')}
-            >
-              상세에서 댓글 확인
+            <Button type="button" variant="outline" onClick={() => navigate('/')}>
+              실제 게시물 목록 보기
             </Button>
           </div>
           <p className="mb-4 text-xs text-neutral-600">
@@ -127,7 +123,33 @@ export function ComponentGallery() {
             <CommentSection
               currentUser={previewUser}
               comments={commentsByPost.preview}
-              onCommentsChange={(comments) => setPostComments('preview', comments)}
+              onCreate={(content) => {
+                if (!previewUser) return;
+                setPostComments('preview', [
+                  ...commentsByPost.preview,
+                  {
+                    id: crypto.randomUUID(),
+                    author: previewUser,
+                    content,
+                    createdAt: new Date().toISOString(),
+                    isOwner: true,
+                  },
+                ]);
+              }}
+              onEdit={(id, content) =>
+                setPostComments(
+                  'preview',
+                  commentsByPost.preview.map((comment) =>
+                    comment.id === id ? { ...comment, content } : comment,
+                  ),
+                )
+              }
+              onDelete={(id) =>
+                setPostComments(
+                  'preview',
+                  commentsByPost.preview.filter((comment) => comment.id !== id),
+                )
+              }
               onLogin={openLogin}
             />
           </div>

@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react';
 
+import { getApiErrorMessage } from '@/shared/apis/response';
 import { MoreVertIcon } from '@/shared/assets/icons';
 import { ActionMenu } from '@/shared/ui/ActionMenu';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import { IconButton } from '@/shared/ui/IconButton';
 import { ProfileAvatar } from '@/shared/ui/ProfileAvatar';
+import { notify } from '@/shared/ui/StatusToast';
 import { formatPublishedTime } from '@/shared/utils/formatPublishedTime';
 
 import type { CommentAuthor, PostComment } from '../model/comment';
@@ -14,17 +16,38 @@ interface CommentItemProps {
   comment: PostComment;
   currentUser: CommentAuthor | null;
   now: number;
-  onEdit: (id: string, content: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (id: string, content: string) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
 }
 
 export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: CommentItemProps) {
   const [editing, setEditing] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const deletingRef = useRef(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const selectedAction = useRef<'edit' | 'delete' | null>(null);
   const editor = useRef<HTMLTextAreaElement>(null);
-  const owned = currentUser !== null && currentUser.id === comment.author.id;
+  const owned = currentUser !== null && comment.isOwner;
+
+  async function deleteComment() {
+    if (!owned || deletingRef.current) return;
+    deletingRef.current = true;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await onDelete(comment.id);
+      setDeleteOpen(false);
+    } catch (cause) {
+      const message = getApiErrorMessage(cause, '댓글을 삭제하지 못했습니다. 다시 시도해주세요.');
+      setDeleteError(message);
+      notify.error(message);
+    } finally {
+      deletingRef.current = false;
+      setDeleting(false);
+    }
+  }
 
   return (
     <li className="pb-5">
@@ -58,6 +81,7 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
                 trigger={
                   <IconButton
                     ref={menuButton}
+                    disabled={editing || deleting}
                     label={`${comment.author.nickname} 댓글 메뉴 열기`}
                     className="size-10"
                   >
@@ -80,6 +104,7 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
                     onSelect: () => {
                       if (owned) {
                         selectedAction.current = 'delete';
+                        setDeleteError('');
                         setDeleteOpen(true);
                       }
                     },
@@ -97,11 +122,11 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
               initialContent={comment.content}
               onCancel={() => {
                 setEditing(false);
-                menuButton.current?.focus();
+                requestAnimationFrame(() => menuButton.current?.focus());
               }}
-              onSubmit={(content) => {
-                if (!owned) return;
-                onEdit(comment.id, content);
+              onSubmit={async (content) => {
+                if (!owned) throw new Error('작성자만 댓글을 수정할 수 있습니다.');
+                await onEdit(comment.id, content);
                 setEditing(false);
               }}
             />
@@ -115,19 +140,17 @@ export function CommentItem({ comment, currentUser, now, onEdit, onDelete }: Com
       <ConfirmDialog
         open={deleteOpen && owned}
         onOpenChange={setDeleteOpen}
-        title="해당 블로그를 삭제하시겠어요?"
-        description="삭제된 블로그는 다시 확인할 수 없어요."
+        title="해당 댓글을 삭제하시겠어요?"
+        description={deleteError || '삭제된 댓글은 다시 확인할 수 없어요.'}
         confirmLabel="삭제하기"
         confirmVariant="destructiveSolid"
+        pending={deleting}
         onCloseAutoFocus={(event) => {
           event.preventDefault();
           const target = menuButton.current ?? document.getElementById('post-comments');
           target?.focus({ preventScroll: true });
         }}
-        onConfirm={() => {
-          setDeleteOpen(false);
-          if (owned) onDelete(comment.id);
-        }}
+        onConfirm={() => void deleteComment()}
       />
     </li>
   );
