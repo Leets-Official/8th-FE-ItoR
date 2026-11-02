@@ -1,7 +1,7 @@
 /* ===== 폰트: Noto Sans KR 가변 폰트 (100~900) ===== */
 @import '@fontsource-variable/noto-sans-kr';
-@import '@fontsource/roboto/400.css';
-@import '@fontsource/smooch/400.css';
+@import '@fontsource/roboto/latin-400.css';
+@import '@fontsource/smooch/latin-400.css';
 
 @tailwind base;
 @tailwind components;
