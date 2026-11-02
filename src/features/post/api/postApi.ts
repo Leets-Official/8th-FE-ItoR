@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios';
 import { api, type ApiResponse } from '@/shared/api/instance';
-import { getAccessToken } from '@/shared/api/tokenStorage';
+import { getAccessToken, getRefreshToken } from '@/shared/api/tokenStorage';
 import { toPostComment, type CommentResponse } from '@/features/comment';
 import type { PostContentBlock, PostCreateInput, PostDetail, PostSummary } from '../model/types';
 
@@ -88,6 +88,7 @@ function toPostSummary({
 export async function getPosts(page: number, size: number): Promise<PostPage> {
   const { data } = await api.get<ApiResponse<PostListResponse>>('/posts/all', {
     params: { page, size },
+    isPublic: true,
   });
   return { posts: data.data.posts.map(toPostSummary), pageCount: data.data.pageMax };
 }
@@ -108,9 +109,10 @@ export async function getAllPosts(): Promise<PostSummary[]> {
 // 없는 글이면 null. 로그인했으면 토큰이 필요한 API로 불러와야 내 글인지(isOwner) 알 수 있다
 export async function getPostDetail(postId: string): Promise<PostDetail | null> {
   try {
+    const isLoggedIn = Boolean(getAccessToken() || getRefreshToken());
     const { data } = await api.get<ApiResponse<PostDetailResponse>>(
-      getAccessToken() ? '/posts/token' : '/posts',
-      { params: { postId } },
+      isLoggedIn ? '/posts/token' : '/posts',
+      { params: { postId }, isPublic: !isLoggedIn },
     );
     const { introduction, isOwner, comments, contents, ...post } = data.data;
     const summary = toPostSummary({ ...post, contents, commentCount: comments.length });
