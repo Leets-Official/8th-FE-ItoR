@@ -3,6 +3,7 @@ import { Outlet } from '@tanstack/react-router';
 import { AuthProvider } from '@/shared/auth/components/AuthProvider';
 import { QueryProvider } from '@/shared/api/QueryProvider';
 import { AppHeader } from '@/app/layout/components/AppHeader';
+import { PwaUpdatePrompt } from '@/app/pwa/PwaUpdatePrompt';
 import { DetailHeaderProvider } from '@/features/detail/components/DetailHeaderProvider';
 import { ProfileEditModeProvider } from '@/features/my/edit/components/ProfileEditModeProvider';
 import { ToastProvider } from '@/shared/ui/toast/ToastProvider';
@@ -11,6 +12,7 @@ export default function MainLayout() {
   return (
     <QueryProvider>
       <ToastProvider>
+        <PwaUpdatePrompt />
         <AuthProvider>
           <DetailHeaderProvider>
             <ProfileEditModeProvider>
