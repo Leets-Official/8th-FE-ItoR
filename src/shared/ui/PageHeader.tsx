@@ -1,5 +1,6 @@
 import type { MouseEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router';
+import { cn } from '@/shared/lib/utils';
 import { Button } from './Button';
 import {
   DropdownMenu,
@@ -8,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from './DropdownMenu';
 import { IconButton } from './IconButton';
-import { cn } from '@/shared/lib/utils';
 
 // basic: 메뉴·로고만 있는 헤더 (회원가입 등), profile: 수정하기 버튼이 있는 헤더 (내 프로필 설정)
 // profile-edit: 내 프로필 설정에서 수정하기를 누르면 바뀌는 취소하기·저장하기 헤더
@@ -25,6 +25,7 @@ interface PageHeaderProps {
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   onChat?: MouseEventHandler<HTMLButtonElement>;
   // detail에서는 더보기 메뉴의 수정하기·삭제하기 항목이 되고, 둘 다 없으면 더보기 버튼을 숨긴다
+  // 메뉴 항목의 onSelect와 버튼의 onClick에 함께 쓰여 이벤트를 받지 않는 () => void로 둔다
   onEdit?: () => void;
   onDelete?: () => void;
   onPublish?: MouseEventHandler<HTMLButtonElement>;
