@@ -18,6 +18,14 @@ export const apiClient = axios.create({
 
 let reissuePromise: Promise<AccessTokenReissuePostResponse> | null = null;
 
+function isRefreshTokenRejected(error: unknown) {
+  if (!axios.isAxiosError(error)) {
+    return false;
+  }
+
+  return error.response?.status === 401;
+}
+
 apiClient.interceptors.request.use((config) => {
   const accessToken = readStoredAuth()?.accessToken;
 
@@ -60,7 +68,10 @@ apiClient.interceptors.response.use(
       request.headers.Authorization = `Bearer ${tokens.accessToken}`;
       return apiClient(request);
     } catch (reissueError) {
-      clearStoredAuth();
+      if (isRefreshTokenRejected(reissueError)) {
+        clearStoredAuth();
+      }
+
       return Promise.reject(reissueError);
     }
   },
