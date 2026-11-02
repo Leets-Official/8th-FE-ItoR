@@ -5,8 +5,16 @@ import { cn } from '@/shared/lib/utils';
 import { Icon, type IconName } from './Icon';
 
 export type ButtonVariant = 'point' | 'outline' | 'white' | 'black' | 'text';
+// 시안에서 사이드바·회원가입·댓글 등록 버튼은 기본(40px)보다 낮은 38px이다
+export type ButtonSize = 40 | 38;
 
-const PILL_CLASS = 'h-10 rounded-full px-3 text-14';
+const PILL_CLASS = 'rounded-full px-3 text-14';
+
+// text 변형은 글자 크기에 맞춘 높이라 size를 적용하지 않는다
+const PILL_SIZE_CLASS: Record<ButtonSize, string> = {
+  40: 'h-10',
+  38: 'h-[38px]',
+};
 
 const buttonVariants = cva(
   'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1 disabled:cursor-default',
@@ -40,6 +48,7 @@ const buttonVariants = cva(
 
 interface CommonButtonProps {
   variant?: ButtonVariant;
+  size?: ButtonSize;
   icon?: IconName;
   pressed?: boolean;
 }
@@ -63,6 +72,7 @@ type ButtonProps = NativeButtonProps | ChildButtonProps;
 
 export function Button({
   variant = 'point',
+  size = 40,
   icon,
   pressed = false,
   asChild = false,
@@ -77,7 +87,11 @@ export function Button({
     <Comp
       data-slot="button"
       type={asChild ? undefined : type}
-      className={cn(buttonVariants({ variant, pressed }), className)}
+      className={cn(
+        buttonVariants({ variant, pressed }),
+        variant !== 'text' && PILL_SIZE_CLASS[size],
+        className,
+      )}
       {...props}
     >
       {icon && <Icon name={icon} size={variant === 'text' ? 14 : 24} />}

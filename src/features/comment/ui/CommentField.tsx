@@ -84,7 +84,8 @@ export function CommentField({
           type="submit"
           variant={hasInput ? 'black' : 'outline'}
           disabled={!hasInput}
-          className="h-[38px] w-16"
+          size={38}
+          className="w-16"
           // 버튼이 포커스를 가져가면 입력창이 blur되어 모바일 키패드가 닫힌다
           onPointerDown={(event) => event.preventDefault()}
         >

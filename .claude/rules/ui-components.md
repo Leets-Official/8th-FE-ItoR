@@ -9,7 +9,7 @@ paths:
 
 - 컴포넌트는 named export로 작성하며, Figma 컴포넌트의 변형은 prop으로 표현합니다.
   - 종류: `variant`/`type` 문자열 유니언 (예: `ButtonVariant`, `ToastType`, `PageHeaderVariant`)
-  - 크기: Figma 속성값을 그대로 쓴 숫자 유니언 `size` (예: `IconSize` = `40 | 24 | 14 | 12`, `TextFieldSize` = `32 | 14`, `BlankSize` = `64 | 32 | 20`)
+  - 크기: Figma 속성값을 그대로 쓴 숫자 유니언 `size` (예: `IconSize` = `40 | 24 | 14 | 12`, `TextFieldSize` = `32 | 14`, `BlankSize` = `64 | 32 | 20`, `ButtonSize` = `40 | 38`)
   - 눌림·선택 같은 상태: `pressed`/`selected` boolean prop. 색을 `className`으로 덮어쓰지 않습니다 (아래 절 참고)
 
 ## 같은 속성의 색 클래스를 한 요소에 겹쳐 쓰지 않기
