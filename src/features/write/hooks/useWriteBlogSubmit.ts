@@ -51,7 +51,7 @@ export function useWriteBlogSubmit(blocks: readonly ArticleBlock[], postId?: str
 
     try {
       const contents = await createPostContents(blocks);
-      const savedPostId = postId ?? (await postBlog({ title, contents }));
+      const savedPostId = postId ?? (await postBlog({ title, contents }, auth.nickname));
 
       if (postId) {
         await patchBlog(postId, { title, contents });

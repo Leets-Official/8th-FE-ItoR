@@ -14,7 +14,7 @@ export type CommentItemProps = {
   currentTime: Date;
   isCommentPending: boolean;
   onUpdateComment: (commentId: number, content: string) => Promise<boolean>;
-  onDeleteComment: (commentId: number) => Promise<void>;
+  onDeleteComment: (commentId: number) => Promise<boolean>;
 };
 
 /** 댓글 내용과 작성자 본인의 수정·삭제 동작을 표시합니다. */
@@ -85,8 +85,10 @@ export function CommentItem({
       return;
     }
 
-    await onDeleteComment(commentId);
-    closeDeleteDialog();
+    const isDeleted = await onDeleteComment(commentId);
+    if (isDeleted) {
+      closeDeleteDialog();
+    }
   }
 
   return (

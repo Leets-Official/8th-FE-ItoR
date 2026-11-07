@@ -59,7 +59,7 @@ function hasSameContents(responseContents: ContentDto[] | undefined, contents: C
   });
 }
 
-async function findCreatedPostId(postCreateRequest: PostCreateRequest) {
+async function findCreatedPostId(postCreateRequest: PostCreateRequest, nickname: string) {
   try {
     const response = await getPostPage({
       page: 1,
@@ -68,6 +68,7 @@ async function findCreatedPostId(postCreateRequest: PostCreateRequest) {
     });
     const createdPost = response.posts?.find(
       (post) =>
+        post.nickName === nickname &&
         post.title === postCreateRequest.title &&
         hasSameContents(post.contents, postCreateRequest.contents),
     );
@@ -78,15 +79,15 @@ async function findCreatedPostId(postCreateRequest: PostCreateRequest) {
   }
 }
 
-/** 제목과 순서가 보존된 본문 블록으로 게시글을 생성하고 생성된 게시글 ID를 반환합니다. */
-export async function postBlog(postCreateRequest: PostCreateRequest) {
+/** 제목과 순서가 보존된 본문 블록으로 게시글을 생성하고 작성자의 생성된 게시글 ID를 반환합니다. */
+export async function postBlog(postCreateRequest: PostCreateRequest, nickname: string) {
   const response = await apiClient.post<ApiResponse<unknown>>('/posts', postCreateRequest, {
     timeout: 10_000,
   });
   const responsePostId =
     getPostId(response.data.data) || getPostIdFromLocation(response.headers.location);
 
-  return responsePostId ?? findCreatedPostId(postCreateRequest);
+  return responsePostId ?? findCreatedPostId(postCreateRequest, nickname);
 }
 
 /** 제목과 본문 블록 순서를 보존해 작성자 본인의 게시글을 수정합니다. */

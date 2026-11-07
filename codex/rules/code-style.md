@@ -66,6 +66,8 @@ React, TypeScript, Tailwind CSS 코드를 작성하거나 수정할 때 적용�
 - 첫 화면의 주요 이미지만 `eager`와 높은 fetch priority를 사용합니다.
 - 이미지의 표시 크기를 아는 경우 `width`와 `height` 속성을 함께 제공합니다.
 - 공개 메인·회원가입 화면은 `pnpm audit:lighthouse`로 네 항목 모두 90점 이상인지 확인합니다.
+- PWA는 정적 앱 셸만 precache하고 인증 정보와 API 응답은 Service Worker 캐시에 저장하지 않습니다.
+- 새 Service Worker는 폼 입력 손실을 막기 위해 사용자 확인 후 적용합니다.
 
 ## 검증
 
