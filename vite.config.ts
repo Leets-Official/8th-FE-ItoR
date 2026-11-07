@@ -15,6 +15,7 @@ export default defineConfig({
       target: 'react',
       routesDirectory: './src/app/routes',
       generatedRouteTree: './src/app/routeTree.gen.ts',
+      autoCodeSplitting: true,
     }),
     svgr({
       svgrOptions: {

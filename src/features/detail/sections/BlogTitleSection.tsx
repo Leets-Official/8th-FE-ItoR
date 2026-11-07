@@ -6,14 +6,16 @@ import { TextContent } from '@/shared/ui/text/TextContent';
 
 type BlogTitleSectionProps = {
   title: string;
-  nickname: string;
+  nickName: string;
+  profileUrl?: string;
   createdAt: string;
   commentCount: number;
 };
 
 export function BlogTitleSection({
   title,
-  nickname,
+  nickName,
+  profileUrl,
   createdAt,
   commentCount,
 }: BlogTitleSectionProps) {
@@ -22,13 +24,17 @@ export function BlogTitleSection({
       <Spacer variant="64" />
 
       <div className="flex h-fit w-full max-w-[688px] flex-col py-3">
-        <TextContent variant="24" title={title} />
+        <TextContent variant="24" title={title} headingLevel={1} />
 
         <Spacer variant="32" />
 
-        <PostMetadata nickname={nickname} createdAt={createdAt} commentCount={commentCount} />
+        <PostMetadata
+          nickname={nickName}
+          createdAt={createdAt}
+          commentCount={commentCount}
+          profileImageUrl={profileUrl}
+        />
       </div>
     </section>
   );
 }
-/** 블로그 상세 페이지의 제목과 작성 정보를 표시하는 영역입니다. */

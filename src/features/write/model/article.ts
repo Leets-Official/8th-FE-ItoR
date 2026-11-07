@@ -2,6 +2,7 @@ export type ArticleImage = {
   id: string;
   src: string;
   alt: string;
+  file?: File;
 };
 
 export type ArticleTextBlock = {

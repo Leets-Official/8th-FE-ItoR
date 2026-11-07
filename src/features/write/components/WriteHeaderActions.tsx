@@ -1,8 +1,10 @@
+import { WRITE_BLOG_FORM_ID } from '../model/writeBlog';
+
 type WriteHeaderActionsProps = {
   formId?: string;
 };
 
-export function WriteHeaderActions({ formId }: WriteHeaderActionsProps) {
+export function WriteHeaderActions({ formId = WRITE_BLOG_FORM_ID }: WriteHeaderActionsProps) {
   return (
     <div className="flex items-center gap-2.5">
       <button

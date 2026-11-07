@@ -6,20 +6,22 @@
 
 - `src/app`: 앱 초기화, 전역 레이아웃, 라우터와 전역 스타일
 - `src/pages`: URL 단위 페이지 파일과 화면 조합
-- `src/features`: 페이지와 같은 이름의 폴더에서 관리하는 UI, 상태, 로직
-- `src/shared`: 여러 페이지와 기능에서 재사용하는 UI, 자산, 유틸리티
+- `src/features`: 페이지 역할과 같은 이름의 폴더에서 관리하는 UI, 상태, 로직
+- `src/shared`: 여러 페이지와 기능에서 재사용하는 UI, API 계약, 검증, 자산과 유틸리티
 
 의존성은 `app → pages → features → shared` 방향을 따릅니다.
 
 - 하위 계층은 상위 계층을 import하지 않습니다.
-- `shared`는 페이지나 특정 기능의 정책을 포함하지 않습니다.
+- `shared`는 한 페이지에만 적용되는 화면 정책을 포함하지 않습니다.
 - 두 곳 이상에서 실제로 재사용되기 전에는 성급하게 공통 계층으로 옮기지 않습니다.
 - 새 계층이나 폴더를 만들기 전에 기존 위치에서 책임을 표현할 수 있는지 확인합니다.
 
 ## 페이지와 기능
 
 - `pages/{페이지 경로}`에는 `*Page.tsx`만 두고 같은 경로의 feature Section을 조립합니다.
-- `features`는 `main`, `detail`, `my/edit`, `register/email`처럼 페이지 URL 계층을 따릅니다.
+- `features`는 `main`, `detail`, `my/edit`, `register/form`처럼 대응하는 페이지 역할을 따릅니다.
+- URL이 `/posts/:postId`여도 화면 역할이 상세라면 `pages/detail`과 `features/detail`처럼 같은
+  역할 이름을 사용합니다.
 - `sections`는 작은 UI를 조립해 페이지의 큰 영역을 구성합니다.
 - `components`는 Section에서 사용하는 카드, 폼 요소, 목록 항목 같은 작은 UI를 둡니다.
 - React Hook은 `features/{페이지명}/hooks`에 두고 `use` 접두사를 사용합니다.
@@ -28,11 +30,13 @@
 - 페이지에 필요한 로직이 여러 책임을 가지면 이미지 업로드, 입력 검증처럼 기능이 드러나는
   이름의 hook으로 나눕니다.
 - 공통 UI는 도메인 데이터나 라우트에 직접 의존하지 않도록 작성합니다.
+- 두 개 이상의 feature가 같은 API DTO나 검증 규칙을 사용하면 `shared/api` 또는
+  `shared/utils`에서 단일 계약으로 관리합니다.
 - 한 파일에서만 쓰이는 작은 구현은 가까운 위치에 두고 불필요하게 파일을 늘리지 않습니다.
 
 ## 목 데이터
 
-- API 응답으로 교체할 게시글, 댓글, 작성자, 프로필 예시는 feature의 `mocks`에 둡니다.
+- API 연결 전 화면 예시 데이터가 필요한 경우에만 feature의 `mocks`에 둡니다.
 - 목 데이터는 `posts.mock.ts`, `comments.mock.ts`처럼 데이터 종류가 드러나는 이름을 사용합니다.
 - 목 데이터 타입은 UI props가 아니라 feature의 `model`에서 가져옵니다.
 - Section은 목 데이터를 직접 import하지 않고 페이지에서 props로 전달받습니다.
@@ -70,11 +74,13 @@ TanStack Router의 파일 기반 라우팅을 사용합니다.
 - 현재 구조로 해결하기 어려운 구체적인 이유가 있을 때만 구조를 변경합니다.
 - 구조 변경은 관련 import, 라우트 생성 결과, 타입 검사를 함께 확인합니다.
 - 생성 파일과 사용자 작업 중인 변경 사항을 직접 덮어쓰지 않습니다.
+- 동작 유지 리팩터링은 기존 DOM 순서, Tailwind 클래스와 사용자 문구를 변경하지 않습니다.
 
-## 블로그 본문 블록 TODO
+## 블로그 본문 블록
 
-- UI 단계에서는 현재 작성·상세 페이지 구조를 유지합니다.
-- API 스키마가 확정되면 텍스트와 이미지 블록 배열을 입력 순서대로 직렬화합니다.
-- UI 컴포넌트는 `ArticleTextBlock`, `ArticleImageBlock` 이름을 사용합니다.
-- 데이터 타입은 `ArticleTextBlockData`, `ArticleImageBlockData`, `ArticleBlockData` 이름을 사용합니다.
-- 작성과 상세 화면은 블록 데이터와 순서를 공유하고 렌더링 컴포넌트는 각각 분리합니다.
+- 게시물 작성 API의 본문은 텍스트와 이미지 블록을 입력 순서대로 직렬화합니다.
+- 각 블록의 `contentOrder`와 `contentType`을 보존하고 상세 화면도 같은 순서로 렌더링합니다.
+- 작성 상태는 `ArticleTextBlock`, `ArticleImageBlock`, `ArticleBlock` 판별 유니온으로 관리합니다.
+- 작성 화면의 이미지 표현은 `ArticleImageBlock`, 텍스트 입력은 `ArticleEditorSection`에서
+  블록 순서대로 렌더링합니다.
+- 상세 화면은 API의 `ContentDto` 순서를 보존하되 읽기 전용 표현 컴포넌트를 사용합니다.

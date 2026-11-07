@@ -1,5 +1,3 @@
-import { MY_POSTS_MOCK } from '@/features/my/mocks/posts.mock';
-import { MY_PROFILE_MOCK } from '@/features/my/mocks/profile.mock';
 import { MyPostListSection } from '@/features/my/sections/MyPostListSection';
 import { MyProfileSection } from '@/features/my/sections/MyProfileSection';
 
@@ -7,11 +5,8 @@ import { MyProfileSection } from '@/features/my/sections/MyProfileSection';
 export default function MyPage() {
   return (
     <section className="flex h-fit w-full flex-col">
-      <MyProfileSection
-        nickname={MY_PROFILE_MOCK.nickname}
-        introduction={MY_PROFILE_MOCK.introduction}
-      />
-      <MyPostListSection posts={MY_POSTS_MOCK} />
+      <MyProfileSection />
+      <MyPostListSection />
     </section>
   );
 }

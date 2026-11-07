@@ -5,23 +5,33 @@ import type { AppSession } from '@/app/layout/model/session';
 import { Avatar } from '@/shared/ui/avatar/Avatar';
 import { PillButton } from '@/shared/ui/button/PillButton';
 import { ActionDialog } from '@/shared/ui/dialog/ActionDialog';
+import { useModalFocus } from '@/shared/ui/dialog/hooks/useModalFocus';
 import { Spacer } from '@/shared/ui/spacing/Spacer';
 import { TextContent } from '@/shared/ui/text/TextContent';
 
 type NavigationDrawerProps = {
   isOpen: boolean;
   session: AppSession;
+  onLoginRequired: () => void;
+  onMyPageOpen: () => void | Promise<void>;
+  onWriteOpen: () => void | Promise<void>;
   onLogout?: () => void | Promise<void>;
   onClose: () => void;
 };
 
 type MemberNavigationContentProps = {
   session: AppSession;
+  onMyPageOpen: () => void | Promise<void>;
+  onWriteOpen: () => void | Promise<void>;
   onLogout?: () => void | Promise<void>;
   onDrawerClose: () => void;
 };
 
-function GuestNavigationContent() {
+type GuestNavigationContentProps = {
+  onLoginRequired: () => void;
+};
+
+function GuestNavigationContent({ onLoginRequired }: GuestNavigationContentProps) {
   return (
     <div className="flex h-full w-[240px] flex-col gap-2.5 border-r border-gray-90 bg-gray-96">
       <div className="flex h-[278px] w-full flex-col py-6">
@@ -36,7 +46,7 @@ function GuestNavigationContent() {
         <Spacer variant="20" />
 
         <div className="flex h-fit w-full flex-col gap-2.5 px-4">
-          <PillButton variant="point" text="깃로그 시작하기" />
+          <PillButton variant="point" text="깃로그 시작하기" onClick={onLoginRequired} />
         </div>
       </div>
     </div>
@@ -45,6 +55,8 @@ function GuestNavigationContent() {
 
 function MemberNavigationContent({
   session,
+  onMyPageOpen,
+  onWriteOpen,
   onLogout,
   onDrawerClose,
 }: MemberNavigationContentProps) {
@@ -70,7 +82,7 @@ function MemberNavigationContent({
         <div className="flex h-fit w-full flex-col py-6">
           <div className="flex h-fit w-full flex-col">
             <div className="flex h-fit w-full max-w-[688px] gap-2.5 px-4">
-              <Avatar size="medium" />
+              <Avatar size="medium" src={session.profilePicture} />
             </div>
 
             <TextContent variant="24" title={session.nickname} subtitle={session.introduction} />
@@ -79,8 +91,8 @@ function MemberNavigationContent({
           <Spacer variant="20" />
 
           <div className="flex h-fit w-full gap-2.5 px-4">
-            <PillButton variant="point" text="나의 깃로그" />
-            <PillButton variant="point" text="깃로그 쓰기" />
+            <PillButton variant="point" text="나의 깃로그" onClick={onMyPageOpen} />
+            <PillButton variant="point" text="깃로그 쓰기" onClick={onWriteOpen} />
           </div>
         </div>
 
@@ -108,18 +120,42 @@ function MemberNavigationContent({
   );
 }
 
-export function NavigationDrawer({ isOpen, session, onLogout, onClose }: NavigationDrawerProps) {
+export function NavigationDrawer({
+  isOpen,
+  session,
+  onLoginRequired,
+  onMyPageOpen,
+  onWriteOpen,
+  onLogout,
+  onClose,
+}: NavigationDrawerProps) {
+  const drawerRef = useModalFocus<HTMLDivElement>(onClose, isOpen);
+
   if (!isOpen) {
     return null;
   }
 
   return createPortal(
     <div className="fixed inset-0 z-[100]" onClick={onClose}>
-      <div className="h-full w-fit" onClick={(event) => event.stopPropagation()}>
+      <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="전체 메뉴"
+        tabIndex={-1}
+        className="h-full w-fit"
+        onClick={(event) => event.stopPropagation()}
+      >
         {session.isLoggedIn ? (
-          <MemberNavigationContent session={session} onLogout={onLogout} onDrawerClose={onClose} />
+          <MemberNavigationContent
+            session={session}
+            onMyPageOpen={onMyPageOpen}
+            onWriteOpen={onWriteOpen}
+            onLogout={onLogout}
+            onDrawerClose={onClose}
+          />
         ) : (
-          <GuestNavigationContent />
+          <GuestNavigationContent onLoginRequired={onLoginRequired} />
         )}
       </div>
     </div>,

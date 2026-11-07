@@ -1,16 +1,22 @@
-/** 블로그 상세 페이지의 댓글 목록과 댓글 작성 영역입니다. */
+/** 블로그 상세 페이지의 댓글 목록과 로그인 상태별 댓글 작성 영역입니다. */
 
-import { useState, type ChangeEvent } from 'react';
-
-import { PillButton } from '@/shared/ui/button/PillButton';
 import { Spacer } from '@/shared/ui/spacing/Spacer';
 
-import { CommentAuthor } from '../components/CommentAuthor';
-import type { DetailComment } from '../model/detail';
+import type { CommentGetDto } from '../api/detailApi';
+import { CommentComposer } from '../components/CommentComposer';
+import { CommentItem } from '../components/CommentItem';
+import { COMMENT_SECTION_ID } from '../model/comment';
 
 type CommentSectionProps = {
-  comments: readonly DetailComment[];
-  currentUserNickname: string;
+  comments: readonly CommentGetDto[];
+  currentTime: Date;
+  isLoggedIn: boolean;
+  nickName: string;
+  profileUrl?: string;
+  isCommentPending: boolean;
+  onCreateComment: (content: string) => Promise<boolean>;
+  onUpdateComment: (commentId: number, content: string) => Promise<boolean>;
+  onDeleteComment: (commentId: number) => Promise<void>;
 };
 
 type CommentSummaryProps = {
@@ -19,7 +25,10 @@ type CommentSummaryProps = {
 
 function CommentSummary({ count }: CommentSummaryProps) {
   return (
-    <div className="flex h-fit w-full max-w-[688px] gap-2 px-4 py-3">
+    <div
+      id={COMMENT_SECTION_ID}
+      className="flex h-fit w-full max-w-[688px] scroll-mt-20 gap-2 px-4 py-3"
+    >
       <h2 className="text-16-medium text-black">댓글</h2>
       <span className="text-14-medium text-point">{count}</span>
     </div>
@@ -38,70 +47,68 @@ function EmptyCommentState() {
   );
 }
 
-function CommentList({ comments }: Pick<CommentSectionProps, 'comments'>) {
+function CommentList({
+  comments,
+  currentTime,
+  isCommentPending,
+  onUpdateComment,
+  onDeleteComment,
+}: Pick<
+  CommentSectionProps,
+  'comments' | 'currentTime' | 'isCommentPending' | 'onUpdateComment' | 'onDeleteComment'
+>) {
   return (
     <div className="flex h-fit w-full max-w-[688px] flex-col gap-2.5">
-      {comments.map((comment) => (
-        <article key={comment.id} className="flex h-fit w-full max-w-[688px] flex-col bg-white">
-          <CommentAuthor
-            nickname={comment.nickname}
-            date={comment.date}
-            showMenu={comment.isOwned}
-          />
-          <div className="flex h-fit w-full flex-col pl-[26px]">
-            <div className="flex h-fit w-full max-w-[688px] gap-2.5 bg-white px-4 py-3">
-              <span className="text-14-light text-gray-20">{comment.content}</span>
-            </div>
-          </div>
-          <Spacer variant="20" />
-        </article>
+      {comments.map((commentGetDto, index) => (
+        <CommentItem
+          key={commentGetDto.commentId ?? `${commentGetDto.createdAt ?? 'comment'}-${index}`}
+          commentGetDto={commentGetDto}
+          currentTime={currentTime}
+          isCommentPending={isCommentPending}
+          onUpdateComment={onUpdateComment}
+          onDeleteComment={onDeleteComment}
+        />
       ))}
     </div>
   );
 }
 
-function CommentForm({ nickname }: { nickname: string }) {
-  const [comment, setComment] = useState('');
-  const registerButtonVariant = comment.length > 0 ? 'dark' : 'neutral';
-
-  function handleCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    setComment(event.currentTarget.value);
-  }
-
-  return (
-    <div className="flex h-fit w-full max-w-[688px] px-4 py-3">
-      <div className="flex h-fit w-full flex-col rounded-[4px] border border-gray-90 py-2">
-        <CommentAuthor nickname={nickname} />
-
-        <div className="flex h-[112px] w-full px-4 py-3">
-          <textarea
-            aria-label="댓글 내용"
-            className="text-14-light h-full w-full resize-none overflow-y-auto bg-transparent text-gray-20 outline-none placeholder:text-gray-56"
-            onChange={handleCommentChange}
-            placeholder="댓글을 입력하세요."
-            rows={1}
-            value={comment}
-          />
-        </div>
-
-        <div className="flex w-full justify-end px-4 py-2">
-          <PillButton variant={registerButtonVariant} text="등록" width={64} height={38} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function CommentSection({ comments, currentUserNickname }: CommentSectionProps) {
+export function CommentSection({
+  comments,
+  currentTime,
+  isLoggedIn,
+  nickName,
+  profileUrl,
+  isCommentPending,
+  onCreateComment,
+  onUpdateComment,
+  onDeleteComment,
+}: CommentSectionProps) {
   return (
     <section className="flex h-fit w-full flex-col items-center justify-center border-b border-b-gray-96 bg-white">
       <CommentSummary count={comments.length} />
       <Spacer variant="20" />
 
-      {comments.length > 0 ? <CommentList comments={comments} /> : <EmptyCommentState />}
+      {comments.length > 0 ? (
+        <CommentList
+          comments={comments}
+          currentTime={currentTime}
+          isCommentPending={isCommentPending}
+          onUpdateComment={onUpdateComment}
+          onDeleteComment={onDeleteComment}
+        />
+      ) : (
+        <EmptyCommentState />
+      )}
 
       <Spacer variant="20" />
-      <CommentForm nickname={currentUserNickname} />
+      <CommentComposer
+        isLoggedIn={isLoggedIn}
+        nickName={nickName}
+        profileUrl={profileUrl}
+        isCommentPending={isCommentPending}
+        onCreateComment={onCreateComment}
+      />
       <Spacer variant="64" />
     </section>
   );

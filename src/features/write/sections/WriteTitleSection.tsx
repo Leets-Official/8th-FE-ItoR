@@ -4,8 +4,12 @@ import { useState, type ChangeEvent } from 'react';
 
 import { Spacer } from '@/shared/ui/spacing/Spacer';
 
-export function WriteTitleSection() {
-  const [title, setTitle] = useState('');
+type WriteTitleSectionProps = {
+  initialTitle?: string;
+};
+
+export function WriteTitleSection({ initialTitle = '' }: WriteTitleSectionProps) {
+  const [title, setTitle] = useState(initialTitle);
 
   function handleTitleChange(event: ChangeEvent<HTMLInputElement>) {
     setTitle(event.currentTarget.value);

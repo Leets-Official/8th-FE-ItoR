@@ -4,11 +4,17 @@ import { useArticleEditor } from '../hooks/useArticleEditor';
 import { useWriteBlogSubmit } from '../hooks/useWriteBlogSubmit';
 import { WRITE_BLOG_FORM_ID } from '../model/writeBlog';
 import { WriteMediaToolbar } from './WriteMediaToolbar';
+import type { ArticleBlock } from '../model/article';
 
 const WRITE_MEDIA_ACTIONS = ['photo'] as const;
 
-export function WriteBlogEditor() {
-  const { submitWriteBlog } = useWriteBlogSubmit();
+type WriteBlogEditorProps = {
+  postId?: string;
+  initialTitle?: string;
+  initialBlocks?: readonly ArticleBlock[];
+};
+
+export function WriteBlogEditor({ postId, initialTitle, initialBlocks }: WriteBlogEditorProps) {
   const {
     blocks,
     focusTextBlockId,
@@ -18,7 +24,8 @@ export function WriteBlogEditor() {
     updateTextBlock,
     updateInsertionPoint,
     removeImageBlock,
-  } = useArticleEditor();
+  } = useArticleEditor(initialBlocks);
+  const { submitWriteBlog, isSubmitting } = useWriteBlogSubmit(blocks, postId);
 
   return (
     <>
@@ -32,8 +39,13 @@ export function WriteBlogEditor() {
         onChange={handleImageChange}
       />
 
-      <form id={WRITE_BLOG_FORM_ID} className="w-full" onSubmit={submitWriteBlog}>
-        <WriteTitleSection />
+      <form
+        id={WRITE_BLOG_FORM_ID}
+        className="w-full"
+        aria-busy={isSubmitting}
+        onSubmit={submitWriteBlog}
+      >
+        <WriteTitleSection initialTitle={initialTitle} />
         <ArticleEditorSection
           blocks={blocks}
           focusTextBlockId={focusTextBlockId}
