@@ -15,7 +15,8 @@ export function PostContent({ blocks }: { blocks: PostContentBlock[] }) {
               alt={block.alt}
               width={block.width}
               height={block.height}
-              loading="lazy"
+              loading={index <= 1 ? 'eager' : 'lazy'}
+              decoding="async"
               className="h-auto w-full rounded-sm"
             />
           )}

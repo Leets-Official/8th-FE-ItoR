@@ -113,10 +113,10 @@ export function ProfileSettingsForm({
     setLoadingPhoto(true);
     setPhotoError('');
     try {
-      const preview = await readProfilePhoto(file);
+      const photo = await readProfilePhoto(file);
       if (request !== photoRequest.current || controller.signal.aborted) return;
-      setValues((previous) => ({ ...previous, avatarUrl: preview }));
-      const imageUrl = await upload.mutateAsync({ file, signal: controller.signal });
+      setValues((previous) => ({ ...previous, avatarUrl: photo.src }));
+      const imageUrl = await upload.mutateAsync({ file: photo.file, signal: controller.signal });
       if (request === photoRequest.current && !controller.signal.aborted) {
         setValues((previous) => ({ ...previous, avatarUrl: imageUrl }));
       }

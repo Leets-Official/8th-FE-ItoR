@@ -1,3 +1,5 @@
+import { optimizeImage } from '@/shared/utils/optimizeImage';
+
 import type { Post, PostContentBlock } from '../model/post';
 import type { PostDraft, PostDraftBlock } from '../model/postDraft';
 
@@ -53,6 +55,7 @@ export function insertPostImage(
 
 export async function readPostImage(file: File) {
   if (!file.type.startsWith('image/')) throw new Error('이미지 파일을 선택해주세요.');
+  file = await optimizeImage(file, 1600);
   const url = URL.createObjectURL(file);
   const image = new Image();
   try {
@@ -62,7 +65,13 @@ export async function readPostImage(file: File) {
         reject(new Error('이미지를 불러올 수 없습니다. 다른 사진을 선택해주세요.'));
       image.src = url;
     });
-    return { src: url, alt: file.name, width: image.naturalWidth, height: image.naturalHeight };
+    return {
+      file,
+      src: url,
+      alt: file.name,
+      width: image.naturalWidth,
+      height: image.naturalHeight,
+    };
   } catch (error) {
     URL.revokeObjectURL(url);
     throw error;

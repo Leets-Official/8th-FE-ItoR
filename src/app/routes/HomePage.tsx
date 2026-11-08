@@ -87,8 +87,13 @@ export function HomePage() {
         ) : (
           <>
             <ul aria-label="게시글 목록">
-              {posts.map((post) => (
-                <PostListItem key={post.id} post={post} now={now} />
+              {posts.map((post, index) => (
+                <PostListItem
+                  key={post.id}
+                  post={post}
+                  now={now}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                />
               ))}
             </ul>
             <Pagination

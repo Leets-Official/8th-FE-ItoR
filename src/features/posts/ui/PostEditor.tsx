@@ -54,10 +54,13 @@ export function PostEditor({ initialDraft, onPublish, submitting = false }: Post
     const { id, start, end } = insertion.current;
     setLoadingImage(true);
     try {
-      const image = await readPostImage(file);
+      const { file: optimizedFile, ...image } = await readPostImage(file);
       previewUrl = image.src;
       if (request !== imageRequest.current) return;
-      const imageUrl = await uploadImage.mutateAsync({ file, signal: controller.signal });
+      const imageUrl = await uploadImage.mutateAsync({
+        file: optimizedFile,
+        signal: controller.signal,
+      });
       if (request !== imageRequest.current) return;
       const nextId = crypto.randomUUID();
       setBlocks((previous) =>
@@ -217,6 +220,8 @@ export function PostEditor({ initialDraft, onPublish, submitting = false }: Post
                       alt={block.alt}
                       width={block.width}
                       height={block.height}
+                      loading={index <= 1 ? 'eager' : 'lazy'}
+                      decoding="async"
                       className="h-auto w-full rounded-sm"
                     />
                     <IconButton
