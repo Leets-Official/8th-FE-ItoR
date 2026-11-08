@@ -1,7 +1,6 @@
-import { lazy, Suspense, useRef, type ReactNode } from 'react';
+import { useRef } from 'react';
 
 import { ClearIcon } from '@/shared/assets/icons';
-import { GitlogButton } from '@/shared/ui/GitlogButton';
 import { IconButton } from '@/shared/ui/IconButton';
 import {
   Dialog,
@@ -9,31 +8,21 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
 } from '@/shared/ui/primitives/dialog';
 
 import type { LoginHandler } from '../model/login';
-
-const LoginForm = lazy(() =>
-  import('./LoginForm').then((module) => ({ default: module.LoginForm })),
-);
+import { LoginForm } from './LoginForm';
 
 interface LoginDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trigger?: ReactNode;
   onLogin: LoginHandler;
 }
 
-export function LoginDialog({ open, onOpenChange, trigger, onLogin }: LoginDialogProps) {
+export function LoginDialog({ open, onOpenChange, onLogin }: LoginDialogProps) {
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {trigger !== null && (
-        <DialogTrigger asChild>
-          {trigger === undefined ? <GitlogButton>로그인</GitlogButton> : trigger}
-        </DialogTrigger>
-      )}
       <DialogContent
         onOpenAutoFocus={() => {
           returnFocus.current =
@@ -59,15 +48,7 @@ export function LoginDialog({ open, onOpenChange, trigger, onLogin }: LoginDialo
             <ClearIcon aria-hidden="true" className="size-6 invert" />
           </IconButton>
         </DialogClose>
-        <Suspense
-          fallback={
-            <p role="status" className="p-8 text-center">
-              로그인 화면을 불러오고 있습니다.
-            </p>
-          }
-        >
-          {open && <LoginForm onSignup={() => onOpenChange(false)} onLogin={onLogin} />}
-        </Suspense>
+        <LoginForm onSignup={() => onOpenChange(false)} onLogin={onLogin} />
       </DialogContent>
     </Dialog>
   );

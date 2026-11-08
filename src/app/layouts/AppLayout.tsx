@@ -35,6 +35,7 @@ export interface AppLayoutContext {
 export function AppLayout() {
   const {
     loginOpen,
+    hasOpenedLogin,
     previewUser,
     isRestoring,
     authError,
@@ -144,6 +145,7 @@ export function AppLayout() {
         menuButtonRef={menuButton}
         signedIn={previewUser !== null}
         loginOpen={loginOpen}
+        hasOpenedLogin={hasOpenedLogin}
         onLoginOpenChange={changeLoginOpen}
         onLogin={completeLogin}
         onWrite={() => {

@@ -12,15 +12,21 @@ export function useLayoutAuth() {
   const session = useAuthSession();
   const login = useLoginMutation();
   const [loginOpen, setLoginOpen] = useState(false);
+  const [hasOpenedLogin, setHasOpenedLogin] = useState(false);
   const [writeAfterLogin, setWriteAfterLogin] = useState(false);
 
   function openLogin() {
+    setHasOpenedLogin(true);
     setLoginOpen(true);
   }
 
   function changeLoginOpen(open: boolean) {
-    setLoginOpen(open);
-    if (!open) setWriteAfterLogin(false);
+    if (open) {
+      openLogin();
+      return;
+    }
+    setLoginOpen(false);
+    setWriteAfterLogin(false);
   }
 
   const completeLogin: LoginHandler = async (method, credentials) => {
@@ -53,6 +59,7 @@ export function useLayoutAuth() {
 
   return {
     loginOpen,
+    hasOpenedLogin,
     previewUser: session.user,
     isRestoring: session.isRestoring,
     authError: session.error,
