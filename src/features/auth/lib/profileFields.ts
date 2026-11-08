@@ -34,6 +34,7 @@ export const PROFILE_ERROR_MESSAGE = {
   introductionTooLong: `* 한 줄 소개는 최대 ${INTRODUCTION_MAX_LENGTH}글자입니다.`,
   invalidPassword: '*비밀번호는 영문, 숫자, 특수문자(@$!%*?&)를 모두 포함해 8~64글자로 입력하세요.',
   passwordMismatch: '*비밀번호가 일치하지 않습니다.',
+  passwordNotSaved: '*비밀번호를 변경하지 못했습니다. 다시 시도해주세요.',
 };
 
 export const SOCIAL_PROVIDER_LABEL: Record<SocialProvider, string> = {

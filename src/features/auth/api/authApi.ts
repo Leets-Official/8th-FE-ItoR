@@ -140,19 +140,33 @@ export async function registerWithEmail({
   }
 }
 
-// 비밀번호는 별도 API로 바꾼다. 바뀐 값은 서버 기준으로 다시 불러온다
+// 서버가 프로필과 비밀번호를 한 요청으로 처리하지 못한다. 중복 이메일처럼 흔한 실패에서 비밀번호만 바뀌지 않도록 프로필을 먼저 저장한다
 export async function updateMyProfile({
   password,
-  profileImageUrl,
   ...profile
-}: ProfileUpdateInput): Promise<{ user: AuthUser } | ProfileUpdateFailure> {
+}: ProfileUpdateInput): Promise<
+  { user: AuthUser; passwordFailure?: ProfileUpdateFailure } | ProfileUpdateFailure
+> {
+  const { profileImageUrl, ...fields } = profile;
   try {
-    await api.patch('/users', { ...profile, profilePicture: profileImageUrl });
-    if (password) await api.patch('/users/password', { password });
-    return { user: await getMyInfo() };
+    await api.patch('/users', { ...fields, profilePicture: profileImageUrl });
   } catch (error) {
     return toRequestFailure(error);
   }
+
+  // 여기부터는 프로필이 이미 저장됐으므로 실패해도 저장된 내용은 화면에 반영한다
+  let passwordFailure: ProfileUpdateFailure | undefined;
+  if (password) {
+    try {
+      await api.patch('/users/password', { password });
+    } catch (error) {
+      passwordFailure = { error: 'password-not-saved', message: toRequestFailure(error).message };
+    }
+  }
+
+  // 바뀐 값은 서버 기준으로 다시 불러오되, 조회만 실패하면 입력한 값으로 맞춘다
+  const user = await getMyInfo().catch(() => profile);
+  return { user, passwordFailure };
 }
 
 // 카카오 가입은 비밀번호 대신 카카오 로그인 때 받은 kakaoId로 계정을 연결한다. 가입 응답에는 토큰이 없어 로그인은 따로 한다

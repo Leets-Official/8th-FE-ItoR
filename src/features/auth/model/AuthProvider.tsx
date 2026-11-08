@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue } from './authContext';
 import { onSessionExpired } from '@/shared/api/instance';
-import { clearTokens } from '@/shared/api/tokenStorage';
+import { clearTokens, getRefreshToken } from '@/shared/api/tokenStorage';
 import { showToast } from '@/shared/ui';
 import {
   registerWithEmail,
@@ -105,11 +105,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const result = await updateMyProfile(input);
         if ('error' in result) return result;
 
-        // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
-        const user = { ...result.user, provider: currentUser.provider };
-        setCurrentUser(user);
-        writeStoredUser(user);
-        return undefined;
+        // 저장하는 동안 로그아웃했거나 세션이 만료됐으면 로그인 상태를 되살리지 않는다
+        if (getRefreshToken()) {
+          // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
+          const user = { ...result.user, provider: currentUser.provider };
+          setCurrentUser(user);
+          writeStoredUser(user);
+        }
+        return result.passwordFailure;
       },
       logout() {
         setCurrentUser(undefined);

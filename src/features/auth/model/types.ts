@@ -51,7 +51,9 @@ export interface ProfileUpdateInput extends Pick<
   password?: string;
 }
 
-export type ProfileUpdateError = 'duplicate-email' | 'invalid-input' | 'unknown';
+// password-not-saved: 프로필은 저장됐지만 비밀번호 변경만 실패했다
+export type ProfileUpdateError =
+  'duplicate-email' | 'invalid-input' | 'password-not-saved' | 'unknown';
 
 export interface ProfileUpdateFailure {
   error: ProfileUpdateError;

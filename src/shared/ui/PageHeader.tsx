@@ -16,11 +16,13 @@ export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic' | 'profile
 
 // write·profile·profile-edit 헤더 오른쪽의 글자 버튼. 글자색은 버튼마다 따로 붙인다
 const TEXT_BUTTON_CLASS =
-  'flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 hover:bg-gray-90 active:bg-gray-90';
+  'flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90 disabled:cursor-default disabled:opacity-60';
 
 interface PageHeaderProps {
   variant?: PageHeaderVariant;
   createLabel?: ReactNode;
+  // profile-edit에서 저장 요청을 기다리는 동안 true. 보낸 요청은 되돌릴 수 없어 취소하기도 함께 막는다
+  isSaving?: boolean;
   onMenu?: MouseEventHandler<HTMLButtonElement>;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   onChat?: MouseEventHandler<HTMLButtonElement>;
@@ -37,6 +39,7 @@ interface PageHeaderProps {
 export function PageHeader({
   variant = 'main',
   createLabel = '깃로그 쓰기',
+  isSaving = false,
   onMenu,
   onCreate,
   onChat,
@@ -128,12 +131,18 @@ export function PageHeader({
         <div className="flex h-[38px] items-start justify-end gap-2.5">
           <button
             type="button"
+            disabled={isSaving}
             className={cn(TEXT_BUTTON_CLASS, 'text-negative')}
             onClick={onCancel}
           >
             취소하기
           </button>
-          <button type="button" className={cn(TEXT_BUTTON_CLASS, 'text-black')} onClick={onSave}>
+          <button
+            type="button"
+            disabled={isSaving}
+            className={cn(TEXT_BUTTON_CLASS, 'text-black')}
+            onClick={onSave}
+          >
             저장하기
           </button>
         </div>
