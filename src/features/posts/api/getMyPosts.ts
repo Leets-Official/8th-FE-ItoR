@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { getAuthSnapshot } from '@/shared/apis/tokenSession';
 
 import type { Post } from '../model/post';
@@ -33,9 +35,17 @@ export async function getMyPosts(revision: number, signal?: AbortSignal) {
       requireSession();
       const group = await Promise.all(
         candidates.slice(start, start + 4).map(async (summary) => {
-          const { data: detail } = await postsApi.getDetail(summary.postId, true, signal);
-          requireSession();
-          return detail.isOwner ? mapPostSummary(summary) : null;
+          try {
+            const { data: detail } = await postsApi.getDetail(summary.postId, true, signal);
+            requireSession();
+            return detail.isOwner ? mapPostSummary(summary) : null;
+          } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+              requireSession();
+              return null;
+            }
+            throw error;
+          }
         }),
       );
       group.forEach((post) => {
