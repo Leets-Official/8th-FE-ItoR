@@ -39,7 +39,7 @@ src/
 │   └── KakaoCallbackPage.tsx # /oauth/kakao/success — 카카오 인가 코드를 받는 Redirect URI
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
-│   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
+│   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent · PostLoadError
 │   │   ├── api/            # postApi.ts — 게시글 요청 함수, postQueries.ts — 쿼리 키·작성/수정/삭제 훅
 │   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
