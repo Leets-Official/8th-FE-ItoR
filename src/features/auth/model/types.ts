@@ -11,7 +11,11 @@ export interface AuthUser extends User {
   provider?: SocialProvider;
 }
 
-export type LoginError = 'unregistered-email' | 'wrong-password';
+// unknown: 네트워크 오류나 서버 오류처럼 입력값과 상관없는 실패
+export type LoginError = 'invalid-credentials' | 'unknown';
+
+// unregistered: 카카오 로그인은 됐지만 우리 서비스에 가입하지 않은 계정
+export type KakaoLoginError = 'unregistered' | 'unknown';
 
 // 비밀번호 대신 소셜 계정으로 로그인하는 가입 방식
 export type SocialProvider = 'kakao';
@@ -29,7 +33,14 @@ export interface SignUpInput {
   profileImageUrl?: string;
 }
 
-export type SignUpError = 'duplicate-email';
+// kakao-auth-required: 카카오 가입에 필요한 kakaoId가 없어 카카오 로그인을 다시 거쳐야 한다
+export type SignUpError = 'duplicate-email' | 'invalid-input' | 'kakao-auth-required' | 'unknown';
+
+export interface SignUpFailure {
+  error: SignUpError;
+  // 서버가 알려준 실패 이유. 화면에 그대로 보여준다
+  message?: string;
+}
 
 // 내 프로필 설정에서 고칠 수 있는 항목. 가입 방식은 바꾸지 않는다
 export interface ProfileUpdateInput extends Pick<
@@ -40,4 +51,10 @@ export interface ProfileUpdateInput extends Pick<
   password?: string;
 }
 
-export type ProfileUpdateError = 'duplicate-email';
+export type ProfileUpdateError = 'duplicate-email' | 'invalid-input' | 'unknown';
+
+export interface ProfileUpdateFailure {
+  error: ProfileUpdateError;
+  // 서버가 알려준 실패 이유. 화면에 그대로 보여준다
+  message?: string;
+}

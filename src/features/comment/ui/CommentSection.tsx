@@ -6,11 +6,13 @@ import type { User } from '@/features/user';
 import { Blank, showToast } from '@/shared/ui';
 
 interface CommentSectionProps {
-  postId: number;
+  postId: string;
   comments: PostComment[];
   // 없으면 비로그인 상태
   currentUser?: User;
   onLoginRequest: () => void;
+  // 등록·삭제가 성공하면 댓글 목록을 다시 불러오게 알린다. Promise를 돌려주면 다시 받아 올 때까지 기다린다
+  onCommentChange?: () => Promise<unknown> | void;
 }
 
 export function CommentSection({
@@ -18,33 +20,30 @@ export function CommentSection({
   comments,
   currentUser,
   onLoginRequest,
+  onCommentChange,
 }: CommentSectionProps) {
-  const { mutate: createComment } = useCreateComment(postId);
-  const { mutate: deleteComment } = useDeleteComment(postId);
+  const { mutate: createComment } = useCreateComment(onCommentChange);
+  const { mutate: deleteComment } = useDeleteComment(onCommentChange);
 
   function handleCommentSubmit(content: string) {
     if (!currentUser) return;
 
-    createComment({
-      postId,
-      content,
-      author: { nickname: currentUser.nickname, profileImageUrl: currentUser.profileImageUrl },
-    });
-  }
-
-  function handleCommentDelete(commentId: number) {
-    deleteComment(
-      { postId, commentId },
-      {
-        onSuccess: () => showToast('positive', '삭제가 완료되었습니다!'),
-        onError: () => showToast('negative', '댓글을 삭제하지 못했습니다.'),
-      },
+    createComment(
+      { postId, content },
+      { onError: () => showToast('negative', '댓글을 등록하지 못했습니다.') },
     );
   }
 
-  // 사용자 id가 아직 없어 닉네임으로 본인 댓글인지 판단한다
+  function handleCommentDelete(commentId: number) {
+    deleteComment(commentId, {
+      onSuccess: () => showToast('positive', '삭제가 완료되었습니다!'),
+      onError: () => showToast('negative', '댓글을 삭제하지 못했습니다.'),
+    });
+  }
+
+  // 로그아웃 직후 다시 불러오기 전의 응답이 남아 있어도 삭제 메뉴를 보이지 않게 로그인 여부도 본다
   function isMyComment(comment: PostComment) {
-    return currentUser?.nickname === comment.author.nickname;
+    return Boolean(currentUser) && comment.isOwner;
   }
 
   return (

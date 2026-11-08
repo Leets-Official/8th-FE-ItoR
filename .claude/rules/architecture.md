@@ -40,16 +40,16 @@ src/
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
 │   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
-│   │   ├── api/            # mocks.ts — API 연동 전 목업 → 연동 후 요청 함수
+│   │   ├── api/            # postApi.ts — 게시글 요청 함수, postQueries.ts — 쿼리 키·작성/수정/삭제 훅
 │   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
 │   ├── auth/               # 로그인
 │   │   ├── ui/             # LoginModal · LoginFields · SignUpPanel · SignUpForm · AccountInfo
-│   │   ├── api/            # mocks.ts — 목업 계정·로그인, kakaoAuth.ts — 카카오 인가 URL 이동
+│   │   ├── api/            # authApi.ts — 로그인·회원가입·프로필 수정 요청, kakaoAuth.ts — 카카오 인가 URL 이동
 │   │   ├── model/          # AuthProvider · useAuth · LoginModalProvider · useLoginModal · types
 │   │   └── index.ts
 │   ├── comment/            # 댓글 — ui/ · api/(commentApi, commentQueries) · model/ · lib/
-│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile, api/mocks.ts (MOCK_USERS), lib/getUserPath.ts
+│   └── user/               # 도메인 공통 사용자 — model/types.ts (User), ui/UserProfile, lib/getUserPath.ts
 ├── shared/                 # 도메인을 모르는 재사용 코드
 │   ├── api/                # axios 인스턴스 — api.md 참고
 │   ├── lib/                # 도메인 무관 유틸 — utils.ts의 cn() (clsx + tailwind-merge), formatDate.ts
@@ -62,12 +62,12 @@ src/
 
 - **도메인 폴더 안은 책임에 따라 한 단계만 나눕니다.** 하위 폴더 안에 또 폴더를 만들지 않고, 모든 도메인이 같은 기준을 따릅니다.
 
-  | 하위 폴더 | 담는 것                                                    | 예시                                     |
-  | --------- | ---------------------------------------------------------- | ---------------------------------------- |
-  | `ui/`     | 화면 조각 컴포넌트                                         | `PostListItem`, `LoginModal`             |
-  | `api/`    | 데이터 출처 — 요청 함수, 쿼리 훅·키, 연동 전 목업          | `commentApi`, `commentQueries`, `mocks`  |
-  | `model/`  | 도메인 타입, 상태를 소유하고 나눠 주는 Provider·Context·훅 | `types`, `AuthProvider`, `useLoginModal` |
-  | `lib/`    | 그 도메인에서만 쓰는 유틸 함수                             | `submitOnModifierEnter`                  |
+  | 하위 폴더 | 담는 것                                                    | 예시                                      |
+  | --------- | ---------------------------------------------------------- | ----------------------------------------- |
+  | `ui/`     | 화면 조각 컴포넌트                                         | `PostListItem`, `LoginModal`              |
+  | `api/`    | 데이터 출처 — 요청 함수, 쿼리 훅·키, 응답 변환             | `commentApi`, `commentQueries`, `postApi` |
+  | `model/`  | 도메인 타입, 상태를 소유하고 나눠 주는 Provider·Context·훅 | `types`, `AuthProvider`, `useLoginModal`  |
+  | `lib/`    | 그 도메인에서만 쓰는 유틸 함수                             | `submitOnModifierEnter`                   |
   - Provider는 JSX를 렌더링하더라도 역할이 상태 소유라 `model/`에 둡니다.
   - 필요한 하위 폴더만 만듭니다. (예: `post`는 `lib/`가 없음)
 
@@ -76,12 +76,12 @@ src/
 
 ### 어디에 둘까
 
-| 위치                | 담는 것                                 | 판단 질문                                     | 예시                               |
-| ------------------- | --------------------------------------- | --------------------------------------------- | ---------------------------------- |
-| `app`               | 라우터, 레이아웃, Provider, 전역 스타일 | 앱 전체에 한 번만 필요한가?                   | `App.tsx`, `RootLayout.tsx`        |
-| `pages`             | 라우트 하나에 대응하는 화면             | URL이 있는가?                                 | `BlogSearchPage`, `BlogDetailPage` |
-| `features/{도메인}` | 특정 도메인 데이터·행동을 아는 코드     | 게시글·댓글·로그인 같은 도메인을 알아야 하나? | `PostListItem`, `LoginModal`, 목업 |
-| `shared`            | 도메인을 모르는 재사용 코드             | 블로그가 아닌 프로젝트에서도 쓸 수 있는가?    | `Button`, `cn()`, axios 인스턴스   |
+| 위치                | 담는 것                                 | 판단 질문                                     | 예시                                    |
+| ------------------- | --------------------------------------- | --------------------------------------------- | --------------------------------------- |
+| `app`               | 라우터, 레이아웃, Provider, 전역 스타일 | 앱 전체에 한 번만 필요한가?                   | `App.tsx`, `RootLayout.tsx`             |
+| `pages`             | 라우트 하나에 대응하는 화면             | URL이 있는가?                                 | `BlogSearchPage`, `BlogDetailPage`      |
+| `features/{도메인}` | 특정 도메인 데이터·행동을 아는 코드     | 게시글·댓글·로그인 같은 도메인을 알아야 하나? | `PostListItem`, `LoginModal`, `postApi` |
+| `shared`            | 도메인을 모르는 재사용 코드             | 블로그가 아닌 프로젝트에서도 쓸 수 있는가?    | `Button`, `cn()`, axios 인스턴스        |
 
 - 처음에는 쓰는 도메인 폴더에 두고, 도메인을 모르는 코드가 두 번째 사용처에서 필요해지면 `shared`로 올립니다. 미리 올리지 않습니다.
 

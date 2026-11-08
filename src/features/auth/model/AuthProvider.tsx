@@ -1,6 +1,15 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue } from './authContext';
-import { loginWithMockAccount, signUpWithMockAccount, updateMockAccount } from '../api/mocks';
+import { onSessionExpired } from '@/shared/api/instance';
+import { clearTokens } from '@/shared/api/tokenStorage';
+import { showToast } from '@/shared/ui';
+import {
+  registerWithEmail,
+  registerWithKakao,
+  requestKakaoLogin,
+  requestLogin,
+  updateMyProfile,
+} from '../api/authApi';
 import type { AuthUser } from './types';
 
 // 새로고침해도 로그인이 풀리지 않도록 탭 단위로 보관한다 (탭을 닫으면 로그아웃)
@@ -31,34 +40,55 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState(readStoredUser);
 
+  // 리프레시 토큰으로도 재발급하지 못하면 토큰은 이미 지워졌으니 화면의 로그인 상태만 비운다
+  useEffect(
+    () =>
+      onSessionExpired(() => {
+        setCurrentUser(undefined);
+        writeStoredUser(undefined);
+        showToast('negative', '로그인이 만료되었습니다. 다시 로그인해 주세요.');
+      }),
+    [],
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       currentUser,
-      login(email, password) {
-        const result = loginWithMockAccount(email, password);
+      async login(email, password) {
+        const result = await requestLogin(email, password);
         if ('error' in result) return result.error;
 
         setCurrentUser(result.user);
         writeStoredUser(result.user);
         return undefined;
       },
-      signUp(input) {
-        const result = signUpWithMockAccount(input);
-        return 'error' in result ? result.error : undefined;
-      },
-      updateProfile(input) {
-        if (!currentUser) return undefined;
-
-        const result = updateMockAccount(currentUser, input);
+      async loginWithKakao(code) {
+        const result = await requestKakaoLogin(code);
         if ('error' in result) return result.error;
 
         setCurrentUser(result.user);
         writeStoredUser(result.user);
+        return undefined;
+      },
+      async signUp(input) {
+        return input.provider === 'kakao' ? registerWithKakao(input) : registerWithEmail(input);
+      },
+      async updateProfile(input) {
+        if (!currentUser) return undefined;
+
+        const result = await updateMyProfile(input);
+        if ('error' in result) return result;
+
+        // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
+        const user = { ...result.user, provider: currentUser.provider };
+        setCurrentUser(user);
+        writeStoredUser(user);
         return undefined;
       },
       logout() {
         setCurrentUser(undefined);
         writeStoredUser(undefined);
+        clearTokens();
       },
     }),
     [currentUser],

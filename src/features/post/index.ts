@@ -1,10 +1,5 @@
-export {
-  createMockPost,
-  deleteMockPost,
-  getMockPostDetail,
-  getMockPosts,
-  updateMockPost,
-} from './api/mocks';
+export { getAllPosts, getPostDetail, getPosts } from './api/postApi';
+export { postQueryKeys, useCreatePost, useDeletePost, useUpdatePost } from './api/postQueries';
 export type {
   PostAuthor,
   PostContentBlock,

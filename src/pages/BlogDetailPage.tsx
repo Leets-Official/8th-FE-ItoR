@@ -1,10 +1,16 @@
 import { useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router';
-import { deleteMockPost, getMockPostDetail, PostContent, PostTitleSection } from '@/features/post';
+import {
+  getPostDetail,
+  PostContent,
+  postQueryKeys,
+  PostTitleSection,
+  useDeletePost,
+} from '@/features/post';
 import { Blank, Button, Modal, PageHeader, showToast, useSidebar } from '@/shared/ui';
 import { useAuth, useLoginModal } from '@/features/auth';
-import { CommentSection, commentQueryKeys, getComments } from '@/features/comment';
+import { CommentSection } from '@/features/comment';
 import { getUserPath, UserProfile } from '@/features/user';
 import { cn } from '@/shared/lib/utils';
 
@@ -12,33 +18,51 @@ const SECTION_CLASS = 'flex w-full flex-col items-center border-b border-gray-96
 const CONTENT_CLASS = 'flex w-full max-w-[688px] flex-col';
 
 export function BlogDetailPage() {
-  const { postId } = useParams();
+  const { postId = '' } = useParams();
   const commentSectionRef = useRef<HTMLElement>(null);
-  const post = getMockPostDetail(Number(postId));
   const { currentUser } = useAuth();
   const { openLoginModal } = useLoginModal();
   const { openSidebar } = useSidebar();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { data: comments = [] } = useQuery({
-    queryKey: commentQueryKeys.list(Number(postId)),
-    queryFn: () => getComments(Number(postId)),
-    enabled: Boolean(post),
+  const { data: post, isPending } = useQuery({
+    queryKey: postQueryKeys.detail(postId, currentUser?.nickname),
+    queryFn: () => getPostDetail(postId),
   });
+  const { mutate: deletePost, isPending: isDeleting } = useDeletePost();
 
   function handleEdit() {
     navigate(`/posts/${postId}/edit`);
   }
 
   function handleDeleteConfirm() {
-    deleteMockPost(Number(postId));
-    showToast('positive', '삭제가 완료되었습니다!');
-    // 뒤로 가기로 지운 글에 돌아오지 않게 바꿔 끼운다
-    navigate('/', { replace: true });
+    if (isDeleting) return;
+    deletePost(postId, {
+      onSuccess: () => {
+        showToast('positive', '삭제가 완료되었습니다!');
+        // 뒤로 가기로 지운 글에 돌아오지 않게 바꿔 끼운다
+        navigate('/', { replace: true });
+      },
+      onError: () => showToast('negative', '게시글을 삭제하지 못했습니다.'),
+    });
+  }
+
+  // 댓글은 상세 응답에 담겨 오고 목록의 댓글 수도 바뀌므로 게시글 쿼리를 통째로 다시 불러온다
+  function handleCommentChange() {
+    return queryClient.invalidateQueries({ queryKey: postQueryKeys.all });
   }
 
   function handleChat() {
     commentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (isPending) {
+    return (
+      <div className="min-h-svh bg-white">
+        <PageHeader variant="detail" className="sticky top-0 z-10" onMenu={openSidebar} />
+      </div>
+    );
   }
 
   if (!post) {
@@ -56,8 +80,8 @@ export function BlogDetailPage() {
   }
 
   const { content, author } = post;
-  // API 연동 전에는 작성자 id가 없어 닉네임으로 내 글인지 판단한다
-  const isMine = currentUser?.nickname === author.nickname;
+  // 로그아웃 직후 다시 불러오기 전의 응답이 남아 있어도 수정·삭제 버튼을 보이지 않게 로그인 여부도 본다
+  const isMine = Boolean(currentUser) && post.isOwner;
 
   return (
     <div className="min-h-svh bg-white">
@@ -92,9 +116,10 @@ export function BlogDetailPage() {
           <div className={CONTENT_CLASS}>
             <CommentSection
               postId={post.id}
-              comments={comments}
+              comments={post.comments}
               currentUser={currentUser}
               onLoginRequest={openLoginModal}
+              onCommentChange={handleCommentChange}
             />
           </div>
           <Blank size={64} />
