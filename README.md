@@ -49,7 +49,7 @@ src/
 | `features/comment` | `CommentSection`                                                         | 댓글 수·빈 상태·입력 UI 조합                         |
 | `shared/ui`        | `PageHeader`, `CompactPageHeader`, `Pagination`, `Blank`                 | 헤더, 페이지 이동, 여백                              |
 | `shared/ui`        | `Button`, `IconButton`, `Icon`, `TextField`, `TextFieldSet`, `TextBlock` | 기본 버튼·아이콘·입력·텍스트 UI                      |
-| `shared/ui`        | `DropdownMenu`, `Menu`, `Modal`, `Toast`, `Toaster`, `showToast`         | 메뉴·모달·토스트 UI                                  |
+| `shared/ui`        | `DropdownMenu`, `Modal`, `Toaster`, `showToast`                          | 메뉴·모달·토스트 UI                                  |
 
 게시글 컴포넌트는 데이터를 props로 받아 표시하고, 페이지는 데이터 조회와 페이지네이션 같은 상태를 관리합니다.
 

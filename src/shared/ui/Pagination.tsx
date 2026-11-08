@@ -1,6 +1,6 @@
-import type { ButtonHTMLAttributes } from 'react';
-import { Icon } from './Icon';
+import type { ComponentProps } from 'react';
 import { cn } from '@/shared/lib/utils';
+import { Icon } from './Icon';
 
 // 같은 속성의 색 클래스가 겹치면 CSS 생성 순서로 승자가 정해지므로, 색은 상태별 클래스에서만 지정한다
 const BASE_BUTTON_CLASS =
@@ -9,12 +9,12 @@ const DEFAULT_COLOR_CLASS =
   'border-gray-85 bg-white text-black/85 hover:border-point hover:text-point';
 const SELECTED_COLOR_CLASS = 'border-point bg-white text-point';
 
-interface PaginationItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface PaginationItemProps extends ComponentProps<'button'> {
   page: number;
   selected?: boolean;
 }
 
-export function PaginationItem({
+function PaginationItem({
   page,
   selected = false,
   disabled = false,
@@ -44,14 +44,14 @@ export function PaginationItem({
   );
 }
 
-export type PaginationDirection = 'previous' | 'next';
+type PaginationDirection = 'previous' | 'next';
 
-interface PaginationArrowButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface PaginationArrowButtonProps extends ComponentProps<'button'> {
   direction: PaginationDirection;
   pressed?: boolean;
 }
 
-export function PaginationArrowButton({
+function PaginationArrowButton({
   direction,
   pressed = false,
   disabled = false,

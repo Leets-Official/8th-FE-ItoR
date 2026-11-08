@@ -23,7 +23,7 @@ interface TitledTextBlockProps extends TextBlockBaseProps {
   headingLevel?: HeadingLevel;
 }
 
-export type TextBlockProps = BodyTextBlockProps | TitledTextBlockProps;
+type TextBlockProps = BodyTextBlockProps | TitledTextBlockProps;
 
 const CONTAINER_CLASS: Record<TextBlockVariant, string> = {
   title: 'flex-col items-start justify-center gap-3',
@@ -40,20 +40,26 @@ export function TextBlock(props: TextBlockProps) {
   const { children, className } = props;
   const variant = props.variant ?? 'body';
 
-  if (variant === 'body') {
-    return (
-      <div className={cn('flex w-full bg-white px-4 py-3', CONTAINER_CLASS.body, className)}>
-        <p className="w-full text-14 font-light text-gray-20">{children}</p>
-      </div>
-    );
-  }
-
-  const Heading = `h${props.headingLevel ?? (variant === 'title' ? 1 : 2)}` as HeadingTag;
-
   return (
     <div className={cn('flex w-full bg-white px-4 py-3', CONTAINER_CLASS[variant], className)}>
-      <Heading className={cn('w-full', TITLE_CLASS[variant])}>{props.title}</Heading>
+      {props.variant !== undefined && props.variant !== 'body' && (
+        <TextBlockHeading variant={props.variant} level={props.headingLevel}>
+          {props.title}
+        </TextBlockHeading>
+      )}
       <p className="w-full text-14 font-light text-gray-20">{children}</p>
     </div>
   );
+}
+
+interface TextBlockHeadingProps {
+  variant: Exclude<TextBlockVariant, 'body'>;
+  level?: HeadingLevel;
+  children: ReactNode;
+}
+
+function TextBlockHeading({ variant, level, children }: TextBlockHeadingProps) {
+  const Heading = `h${level ?? (variant === 'title' ? 1 : 2)}` as HeadingTag;
+
+  return <Heading className={cn('w-full', TITLE_CLASS[variant])}>{children}</Heading>;
 }
