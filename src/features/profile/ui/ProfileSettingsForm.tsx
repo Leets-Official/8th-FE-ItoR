@@ -66,7 +66,7 @@ export function ProfileSettingsForm({
   pending,
   onSave,
 }: ProfileSettingsFormProps) {
-  const [values, setValues] = useState<ProfileDraft>({
+  const profileValues: ProfileDraft = {
     email: profile.email,
     name: profile.name,
     birthDate: profile.birthDate,
@@ -75,7 +75,9 @@ export function ProfileSettingsForm({
     avatarUrl: profile.avatarUrl,
     password: '',
     passwordConfirmation: '',
-  });
+  };
+  const [values, setValues] = useState(profileValues);
+  const displayedValues = editing ? values : profileValues;
   const [submitted, setSubmitted] = useState(false);
   const [touched, setTouched] = useState<Partial<Record<ProfileFieldName, boolean>>>({});
   const submitting = useRef(false);
@@ -155,7 +157,7 @@ export function ProfileSettingsForm({
     return {
       id: `profile-${name}`,
       name,
-      value: values[name] ?? '',
+      value: displayedValues[name] ?? '',
       readOnly: !editing,
       onChange: change,
       onBlur: blur,
@@ -201,8 +203,8 @@ export function ProfileSettingsForm({
           <div className="px-4 py-3">
             <div className="relative size-16">
               <ProfileAvatar
-                src={values.avatarUrl}
-                alt={`${values.nickname || '기본'} 프로필 사진`}
+                src={displayedValues.avatarUrl}
+                alt={`${displayedValues.nickname || '기본'} 프로필 사진`}
                 className="size-16"
                 loading="eager"
               />
