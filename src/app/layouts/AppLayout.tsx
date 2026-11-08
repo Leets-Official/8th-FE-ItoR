@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 import { useIsMutating } from '@tanstack/react-query';
 import { Outlet, useMatch, useNavigate } from 'react-router';
@@ -17,9 +17,12 @@ import { cn } from '@/shared/utils/cn';
 import { GitlogButton } from '@/shared/ui/GitlogButton';
 
 import { AppHeader } from './header/AppHeader';
-import { AppSidebar } from './AppSidebar';
 import { useLayoutAuth } from './hooks/useLayoutAuth';
 import { useRouteScroll } from './hooks/useRouteScroll';
+
+const AppSidebar = lazy(() =>
+  import('./AppSidebar').then((module) => ({ default: module.AppSidebar })),
+);
 
 export interface AppLayoutContext {
   openLogin: () => void;
@@ -98,28 +101,42 @@ export function AppLayout() {
   return (
     <div className={cn('min-h-dvh bg-white text-neutral-950', sidebarOpen && 'sm:pl-60 xl:pl-0')}>
       {sidebarOpen && (
-        <AppSidebar
-          user={previewUser}
-          onClose={closeSidebar}
-          onStart={() => {
-            menuButton.current?.focus({ preventScroll: true });
-            setSidebarOpen(false);
-            openLogin();
-          }}
-          onMyGitlog={() => {
-            setSidebarOpen(false);
-            navigate('/?view=mine');
-          }}
-          onWrite={() => {
-            setSidebarOpen(false);
-            startWriting();
-          }}
-          onSettings={() => {
-            setSidebarOpen(false);
-            navigate('/mypage/settings');
-          }}
-          onLogout={logout}
-        />
+        <Suspense
+          fallback={
+            <aside
+              aria-label="메뉴 로딩"
+              className="fixed inset-y-0 left-0 z-40 w-60 max-w-full border-r border-neutral-200 bg-neutral-100 p-4"
+            >
+              <p role="status" className="py-3">
+                메뉴를 불러오고 있습니다.
+              </p>
+              <GitlogButton onClick={closeSidebar}>메뉴 닫기</GitlogButton>
+            </aside>
+          }
+        >
+          <AppSidebar
+            user={previewUser}
+            onClose={closeSidebar}
+            onStart={() => {
+              menuButton.current?.focus({ preventScroll: true });
+              setSidebarOpen(false);
+              openLogin();
+            }}
+            onMyGitlog={() => {
+              setSidebarOpen(false);
+              navigate('/?view=mine');
+            }}
+            onWrite={() => {
+              setSidebarOpen(false);
+              startWriting();
+            }}
+            onSettings={() => {
+              setSidebarOpen(false);
+              navigate('/mypage/settings');
+            }}
+            onLogout={logout}
+          />
+        </Suspense>
       )}
       <AppHeader
         sidebarOpen={sidebarOpen}
@@ -156,17 +173,25 @@ export function AppLayout() {
           </GitlogButton>
         </main>
       ) : (
-        <Outlet
-          context={
-            {
-              openLogin,
-              previewUser,
-              startWriting,
-              commentsByPost,
-              setPostComments,
-            } satisfies AppLayoutContext
+        <Suspense
+          fallback={
+            <p role="status" className="p-8 text-center">
+              화면을 불러오고 있습니다.
+            </p>
           }
-        />
+        >
+          <Outlet
+            context={
+              {
+                openLogin,
+                previewUser,
+                startWriting,
+                commentsByPost,
+                setPostComments,
+              } satisfies AppLayoutContext
+            }
+          />
+        </Suspense>
       )}
       <Toaster offset={88} mobileOffset={88} />
     </div>

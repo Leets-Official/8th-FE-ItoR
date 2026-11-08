@@ -1,4 +1,4 @@
-import type { Ref } from 'react';
+import { lazy, Suspense, type Ref } from 'react';
 
 import { useLocation, useMatch } from 'react-router';
 
@@ -9,9 +9,12 @@ import { IconButton } from '@/shared/ui/IconButton';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
 import { HomeHeaderActions } from './HomeHeaderActions';
-import { PostHeaderActions } from './PostHeaderActions';
 import { WriteHeaderActions } from './WriteHeaderActions';
 import { ProfileHeaderActions } from './ProfileHeaderActions';
+
+const PostHeaderActions = lazy(() =>
+  import('./PostHeaderActions').then((module) => ({ default: module.PostHeaderActions })),
+);
 
 interface AppHeaderProps {
   signedIn: boolean;
@@ -82,13 +85,21 @@ export function AppHeader({
             <ProfileHeaderActions editing={pathname.endsWith('/edit')} pending={profilePending} />
           )}
           {isPostPage && (
-            <PostHeaderActions
-              key={pathname}
-              canManage={canManagePost}
-              pending={postPending}
-              onEdit={onEditPost}
-              onDelete={onDeletePost}
-            />
+            <Suspense
+              fallback={
+                <span role="status" className="sr-only">
+                  게시글 메뉴를 불러오고 있습니다.
+                </span>
+              }
+            >
+              <PostHeaderActions
+                key={pathname}
+                canManage={canManagePost}
+                pending={postPending}
+                onEdit={onEditPost}
+                onDelete={onDeletePost}
+              />
+            </Suspense>
           )}
           <LoginDialog
             open={loginOpen}
