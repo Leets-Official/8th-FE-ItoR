@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth';
 import {
   getPostDetail,
   PostEditor,
+  PostLoadError,
   postQueryKeys,
   useCreatePost,
   useDeletePost,
@@ -28,7 +29,13 @@ export function PostWritePage() {
   useToastOffset(TOAST_OFFSET_TOP);
 
   const isEditing = postId !== undefined;
-  const { data: post, isPending: isPostPending } = useQuery({
+  const {
+    data: post,
+    isPending: isPostPending,
+    isError: isPostError,
+    isFetching: isPostFetching,
+    refetch: refetchPost,
+  } = useQuery({
     queryKey: postQueryKeys.detail(postId ?? '', currentUser?.nickname),
     queryFn: () => getPostDetail(postId ?? ''),
     enabled: isEditing && Boolean(currentUser),
@@ -45,6 +52,14 @@ export function PostWritePage() {
     return (
       <div className="min-h-svh bg-white">
         <PageHeader variant="write" className="sticky top-0 z-20" onMenu={openSidebar} />
+      </div>
+    );
+  }
+  if (isEditing && !post && isPostError) {
+    return (
+      <div className="min-h-svh bg-white">
+        <PageHeader variant="write" className="sticky top-0 z-20" onMenu={openSidebar} />
+        <PostLoadError isRetrying={isPostFetching} onRetry={() => refetchPost()} />
       </div>
     );
   }
@@ -76,7 +91,7 @@ export function PostWritePage() {
 
   // 뒤로 가기로 다 쓴 글쓰기 화면에 돌아오지 않게 바꿔 끼운다
   function handleSubmit(input: PostCreateInput) {
-    if (!currentUser || isSaving) return;
+    if (isSaving) return;
 
     if (post) {
       updatePost(
@@ -92,17 +107,14 @@ export function PostWritePage() {
       return;
     }
 
-    createPost(
-      { input, authorNickname: currentUser.nickname },
-      {
-        // 방금 쓴 글을 찾지 못하면 새 글이 맨 위에 보이는 메인으로 보낸다
-        onSuccess: (savedPostId) => {
-          showToast('positive', '게시되었습니다!');
-          navigate(savedPostId ? `/posts/${savedPostId}` : '/', { replace: true });
-        },
-        onError: () => showToast('negative', '게시글을 올리지 못했습니다.'),
+    createPost(input, {
+      // 작성 응답에 게시글 id가 없어 상세 대신 새 글이 맨 위에 보이는 메인으로 보낸다
+      onSuccess: () => {
+        showToast('positive', '게시되었습니다!');
+        navigate('/', { replace: true });
       },
-    );
+      onError: () => showToast('negative', '게시글을 올리지 못했습니다.'),
+    });
   }
 
   return (

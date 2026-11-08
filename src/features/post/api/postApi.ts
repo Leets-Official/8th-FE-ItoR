@@ -106,8 +106,13 @@ export async function getAllPosts(): Promise<PostSummary[]> {
   return [firstPage, ...restPages].flatMap(({ posts }) => posts);
 }
 
+const POST_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // 없는 글이면 null. 로그인했으면 토큰이 필요한 API로 불러와야 내 글인지(isOwner) 알 수 있다
 export async function getPostDetail(postId: string): Promise<PostDetail | null> {
+  // 서버는 UUID 형식이 아닌 id에 500으로 응답한다. 서버 장애의 500과 구분하려고 보내기 전에 거른다
+  if (!POST_ID_PATTERN.test(postId)) return null;
+
   try {
     const isLoggedIn = Boolean(getAccessToken() || getRefreshToken());
     const { data } = await api.get<ApiResponse<PostDetailResponse>>(
@@ -124,23 +129,13 @@ export async function getPostDetail(postId: string): Promise<PostDetail | null> 
       comments: comments.map(toPostComment),
     };
   } catch (error) {
-    // UUID 형식이 아닌 주소로 들어오면 서버가 500으로 응답해 이것도 없는 글로 본다
-    if (isAxiosError(error) && [400, 404, 500].includes(error.response?.status ?? 0)) return null;
+    if (isAxiosError(error) && [400, 404].includes(error.response?.status ?? 0)) return null;
     throw error;
   }
 }
 
-interface CreatePostParams {
-  input: PostCreateInput;
-  // 작성 응답에 게시글 id가 없어 방금 쓴 글을 찾을 때 쓴다
-  authorNickname: string;
-}
-
-// 최신 글 중 방금 쓴 내 글을 찾아 id를 돌려준다. 못 찾으면 undefined
-export async function createPost({ input: { title, content }, authorNickname }: CreatePostParams) {
+export async function createPost({ title, content }: PostCreateInput) {
   await api.post('/posts', { title, contents: toContentDtos(content) });
-  const { posts } = await getPosts(1, 10);
-  return posts.find((post) => post.author.nickname === authorNickname && post.title === title)?.id;
 }
 
 interface UpdatePostParams {

@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import {
   getPostDetail,
   PostContent,
+  PostLoadError,
   postQueryKeys,
   PostTitleSection,
   useDeletePost,
@@ -26,7 +27,13 @@ export function BlogDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { data: post, isPending } = useQuery({
+  const {
+    data: post,
+    isPending,
+    isError,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: postQueryKeys.detail(postId, currentUser?.nickname),
     queryFn: () => getPostDetail(postId),
   });
@@ -61,6 +68,16 @@ export function BlogDetailPage() {
     return (
       <div className="min-h-svh bg-white">
         <PageHeader variant="detail" className="sticky top-0 z-10" onMenu={openSidebar} />
+      </div>
+    );
+  }
+
+  // 이미 받아 둔 글이 있으면 다시 불러오다 실패해도 그대로 보여 준다
+  if (!post && isError) {
+    return (
+      <div className="min-h-svh bg-white">
+        <PageHeader variant="detail" className="sticky top-0 z-10" onMenu={openSidebar} />
+        <PostLoadError isRetrying={isFetching} onRetry={() => refetch()} />
       </div>
     );
   }
