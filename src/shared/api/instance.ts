@@ -76,7 +76,7 @@ async function reissueTokens() {
       return true;
     }
   } catch {
-    // 리프레시 토큰도 만료됐거나 잘못됐으면 아래에서 로그아웃한다
+    // 리프레시 토큰도 만료됐거나 잘못됐으면, 또는 새 토큰을 저장하지 못했으면 아래에서 로그아웃한다
   }
 
   if (getRefreshToken() === refreshToken) expireSession();
