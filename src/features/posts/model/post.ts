@@ -1,6 +1,6 @@
 export type PostContentBlock =
   | { type: 'text'; text: string }
-  | { type: 'image'; src: string; alt: string; width: number; height: number };
+  | { type: 'image'; src: string; alt: string; width?: number; height?: number };
 
 export interface Post {
   id: string;

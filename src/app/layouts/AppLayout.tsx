@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useIsMutating } from '@tanstack/react-query';
 import { Outlet, useMatch, useNavigate } from 'react-router';
 
-import { isPostAuthor } from '@/features/posts/lib/postOwnership';
+import { postQueries } from '@/features/posts/api/postQueries';
+import { useDeletePostMutation } from '@/features/posts/api/usePostMutations';
+import { usePostDetailQuery } from '@/features/posts/api/usePostQueries';
 import type { PostComment } from '@/features/comments/model/comment';
 import { usePreviewComments } from '@/features/comments/model/usePreviewComments';
-import type { Post } from '@/features/posts/model/post';
-import type { PostDraft } from '@/features/posts/model/postDraft';
-import { usePostImageUrls } from '@/features/posts/model/usePostImageUrls';
-import { usePreviewPosts } from '@/features/posts/model/usePreviewPosts';
 import type { Profile, ProfileDraft } from '@/features/profile/model/profile';
+import { getApiErrorMessage } from '@/shared/apis/response';
 import { Toaster } from '@/shared/ui/primitives/sonner';
 import { notify } from '@/shared/ui/StatusToast';
 import { cn } from '@/shared/utils/cn';
@@ -24,12 +24,7 @@ export interface AppLayoutContext {
   openLogin: () => void;
   previewUser: Profile | null;
   updateProfile: (draft: ProfileDraft) => boolean;
-  posts: Post[];
-  publishPost: (draft: PostDraft) => Post | null;
-  updatePost: (id: string, draft: PostDraft) => Post | null;
   startWriting: () => void;
-  trackImage: (url: string) => void;
-  releaseImage: (url: string) => void;
   commentsByPost: Record<string, PostComment[]>;
   setPostComments: (postId: string, comments: PostComment[]) => void;
 }
@@ -64,40 +59,40 @@ export function AppLayout() {
     setSidebarOpen(false);
   }
   const users = previewUser ? [previewUser] : [];
-  const { posts, publishPost, updatePost, deletePost } = usePreviewPosts(previewUser, users);
-  const { trackImage, releaseImage } = usePostImageUrls();
   const { commentsByPost, setPostComments } = usePreviewComments(users);
   const detailMatch = useMatch('/posts/:postId');
-  const currentPost = posts.find((post) => post.id === detailMatch?.params.postId);
+  const writingNewPost = useMatch('/posts/new') !== null;
+  const detail = usePostDetailQuery(
+    detailMatch?.params.postId,
+    !writingNewPost && !isRestoring && !authError,
+  );
+  const currentPost = detail.data?.post;
+  const canManagePost =
+    previewUser !== null && detail.isSuccess && detail.data.isOwner && !isRestoring && !authError;
+  const deletePost = useDeletePostMutation();
+  const postPending = useIsMutating({ mutationKey: postQueries.all }) > 0;
+  const deleting = useRef(false);
   const navigate = useNavigate();
   useRouteScroll();
 
-  function savePost(id: string, draft: PostDraft) {
-    const previousPost = posts.find((post) => post.id === id);
-    const updated = updatePost(id, draft);
-    if (updated) {
-      previousPost?.content.forEach((block) => {
-        if (
-          block.type === 'image' &&
-          !updated.content.some((item) => item.type === 'image' && item.src === block.src)
-        )
-          releaseImage(block.src);
-      });
-    }
-    return updated;
-  }
-
-  function removeCurrentPost() {
-    if (!currentPost || !deletePost(currentPost.id)) {
+  async function removeCurrentPost() {
+    if (deleting.current || postPending) return false;
+    if (!currentPost || !canManagePost) {
       notify.error('작성자만 게시글을 삭제할 수 있습니다.');
-      return;
+      return false;
     }
-    currentPost.content.forEach((block) => {
-      if (block.type === 'image') releaseImage(block.src);
-    });
-    setPostComments(currentPost.id, []);
-    navigate('/');
-    notify.success('삭제가 완료되었습니다!');
+    deleting.current = true;
+    try {
+      await deletePost.mutateAsync(currentPost.id);
+      navigate('/');
+      notify.success('삭제가 완료되었습니다!');
+      return true;
+    } catch (error) {
+      notify.error(getApiErrorMessage(error));
+      return false;
+    } finally {
+      deleting.current = false;
+    }
   }
 
   return (
@@ -138,9 +133,10 @@ export function AppLayout() {
           setSidebarOpen(false);
           startWriting();
         }}
-        canManagePost={isPostAuthor(currentPost, previewUser)}
+        canManagePost={canManagePost}
+        postPending={postPending}
         onEditPost={() => {
-          if (currentPost && isPostAuthor(currentPost, previewUser))
+          if (currentPost && canManagePost && !postPending)
             navigate(`/posts/${currentPost.id}/edit`);
         }}
         onDeletePost={removeCurrentPost}
@@ -166,12 +162,7 @@ export function AppLayout() {
               openLogin,
               previewUser,
               updateProfile,
-              posts,
-              publishPost,
-              updatePost: savePost,
               startWriting,
-              trackImage,
-              releaseImage,
               commentsByPost,
               setPostComments,
             } satisfies AppLayoutContext

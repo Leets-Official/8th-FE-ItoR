@@ -21,6 +21,7 @@ interface ConfirmDialogProps {
   confirmLabel: string;
   confirmVariant?: ComponentProps<typeof Button>['variant'];
   confirmClassName?: string;
+  pending?: boolean;
   onConfirm: () => void;
   onCloseAutoFocus?: ComponentProps<typeof DialogContent>['onCloseAutoFocus'];
 }
@@ -33,11 +34,12 @@ export function ConfirmDialog({
   confirmLabel,
   confirmVariant = 'default',
   confirmClassName,
+  pending = false,
   onConfirm,
   onCloseAutoFocus,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(nextOpen) => !pending && onOpenChange(nextOpen)}>
       <DialogContent
         {...(description ? {} : { 'aria-describedby': undefined })}
         showCloseButton={false}
@@ -59,6 +61,7 @@ export function ConfirmDialog({
           <DialogClose asChild>
             <Button
               type="button"
+              disabled={pending}
               variant="outline"
               className="h-10 flex-1 rounded-xs border-neutral-100 bg-white px-3 py-2 text-sm leading-6 font-normal text-black hover:bg-neutral-50"
             >
@@ -67,6 +70,8 @@ export function ConfirmDialog({
           </DialogClose>
           <Button
             type="button"
+            disabled={pending}
+            aria-busy={pending}
             variant={confirmVariant}
             onClick={onConfirm}
             className={cn(
@@ -74,7 +79,7 @@ export function ConfirmDialog({
               confirmClassName,
             )}
           >
-            {confirmLabel}
+            {pending ? '처리 중...' : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,11 +8,17 @@ import { Button } from '@/shared/ui/primitives/button';
 
 interface PostHeaderActionsProps {
   canManage: boolean;
+  pending?: boolean;
   onEdit: () => void;
-  onDelete: () => void;
+  onDelete: () => Promise<boolean>;
 }
 
-export function PostHeaderActions({ canManage, onEdit, onDelete }: PostHeaderActionsProps) {
+export function PostHeaderActions({
+  canManage,
+  pending = false,
+  onEdit,
+  onDelete,
+}: PostHeaderActionsProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const selectedAction = useRef(false);
@@ -32,7 +38,7 @@ export function PostHeaderActions({ canManage, onEdit, onDelete }: PostHeaderAct
           }}
           label="게시글 메뉴 열기"
           trigger={
-            <IconButton ref={menuButton} label="게시글 메뉴 열기" size="lg">
+            <IconButton ref={menuButton} label="게시글 메뉴 열기" size="lg" disabled={pending}>
               <MoreVertIcon aria-hidden="true" />
             </IconButton>
           }
@@ -58,6 +64,7 @@ export function PostHeaderActions({ canManage, onEdit, onDelete }: PostHeaderAct
         />
       )}
       <ConfirmDialog
+        pending={pending}
         open={deleteOpen && canManage}
         onOpenChange={setDeleteOpen}
         title="해당 블로그를 삭제하시겠어요?"
@@ -68,9 +75,9 @@ export function PostHeaderActions({ canManage, onEdit, onDelete }: PostHeaderAct
           event.preventDefault();
           menuButton.current?.focus();
         }}
-        onConfirm={() => {
-          setDeleteOpen(false);
-          if (canManage) onDelete();
+        onConfirm={async () => {
+          if (!canManage || pending) return;
+          if (await onDelete()) setDeleteOpen(false);
         }}
       />
     </>

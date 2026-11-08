@@ -1,20 +1,26 @@
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router';
 
+import {
+  useCreatePostMutation,
+  useUpdatePostMutation,
+} from '@/features/posts/api/usePostMutations';
+import { usePostDetailQuery } from '@/features/posts/api/usePostQueries';
 import { createPostDraft } from '@/features/posts/lib/postDraft';
-import { isPostAuthor } from '@/features/posts/lib/postOwnership';
 import type { PostDraft } from '@/features/posts/model/postDraft';
 import { PostEditor } from '@/features/posts/ui/PostEditor';
+import { getApiErrorMessage } from '@/shared/apis/response';
 import { Button } from '@/shared/ui/primitives/button';
 import { notify } from '@/shared/ui/StatusToast';
 
 import type { AppLayoutContext } from '../layouts/AppLayout';
 
 export function PostWritePage() {
-  const { previewUser, posts, publishPost, updatePost, trackImage, releaseImage, openLogin } =
-    useOutletContext<AppLayoutContext>();
+  const { previewUser, openLogin } = useOutletContext<AppLayoutContext>();
   const navigate = useNavigate();
   const { postId } = useParams();
-  const existingPost = posts.find((post) => post.id === postId);
+  const detail = usePostDetailQuery(postId, previewUser !== null);
+  const createPost = useCreatePostMutation();
+  const updatePost = useUpdatePostMutation();
 
   if (!previewUser)
     return (
@@ -26,36 +32,52 @@ export function PostWritePage() {
       </main>
     );
 
-  if (postId && !isPostAuthor(existingPost, previewUser))
+  if (postId && detail.isPending)
     return (
       <main className="p-8 text-center font-auth">
-        <h1>
-          {existingPost ? '작성자만 게시글을 수정할 수 있습니다.' : '게시글을 찾을 수 없습니다.'}
-        </h1>
-        <Link to="/" className="mt-4 inline-block text-gitlog-action underline">
+        <p role="status">게시물을 불러오고 있습니다.</p>
+      </main>
+    );
+
+  if (postId && detail.isError && !detail.data)
+    return (
+      <main className="space-y-4 p-8 text-center font-auth">
+        <p role="alert">{getApiErrorMessage(detail.error)}</p>
+        <Button onClick={() => void detail.refetch()}>다시 시도</Button>
+        <Link to="/" className="block text-gitlog-action underline">
           목록으로
         </Link>
       </main>
     );
 
-  function publish(draft: PostDraft) {
-    const post = postId ? updatePost(postId, draft) : publishPost(draft);
-    if (!post) {
-      notify.error('게시글을 저장할 수 없습니다. 로그인과 작성자 권한을 확인해주세요.');
-      return false;
+  if (postId && !detail.data?.isOwner)
+    return (
+      <main className="p-8 text-center font-auth">
+        <h1>작성자만 게시글을 수정할 수 있습니다.</h1>
+        <Link to={`/posts/${postId}`} className="mt-4 inline-block text-gitlog-action underline">
+          게시글로 돌아가기
+        </Link>
+      </main>
+    );
+
+  async function publish(draft: PostDraft) {
+    if (postId) {
+      if (!detail.data?.isOwner) throw new Error('작성자만 게시글을 수정할 수 있습니다.');
+      await updatePost.mutateAsync({ postId, draft });
+      navigate(`/posts/${postId}`, { replace: true });
+    } else {
+      await createPost.mutateAsync(draft);
+      navigate('/', { replace: true });
     }
-    navigate(`/posts/${post.id}`);
     notify.success('저장되었습니다!');
-    return true;
   }
 
   return (
     <PostEditor
       key={postId ?? 'new'}
-      initialDraft={existingPost ? createPostDraft(existingPost) : undefined}
+      initialDraft={postId && detail.data ? createPostDraft(detail.data.post) : undefined}
       onPublish={publish}
-      trackImage={trackImage}
-      releaseImage={releaseImage}
+      submitting={createPost.isPending || updatePost.isPending}
     />
   );
 }

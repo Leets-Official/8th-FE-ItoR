@@ -40,7 +40,8 @@ export function refreshAuthSession() {
 }
 
 function isProtectedBackendRequest(config: InternalAxiosRequestConfig) {
-  if (!config.url || !api.defaults.baseURL) return false;
+  if (!config.url || !api.defaults.baseURL || config.headers.get('Authorization') === false)
+    return false;
   const backend = new URL(api.defaults.baseURL, window.location.origin);
   const base = new URL(config.baseURL ?? api.defaults.baseURL, window.location.origin);
   const url = new URL(config.url, base);
