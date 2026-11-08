@@ -29,7 +29,10 @@ export function ProfileAvatar({ alt, src, size = 'md', className, ...props }: Pr
         {...props}
         src={src ?? defaultProfileAvatar}
         alt={alt}
+        width={props.width ?? 104}
+        height={props.height ?? 104}
         loading={props.loading ?? 'lazy'}
+        decoding={props.decoding ?? 'async'}
         className={cn('size-full object-cover', !src && 'scale-[1.34]')}
       />
     </span>

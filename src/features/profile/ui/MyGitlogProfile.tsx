@@ -13,7 +13,12 @@ export function MyGitlogProfile({ user, onSettings }: MyGitlogProfileProps) {
     <section aria-label="내 프로필" className="border-b border-neutral-100 bg-neutral-100">
       <div className="mx-auto w-full max-w-[688px] pt-16 pb-5">
         <div className="px-4 py-3">
-          <ProfileAvatar alt={`${user.nickname} 프로필`} src={user.avatarUrl} className="size-16" />
+          <ProfileAvatar
+            alt={`${user.nickname} 프로필`}
+            src={user.avatarUrl}
+            className="size-16"
+            loading="eager"
+          />
         </div>
         <div className="flex flex-col gap-3 px-4 py-3">
           <h2 className="text-2xl leading-10 font-medium break-words text-black">

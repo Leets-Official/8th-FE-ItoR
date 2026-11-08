@@ -1,6 +1,9 @@
-export async function readProfilePhoto(file: File): Promise<string> {
+import { optimizeImage } from '@/shared/utils/optimizeImage';
+
+export async function readProfilePhoto(file: File) {
   if (!file.type.startsWith('image/')) throw new Error('이미지 파일을 선택해주세요.');
   if (file.size > 5 * 1024 * 1024) throw new Error('프로필 사진은 5MB 이하로 선택해주세요.');
+  file = await optimizeImage(file, 256);
   const src = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () =>
@@ -17,5 +20,5 @@ export async function readProfilePhoto(file: File): Promise<string> {
   } catch {
     throw new Error('사진을 불러올 수 없습니다. 다른 이미지 파일을 선택해주세요.');
   }
-  return src;
+  return { file, src };
 }

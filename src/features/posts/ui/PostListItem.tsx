@@ -3,7 +3,13 @@ import { Link, useLocation } from 'react-router';
 import type { Post } from '../model/post';
 import { PostMetadata } from './PostMetadata';
 
-export function PostListItem({ post, now }: { post: Post; now: number }) {
+interface PostListItemProps {
+  post: Post;
+  now: number;
+  loading?: 'eager' | 'lazy';
+}
+
+export function PostListItem({ post, now, loading = 'lazy' }: PostListItemProps) {
   const { search } = useLocation();
   return (
     <li className="border-b border-neutral-100">
@@ -26,7 +32,8 @@ export function PostListItem({ post, now }: { post: Post; now: number }) {
                   alt=""
                   width={92}
                   height={92}
-                  loading="lazy"
+                  loading={loading}
+                  decoding="async"
                   className="size-23 shrink-0 rounded-xs object-cover"
                 />
               </div>

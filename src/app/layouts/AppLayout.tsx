@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 import { useIsMutating } from '@tanstack/react-query';
 import { Outlet, useMatch, useNavigate } from 'react-router';
@@ -8,7 +8,8 @@ import { useDeletePostMutation } from '@/features/posts/api/usePostMutations';
 import { usePostDetailQuery } from '@/features/posts/api/usePostQueries';
 import type { PostComment } from '@/features/comments/model/comment';
 import { usePreviewComments } from '@/features/comments/model/usePreviewComments';
-import type { Profile, ProfileDraft } from '@/features/profile/model/profile';
+import type { Profile } from '@/features/profile/model/profile';
+import { profileQueries } from '@/features/profile/api/profileQueries';
 import { getApiErrorMessage } from '@/shared/apis/response';
 import { Toaster } from '@/shared/ui/primitives/sonner';
 import { notify } from '@/shared/ui/StatusToast';
@@ -16,14 +17,16 @@ import { cn } from '@/shared/utils/cn';
 import { GitlogButton } from '@/shared/ui/GitlogButton';
 
 import { AppHeader } from './header/AppHeader';
-import { AppSidebar } from './AppSidebar';
 import { useLayoutAuth } from './hooks/useLayoutAuth';
 import { useRouteScroll } from './hooks/useRouteScroll';
+
+const AppSidebar = lazy(() =>
+  import('./AppSidebar').then((module) => ({ default: module.AppSidebar })),
+);
 
 export interface AppLayoutContext {
   openLogin: () => void;
   previewUser: Profile | null;
-  updateProfile: (draft: ProfileDraft) => boolean;
   startWriting: () => void;
   commentsByPost: Record<string, PostComment[]>;
   setPostComments: (postId: string, comments: PostComment[]) => void;
@@ -32,8 +35,8 @@ export interface AppLayoutContext {
 export function AppLayout() {
   const {
     loginOpen,
+    hasOpenedLogin,
     previewUser,
-    updateProfile,
     isRestoring,
     authError,
     retryAuth,
@@ -71,14 +74,15 @@ export function AppLayout() {
     previewUser !== null && detail.isSuccess && detail.data.isOwner && !isRestoring && !authError;
   const deletePost = useDeletePostMutation();
   const postPending = useIsMutating({ mutationKey: postQueries.all }) > 0;
+  const profilePending = useIsMutating({ mutationKey: [...profileQueries.all, 'update'] }) > 0;
   const deleting = useRef(false);
   const navigate = useNavigate();
   useRouteScroll();
 
   async function removeCurrentPost() {
     if (deleting.current || postPending) return false;
-    if (!currentPost || !canManagePost) {
-      notify.error('작성자만 게시글을 삭제할 수 있습니다.');
+    if (!currentPost) {
+      notify.error('게시글을 찾을 수 없습니다.');
       return false;
     }
     deleting.current = true;
@@ -98,28 +102,42 @@ export function AppLayout() {
   return (
     <div className={cn('min-h-dvh bg-white text-neutral-950', sidebarOpen && 'sm:pl-60 xl:pl-0')}>
       {sidebarOpen && (
-        <AppSidebar
-          user={previewUser}
-          onClose={closeSidebar}
-          onStart={() => {
-            menuButton.current?.focus({ preventScroll: true });
-            setSidebarOpen(false);
-            openLogin();
-          }}
-          onMyGitlog={() => {
-            setSidebarOpen(false);
-            navigate('/?view=mine');
-          }}
-          onWrite={() => {
-            setSidebarOpen(false);
-            startWriting();
-          }}
-          onSettings={() => {
-            setSidebarOpen(false);
-            navigate('/mypage/settings');
-          }}
-          onLogout={logout}
-        />
+        <Suspense
+          fallback={
+            <aside
+              aria-label="메뉴 로딩"
+              className="fixed inset-y-0 left-0 z-40 w-60 max-w-full border-r border-neutral-200 bg-neutral-100 p-4"
+            >
+              <p role="status" className="py-3">
+                메뉴를 불러오고 있습니다.
+              </p>
+              <GitlogButton onClick={closeSidebar}>메뉴 닫기</GitlogButton>
+            </aside>
+          }
+        >
+          <AppSidebar
+            user={previewUser}
+            onClose={closeSidebar}
+            onStart={() => {
+              menuButton.current?.focus({ preventScroll: true });
+              setSidebarOpen(false);
+              openLogin();
+            }}
+            onMyGitlog={() => {
+              setSidebarOpen(false);
+              navigate('/?view=mine');
+            }}
+            onWrite={() => {
+              setSidebarOpen(false);
+              startWriting();
+            }}
+            onSettings={() => {
+              setSidebarOpen(false);
+              navigate('/mypage/settings');
+            }}
+            onLogout={logout}
+          />
+        </Suspense>
       )}
       <AppHeader
         sidebarOpen={sidebarOpen}
@@ -127,6 +145,7 @@ export function AppLayout() {
         menuButtonRef={menuButton}
         signedIn={previewUser !== null}
         loginOpen={loginOpen}
+        hasOpenedLogin={hasOpenedLogin}
         onLoginOpenChange={changeLoginOpen}
         onLogin={completeLogin}
         onWrite={() => {
@@ -135,9 +154,9 @@ export function AppLayout() {
         }}
         canManagePost={canManagePost}
         postPending={postPending}
+        profilePending={profilePending}
         onEditPost={() => {
-          if (currentPost && canManagePost && !postPending)
-            navigate(`/posts/${currentPost.id}/edit`);
+          if (currentPost && !postPending) navigate(`/posts/${currentPost.id}/edit`);
         }}
         onDeletePost={removeCurrentPost}
       />
@@ -156,18 +175,25 @@ export function AppLayout() {
           </GitlogButton>
         </main>
       ) : (
-        <Outlet
-          context={
-            {
-              openLogin,
-              previewUser,
-              updateProfile,
-              startWriting,
-              commentsByPost,
-              setPostComments,
-            } satisfies AppLayoutContext
+        <Suspense
+          fallback={
+            <p role="status" className="p-8 text-center">
+              화면을 불러오고 있습니다.
+            </p>
           }
-        />
+        >
+          <Outlet
+            context={
+              {
+                openLogin,
+                previewUser,
+                startWriting,
+                commentsByPost,
+                setPostComments,
+              } satisfies AppLayoutContext
+            }
+          />
+        </Suspense>
       )}
       <Toaster offset={88} mobileOffset={88} />
     </div>
