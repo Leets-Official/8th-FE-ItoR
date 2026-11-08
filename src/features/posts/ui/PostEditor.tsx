@@ -185,7 +185,7 @@ export function PostEditor({ initialDraft, onPublish, submitting = false }: Post
             )}
             {loadingImage && (
               <p role="status" className="px-4 text-xs text-neutral-400">
-                사진을 업로드하고 있습니다.
+                사진을 업로드하고 있습니다. 업로드가 끝나면 본문을 수정할 수 있습니다.
               </p>
             )}
             {blocks.map((block, index) => (
@@ -195,6 +195,7 @@ export function PostEditor({ initialDraft, onPublish, submitting = false }: Post
                     aria-label={`본문 ${index + 1}`}
                     rows={1}
                     value={block.text}
+                    readOnly={loadingImage}
                     placeholder={
                       index === 0 ? '어떠한 것을 깨달았나요?' : '내용을 이어서 작성하세요.'
                     }

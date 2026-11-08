@@ -8,7 +8,8 @@ import { useDeletePostMutation } from '@/features/posts/api/usePostMutations';
 import { usePostDetailQuery } from '@/features/posts/api/usePostQueries';
 import type { PostComment } from '@/features/comments/model/comment';
 import { usePreviewComments } from '@/features/comments/model/usePreviewComments';
-import type { Profile, ProfileDraft } from '@/features/profile/model/profile';
+import type { Profile } from '@/features/profile/model/profile';
+import { profileQueries } from '@/features/profile/api/profileQueries';
 import { getApiErrorMessage } from '@/shared/apis/response';
 import { Toaster } from '@/shared/ui/primitives/sonner';
 import { notify } from '@/shared/ui/StatusToast';
@@ -23,7 +24,6 @@ import { useRouteScroll } from './hooks/useRouteScroll';
 export interface AppLayoutContext {
   openLogin: () => void;
   previewUser: Profile | null;
-  updateProfile: (draft: ProfileDraft) => boolean;
   startWriting: () => void;
   commentsByPost: Record<string, PostComment[]>;
   setPostComments: (postId: string, comments: PostComment[]) => void;
@@ -33,7 +33,6 @@ export function AppLayout() {
   const {
     loginOpen,
     previewUser,
-    updateProfile,
     isRestoring,
     authError,
     retryAuth,
@@ -71,14 +70,15 @@ export function AppLayout() {
     previewUser !== null && detail.isSuccess && detail.data.isOwner && !isRestoring && !authError;
   const deletePost = useDeletePostMutation();
   const postPending = useIsMutating({ mutationKey: postQueries.all }) > 0;
+  const profilePending = useIsMutating({ mutationKey: [...profileQueries.all, 'update'] }) > 0;
   const deleting = useRef(false);
   const navigate = useNavigate();
   useRouteScroll();
 
   async function removeCurrentPost() {
     if (deleting.current || postPending) return false;
-    if (!currentPost || !canManagePost) {
-      notify.error('작성자만 게시글을 삭제할 수 있습니다.');
+    if (!currentPost) {
+      notify.error('게시글을 찾을 수 없습니다.');
       return false;
     }
     deleting.current = true;
@@ -135,9 +135,9 @@ export function AppLayout() {
         }}
         canManagePost={canManagePost}
         postPending={postPending}
+        profilePending={profilePending}
         onEditPost={() => {
-          if (currentPost && canManagePost && !postPending)
-            navigate(`/posts/${currentPost.id}/edit`);
+          if (currentPost && !postPending) navigate(`/posts/${currentPost.id}/edit`);
         }}
         onDeletePost={removeCurrentPost}
       />
@@ -161,7 +161,6 @@ export function AppLayout() {
             {
               openLogin,
               previewUser,
-              updateProfile,
               startWriting,
               commentsByPost,
               setPostComments,
