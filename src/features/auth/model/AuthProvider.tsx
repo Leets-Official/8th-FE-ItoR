@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue } from './authContext';
 import { onSessionExpired } from '@/shared/api/instance';
-import { clearTokens } from '@/shared/api/tokenStorage';
+import { clearTokens, getRefreshToken } from '@/shared/api/tokenStorage';
 import { showToast } from '@/shared/ui';
 import {
   registerWithEmail,
@@ -15,10 +15,36 @@ import type { AuthUser } from './types';
 // 새로고침해도 로그인이 풀리지 않도록 탭 단위로 보관한다 (탭을 닫으면 로그아웃)
 const STORAGE_KEY = 'gitlog:auth-user';
 
+// 저장소의 값은 타입 보장이 없으므로 사용자 정보의 구조를 확인한다
+function isAuthUser(value: unknown): value is AuthUser {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+
+  return (
+    'nickname' in value &&
+    typeof value.nickname === 'string' &&
+    'email' in value &&
+    typeof value.email === 'string' &&
+    'name' in value &&
+    typeof value.name === 'string' &&
+    'birthDate' in value &&
+    typeof value.birthDate === 'string' &&
+    (!('profileImageUrl' in value) ||
+      value.profileImageUrl === undefined ||
+      typeof value.profileImageUrl === 'string') &&
+    (!('introduction' in value) ||
+      value.introduction === undefined ||
+      typeof value.introduction === 'string') &&
+    (!('provider' in value) || value.provider === undefined || value.provider === 'kakao')
+  );
+}
+
 function readStoredUser(): AuthUser | undefined {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as AuthUser) : undefined;
+    if (!stored) return undefined;
+
+    const parsed: unknown = JSON.parse(stored);
+    return isAuthUser(parsed) ? parsed : undefined;
   } catch {
     return undefined;
   }
@@ -79,11 +105,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const result = await updateMyProfile(input);
         if ('error' in result) return result;
 
-        // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
-        const user = { ...result.user, provider: currentUser.provider };
-        setCurrentUser(user);
-        writeStoredUser(user);
-        return undefined;
+        // 저장하는 동안 로그아웃했거나 세션이 만료됐으면 로그인 상태를 되살리지 않는다
+        if (getRefreshToken()) {
+          // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
+          const user = { ...result.user, provider: currentUser.provider };
+          setCurrentUser(user);
+          writeStoredUser(user);
+        }
+        return result.passwordFailure;
       },
       logout() {
         setCurrentUser(undefined);

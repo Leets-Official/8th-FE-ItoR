@@ -37,12 +37,22 @@ interface ProfileEditFormProps {
   user: AuthUser;
   // 저장하기 버튼이 폼 바깥(헤더)에 있어서, 페이지가 이 ref로 requestSubmit()을 호출해 제출한다
   ref?: Ref<HTMLFormElement>;
+  // 헤더의 저장하기·취소하기 버튼도 막아야 해서 제출 중 여부는 페이지가 갖는다
+  isSubmitting: boolean;
+  onSubmittingChange: (isSubmitting: boolean) => void;
   onSuccess?: () => void;
   className?: string;
 }
 
 // 내 프로필 설정의 수정 모드 — AccountInfo와 같은 자리에서 가입 방식을 뺀 모든 항목을 고친다
-export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEditFormProps) {
+export function ProfileEditForm({
+  user,
+  ref,
+  isSubmitting,
+  onSubmittingChange,
+  onSuccess,
+  className,
+}: ProfileEditFormProps) {
   const { updateProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImageUrl, setProfileImageUrl] = useState(user.profileImageUrl);
@@ -80,6 +90,8 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    // 응답을 기다리는 동안 다시 제출해 수정 요청과 토스트가 겹치지 않게 한다
+    if (isSubmitting) return;
     const form = event.currentTarget;
     const formData = new FormData(form);
     const read = (name: string) => String(formData.get(name) ?? '').trim();
@@ -104,6 +116,7 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
       nextErrors.passwordConfirm = PROFILE_ERROR_MESSAGE.passwordMismatch;
     }
     if (Object.keys(nextErrors).length === 0) {
+      onSubmittingChange(true);
       const failure = await updateProfile({
         ...values,
         email,
@@ -111,8 +124,14 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
         profileImageUrl,
         password: password || undefined,
       });
+      onSubmittingChange(false);
+
       if (failure?.error === 'duplicate-email') {
         nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      } else if (failure?.error === 'password-not-saved') {
+        // 수정 모드에 남겨 비밀번호만 다시 시도할 수 있게 한다
+        showToast('negative', '프로필은 저장했지만 비밀번호는 변경하지 못했습니다.');
+        nextErrors.password = failure.message ?? PROFILE_ERROR_MESSAGE.passwordNotSaved;
       } else if (failure) {
         showToast('negative', failure.message ?? '저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
         return;

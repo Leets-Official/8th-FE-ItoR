@@ -39,7 +39,7 @@ src/
 │   └── KakaoCallbackPage.tsx # /oauth/kakao/success — 카카오 인가 코드를 받는 Redirect URI
 ├── features/               # 도메인별 폴더 — 안에서 ui · api · model · lib로 한 단계 나눔
 │   ├── post/               # 게시글
-│   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent
+│   │   ├── ui/             # PostListItem · PostTitleSection · PostMeta · PostContent · PostLoadError
 │   │   ├── api/            # postApi.ts — 게시글 요청 함수, postQueries.ts — 쿼리 키·작성/수정/삭제 훅
 │   │   ├── model/          # types.ts — PostSummary, PostAuthor, PostDetail …
 │   │   └── index.ts        # Public API
@@ -120,5 +120,7 @@ app → pages → features → shared
 ## 라우팅
 
 - 라우팅은 `react-router`의 `createBrowserRouter`로 [router.tsx](../../src/app/router.tsx)에서 설정합니다. [App.tsx](../../src/app/App.tsx)는 `react-router/dom`의 `RouterProvider`와 공통 UI를 배치합니다. 새 페이지는 `src/pages/{이름}Page.tsx`로 만들고 `router.tsx`에서 `RootLayout`의 `children` 배열에 추가합니다.
+  - 첫 화면(`/`)만 정적으로 import하고, 나머지 페이지는 `lazy: () => import('@/pages/…').then((m) => ({ Component: m.…Page }))`로 들어갈 때 따로 받습니다. prop을 넘겨야 하면 `Component` 대신 `element`를 돌려줍니다.
+  - [package.json](../../package.json)의 `"sideEffects": ["*.css"]` 덕분에 도메인 `index.ts`가 메인 번들에 있어도 lazy 페이지에서만 쓰는 모듈은 그 페이지 청크로 빠집니다. import만으로 동작하는(부수 효과가 있는) JS 모듈을 만들면 이 목록에 추가합니다.
 - **라우터 기능(`useNavigate`, `useLocation`)이 필요한 공통 UI는 [RootLayout.tsx](../../src/app/RootLayout.tsx)에 둡니다.** URL이 없는 레이아웃 라우트라 `pages`가 아닌 `app`에 두며, 자식 라우트가 바뀌어도 다시 마운트되지 않습니다. 로그인 모달과 사이드바(+ 로그아웃 확인 모달)가 여기에 하나씩만 있고, 페이지에서 `useLoginModal()`의 `openLoginModal()`, `useSidebar()`의 `openSidebar()`로 엽니다. 헤더는 페이지마다 변형·동작이 달라 각 페이지에 두고 `onMenu={openSidebar}`만 연결합니다. 도메인 컴포넌트에는 `onLoginRequest` 같은 콜백으로 내려줍니다. `App.tsx`는 `RouterProvider` 바깥이라 라우터 훅을 쓸 수 없습니다.
 - 새 코드의 위치는 위 "어디에 둘까" 표의 판단 질문으로 정합니다.

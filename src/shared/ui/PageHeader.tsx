@@ -1,5 +1,6 @@
 import type { MouseEventHandler, ReactNode } from 'react';
 import { Link } from 'react-router';
+import { cn } from '@/shared/lib/utils';
 import { Button } from './Button';
 import {
   DropdownMenu,
@@ -8,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from './DropdownMenu';
 import { IconButton } from './IconButton';
-import { cn } from '@/shared/lib/utils';
 
 // basic: 메뉴·로고만 있는 헤더 (회원가입 등), profile: 수정하기 버튼이 있는 헤더 (내 프로필 설정)
 // profile-edit: 내 프로필 설정에서 수정하기를 누르면 바뀌는 취소하기·저장하기 헤더
@@ -16,15 +16,18 @@ export type PageHeaderVariant = 'main' | 'detail' | 'write' | 'basic' | 'profile
 
 // write·profile·profile-edit 헤더 오른쪽의 글자 버튼. 글자색은 버튼마다 따로 붙인다
 const TEXT_BUTTON_CLASS =
-  'flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 hover:bg-gray-90 active:bg-gray-90';
+  'flex h-[38px] w-[76px] cursor-pointer items-center justify-center rounded-full px-3 py-2 text-14 not-disabled:hover:bg-gray-90 not-disabled:active:bg-gray-90 disabled:cursor-default disabled:opacity-60';
 
 interface PageHeaderProps {
   variant?: PageHeaderVariant;
   createLabel?: ReactNode;
+  // profile-edit에서 저장 요청을 기다리는 동안 true. 보낸 요청은 되돌릴 수 없어 취소하기도 함께 막는다
+  isSaving?: boolean;
   onMenu?: MouseEventHandler<HTMLButtonElement>;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   onChat?: MouseEventHandler<HTMLButtonElement>;
   // detail에서는 더보기 메뉴의 수정하기·삭제하기 항목이 되고, 둘 다 없으면 더보기 버튼을 숨긴다
+  // 메뉴 항목의 onSelect와 버튼의 onClick에 함께 쓰여 이벤트를 받지 않는 () => void로 둔다
   onEdit?: () => void;
   onDelete?: () => void;
   onPublish?: MouseEventHandler<HTMLButtonElement>;
@@ -36,6 +39,7 @@ interface PageHeaderProps {
 export function PageHeader({
   variant = 'main',
   createLabel = '깃로그 쓰기',
+  isSaving = false,
   onMenu,
   onCreate,
   onChat,
@@ -127,12 +131,18 @@ export function PageHeader({
         <div className="flex h-[38px] items-start justify-end gap-2.5">
           <button
             type="button"
+            disabled={isSaving}
             className={cn(TEXT_BUTTON_CLASS, 'text-negative')}
             onClick={onCancel}
           >
             취소하기
           </button>
-          <button type="button" className={cn(TEXT_BUTTON_CLASS, 'text-black')} onClick={onSave}>
+          <button
+            type="button"
+            disabled={isSaving}
+            className={cn(TEXT_BUTTON_CLASS, 'text-black')}
+            onClick={onSave}
+          >
             저장하기
           </button>
         </div>

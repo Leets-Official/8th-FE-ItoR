@@ -9,7 +9,7 @@ paths:
 
 - 컴포넌트는 named export로 작성하며, Figma 컴포넌트의 변형은 prop으로 표현합니다.
   - 종류: `variant`/`type` 문자열 유니언 (예: `ButtonVariant`, `ToastType`, `PageHeaderVariant`)
-  - 크기: Figma 속성값을 그대로 쓴 숫자 유니언 `size` (예: `IconSize` = `40 | 24 | 14 | 12`, `TextFieldSize` = `32 | 14`, `BlankSize` = `64 | 32 | 20`)
+  - 크기: Figma 속성값을 그대로 쓴 숫자 유니언 `size` (예: `IconSize` = `40 | 24 | 14 | 12`, `TextFieldSize` = `32 | 14`, `BlankSize` = `64 | 32 | 20`, `ButtonSize` = `40 | 38`)
   - 눌림·선택 같은 상태: `pressed`/`selected` boolean prop. 색을 `className`으로 덮어쓰지 않습니다 (아래 절 참고)
 
 ## 같은 속성의 색 클래스를 한 요소에 겹쳐 쓰지 않기
@@ -25,10 +25,10 @@ paths:
 
 - [shadcn/ui](https://ui.shadcn.com) 방식으로 컴포넌트 코드를 `src/shared/ui/`에 두고 Figma 시안에 맞게 수정해 사용합니다. 설정은 [components.json](../../components.json)에 있습니다.
 - 동작·접근성(포커스 관리, 키보드 조작, ARIA)은 Radix(`radix-ui`)가, 스타일은 `@theme` 토큰 클래스가 담당합니다.
-  - `DropdownMenu`·`Menu` → Radix DropdownMenu, `Modal` → Radix AlertDialog, 토스트 → sonner(`<Toaster />` + `showToast()`), `Button` → cva + `asChild`(Slot)
+  - `DropdownMenu` → Radix DropdownMenu, `Modal` → Radix AlertDialog, 토스트 → sonner(`<Toaster />` + `showToast()`), `Button` → cva + `asChild`(Slot)
 - `npx shadcn@latest init`은 실행하지 않습니다 — `index.css`에 shadcn 전용 CSS 변수(`--primary` 등)를 주입해 `--color-*: initial` 토큰 구조와 충돌합니다.
 - `npx shadcn@latest add <컴포넌트>`로 새 컴포넌트를 가져오면 `bg-primary`, `text-muted-foreground` 같은 shadcn 색 클래스를 `@theme` 토큰 클래스로 바꾼 뒤 사용합니다. 아이콘도 lucide 대신 [Icon](../../src/shared/ui/Icon.tsx)으로 교체합니다.
-- 새 공용 컴포넌트는 `src/shared/ui/index.ts`에 등록하고, 모든 변형·크기·상태를 [ShowcasePage](../../src/pages/ShowcasePage.tsx)에 추가합니다.
+- 새 공용 컴포넌트는 `src/shared/ui/index.ts`에 등록합니다.
 - `className`은 항상 `cn()`으로 합칩니다. 커스텀 글자 크기 토큰(`text-12` 등)을 새로 추가하면 [utils.ts](../../src/shared/lib/utils.ts)의 `extendTailwindMerge` 설정에도 추가해야 글자색 클래스와 충돌로 오인되지 않습니다.
 
 ## 아이콘

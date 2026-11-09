@@ -4,13 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 로그인 모달의 GITLOG 로고가 첫 방문 LCP라, JS가 모달을 그리기 전에 폰트를 미리 받는다 -->
+    <link rel="preload" href="/fonts/smooch_gitlog.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Roboto:wght@400;500&family=Smooch&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Roboto:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <title>8th-fe-itor</title>
+    <title>개발 블로그 모아보기 | Gitlog</title>
+    <meta
+      name="description"
+      content="Gitlog에서 개발자들의 학습 기록과 프로젝트 경험을 찾아보세요."
+    />
   </head>
   <body>
     <div id="root"></div>
