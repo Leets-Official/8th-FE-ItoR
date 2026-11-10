@@ -16,7 +16,7 @@ type CommentSectionProps = {
   isCommentPending: boolean;
   onCreateComment: (content: string) => Promise<boolean>;
   onUpdateComment: (commentId: number, content: string) => Promise<boolean>;
-  onDeleteComment: (commentId: number) => Promise<void>;
+  onDeleteComment: (commentId: number) => Promise<boolean>;
 };
 
 type CommentSummaryProps = {

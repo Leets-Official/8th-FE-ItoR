@@ -47,9 +47,10 @@ function CommentForm({
       return;
     }
 
+    const submittedContent = content;
     const isCreated = await onCreateComment(trimmedContent);
     if (isCreated) {
-      setContent('');
+      setContent((currentContent) => (currentContent === submittedContent ? '' : currentContent));
     }
   }
 

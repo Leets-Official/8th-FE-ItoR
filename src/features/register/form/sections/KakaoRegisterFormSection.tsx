@@ -59,9 +59,9 @@ export function KakaoRegisterFormSection({ registration }: KakaoRegisterFormSect
             title="이름"
             textPlaceholder="이름"
             value={values.name}
-            disabled
             warningMessage="* 이름은 20자 이내의 한글로 입력해주세요."
             showWarning={hasSubmitted && errors.name}
+            onChange={(value) => updateValue('name', value)}
           />
           <FormField
             title="생년월일"

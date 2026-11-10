@@ -74,8 +74,10 @@ export function usePostDetail(postId: string) {
 
     try {
       await deleteCommentMutation.mutateAsync(commentId);
+      return true;
     } catch (error) {
       setActionErrorMessage(getApiErrorMessage(error, '댓글을 삭제하지 못했습니다.'));
+      return false;
     }
   }
 

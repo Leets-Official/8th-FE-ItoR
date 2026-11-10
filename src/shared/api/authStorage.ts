@@ -79,8 +79,13 @@ export function updateStoredProfile(
 }
 
 export function clearStoredAuth() {
-  window.localStorage.removeItem(AUTH_STORAGE_KEY);
-  notifyAuthChange(null);
+  try {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {
+    // 저장소 접근이 제한되어도 현재 탭의 인증 상태와 Query 캐시는 정리한다.
+  } finally {
+    notifyAuthChange(null);
+  }
 }
 
 export function subscribeAuthChange(listener: AuthChangeListener) {
