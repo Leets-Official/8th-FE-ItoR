@@ -51,6 +51,12 @@ export async function saveProfile({
     requests.push(patchPassword({ password: values.password }));
   }
 
-  await Promise.all(requests);
+  const results = await Promise.allSettled(requests);
+  const failedRequest = results.find((result) => result.status === 'rejected');
+
+  if (failedRequest) {
+    throw failedRequest.reason;
+  }
+
   return nextProfilePicture;
 }

@@ -6,15 +6,28 @@ import { getApiErrorMessage } from '@/shared/api/apiClient';
 import { useAuth } from '@/shared/auth/hooks/useAuth';
 import { useToast } from '@/shared/ui/toast/hooks/useToast';
 
-import { getMe } from '../../api/userApi';
+import { getMe, type UserGetResponse } from '../../api/userApi';
 import { userQueryKeys } from '../../api/userQueryKeys';
 import { saveProfile } from '../api/profileEditApi';
 import {
   getProfileEditErrors,
   INITIAL_PROFILE_EDIT_VALUES,
   type ProfileEditField,
+  type ProfileEditValues,
 } from '../model/profileEditForm';
 import { useProfileEditMode } from './useProfileEditMode';
+
+function createProfileEditValues(profile: UserGetResponse): ProfileEditValues {
+  return {
+    nickname: profile.nickname,
+    introduction: profile.introduction ?? '',
+    email: profile.email,
+    password: '',
+    passwordConfirm: '',
+    name: profile.name,
+    birthDate: profile.birthDate,
+  };
+}
 
 export function useProfileEditForm() {
   const { isEditing, stopEditing } = useProfileEditMode();
@@ -48,15 +61,7 @@ export function useProfileEditForm() {
       return;
     }
 
-    const profileValues = {
-      nickname: profileQuery.data.nickname,
-      introduction: profileQuery.data.introduction ?? '',
-      email: profileQuery.data.email,
-      password: '',
-      passwordConfirm: '',
-      name: profileQuery.data.name,
-      birthDate: profileQuery.data.birthDate,
-    };
+    const profileValues = createProfileEditValues(profileQuery.data);
     hasInitializedProfileRef.current = true;
     setValues(profileValues);
     setSavedValues(profileValues);
@@ -107,6 +112,29 @@ export function useProfileEditForm() {
       showToast({ variant: 'positive', message: '저장되었습니다' });
     } catch (error) {
       const message = getApiErrorMessage(error, '프로필 저장에 실패했습니다.');
+
+      try {
+        const refreshedProfile = await queryClient.fetchQuery({
+          queryKey: userQueryKeys.me(),
+          queryFn: getMe,
+          staleTime: 0,
+        });
+        const refreshedValues = createProfileEditValues(refreshedProfile);
+        const refreshedProfilePicture = refreshedProfile.profilePicture ?? '';
+        setValues(refreshedValues);
+        setSavedValues(refreshedValues);
+        setProfilePicture(refreshedProfilePicture);
+        setSavedProfilePicture(refreshedProfilePicture);
+        setProfileImageFile(null);
+        updateProfile({
+          nickname: refreshedProfile.nickname,
+          profilePicture: refreshedProfile.profilePicture,
+          introduction: refreshedProfile.introduction,
+        });
+      } catch {
+        // 재조회에도 실패하면 사용자가 다시 시도할 수 있도록 현재 입력 상태를 유지한다.
+      }
+
       setApiErrorMessage(message);
       showToast({ variant: 'negative', message });
     }
