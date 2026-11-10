@@ -1,6 +1,6 @@
 import { apiClient } from '@/shared/api/apiClient';
 import type { ApiResponse } from '@/shared/api/apiTypes';
-import { getPostPage, type ContentDto } from '@/shared/api/postApi';
+import type { ContentDto } from '@/shared/api/postApi';
 
 export type PostCreateRequest = {
   title: string;
@@ -40,54 +40,15 @@ function getPostIdFromLocation(location: string | undefined) {
   return isPostId(queryPostId) ? queryPostId : isPostId(pathPostId) ? pathPostId : undefined;
 }
 
-function hasSameContents(responseContents: ContentDto[] | undefined, contents: ContentDto[]) {
-  if (!responseContents || responseContents.length !== contents.length) {
-    return false;
-  }
-
-  const orderedResponseContents = responseContents.toSorted(
-    (firstContent, secondContent) => firstContent.contentOrder - secondContent.contentOrder,
-  );
-
-  return orderedResponseContents.every((responseContent, index) => {
-    const requestContent = contents[index];
-    return (
-      responseContent.contentOrder === requestContent.contentOrder &&
-      responseContent.content === requestContent.content &&
-      responseContent.contentType === requestContent.contentType
-    );
-  });
-}
-
-async function findCreatedPostId(postCreateRequest: PostCreateRequest, nickname: string) {
-  try {
-    const response = await getPostPage({
-      page: 1,
-      size: 10,
-      authenticated: true,
-    });
-    const createdPost = response.posts?.find(
-      (post) =>
-        post.nickName === nickname &&
-        post.title === postCreateRequest.title &&
-        hasSameContents(post.contents, postCreateRequest.contents),
-    );
-
-    return createdPost?.postId;
-  } catch {
-    return undefined;
-  }
-}
-
-/** 제목과 순서가 보존된 본문 블록으로 게시글을 생성하고 작성자의 생성된 게시글 ID를 반환합니다. */
-export async function postBlog(postCreateRequest: PostCreateRequest, nickname: string) {
+/** 제목과 순서가 보존된 본문 블록으로 게시글을 생성하고 응답에 포함된 게시글 ID를 반환합니다. */
+export async function postBlog(postCreateRequest: PostCreateRequest) {
   const response = await apiClient.post<ApiResponse<unknown>>('/posts', postCreateRequest, {
     timeout: 10_000,
   });
   const responsePostId =
     getPostId(response.data.data) || getPostIdFromLocation(response.headers.location);
 
-  return responsePostId ?? findCreatedPostId(postCreateRequest, nickname);
+  return responsePostId;
 }
 
 /** 제목과 본문 블록 순서를 보존해 작성자 본인의 게시글을 수정합니다. */
