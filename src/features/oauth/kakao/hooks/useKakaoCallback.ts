@@ -31,7 +31,7 @@ export function useKakaoCallback(code: string | undefined) {
 
         if (isLoginPostResponse(response)) {
           completeLogin(response);
-          await navigate({ to: '/' });
+          await navigate({ to: '/', replace: true });
           return;
         }
 
