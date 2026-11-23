@@ -70,6 +70,8 @@ export function PostEditor({
   const caretRef = useRef<Caret | null>(null);
   // 렌더링이 끝난 뒤 포커스를 옮길 자리. 합쳐진 글이 화면에 반영되기 전에는 커서를 둘 수 없다
   const pendingFocusRef = useRef<Caret | null>(null);
+  // 올리는 중인 사진 수. 끝나기 전에 게시하면 사진이 빠진 채 저장되므로 게시를 막는 데 쓴다
+  const uploadingCountRef = useRef(0);
   const [title, setTitle] = useState(initialValue?.title ?? '');
   const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
     initialValue ? toEditorBlocks(initialValue.content) : [createTextBlock()],
@@ -129,11 +131,14 @@ export function PostEditor({
     // 사진을 올리는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
     const caret = caretRef.current;
     let imageUrl: string;
+    uploadingCountRef.current += 1;
     try {
       imageUrl = await uploadImage(file);
     } catch {
       showToast('negative', '사진을 올리지 못했습니다.');
       return;
+    } finally {
+      uploadingCountRef.current -= 1;
     }
 
     const imageId = crypto.randomUUID();
@@ -184,6 +189,10 @@ export function PostEditor({
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (uploadingCountRef.current > 0) {
+      showToast('negative', '사진을 올리는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
     const trimmedTitle = title.trim();
     // 빈 글 블록은 사진을 넣으며 생긴 자리라 저장하지 않는다
     const content: PostContentBlock[] = blocks

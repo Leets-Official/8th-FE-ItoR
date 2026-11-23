@@ -10,5 +10,6 @@ export type {
 export { PostEditor } from './ui/PostEditor';
 export { PostContent } from './ui/PostContent';
 export { PostListItem } from './ui/PostListItem';
+export { PostLoadError } from './ui/PostLoadError';
 export { PostMeta } from './ui/PostMeta';
 export { PostTitleSection } from './ui/PostTitleSection';

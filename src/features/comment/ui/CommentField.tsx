@@ -13,7 +13,10 @@ interface CommentFieldProps {
   // 없으면 비로그인 상태로 보고 입력 대신 로그인을 요청한다
   currentUser?: User;
   onLoginRequest: () => void;
-  onSubmit?: (content: string) => void;
+  // 등록에 성공했을 때만 onSuccess를 불러 입력을 비운다. 실패하면 다시 시도할 수 있게 남겨 둔다
+  onSubmit?: (content: string, onSuccess: () => void) => void;
+  // 등록 중에 다시 제출하면 같은 댓글이 두 번 올라가므로 막는다
+  isSubmitting?: boolean;
   className?: string;
 }
 
@@ -21,6 +24,7 @@ export function CommentField({
   currentUser,
   onLoginRequest,
   onSubmit,
+  isSubmitting = false,
   className,
 }: CommentFieldProps) {
   const [content, setContent] = useState('');
@@ -35,13 +39,17 @@ export function CommentField({
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    const trimmedContent = content.trim();
-    // 공백만 입력했으면 등록하지 않고 필드만 비운다
-    if (trimmedContent) onSubmit?.(trimmedContent);
-
-    setContent('');
+    if (isSubmitting) return;
     // 이어서 입력할 수 있게 포커스를 되돌려 모바일 키패드가 닫히지 않게 한다
     textareaRef.current?.focus();
+
+    const trimmedContent = content.trim();
+    // 공백만 입력했으면 등록하지 않고 필드만 비운다
+    if (!trimmedContent) {
+      setContent('');
+      return;
+    }
+    onSubmit?.(trimmedContent, () => setContent(''));
   }
 
   if (!currentUser) {
@@ -83,8 +91,9 @@ export function CommentField({
         <Button
           type="submit"
           variant={hasInput ? 'black' : 'outline'}
-          disabled={!hasInput}
-          className="h-[38px] w-16"
+          disabled={!hasInput || isSubmitting}
+          size={38}
+          className="w-16"
           // 버튼이 포커스를 가져가면 입력창이 blur되어 모바일 키패드가 닫힌다
           onPointerDown={(event) => event.preventDefault()}
         >

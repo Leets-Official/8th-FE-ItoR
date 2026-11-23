@@ -25,9 +25,6 @@ interface SidebarProps {
   className?: string;
 }
 
-// 시안의 버튼 높이는 38px로 기본 Button(40px)보다 작다
-const BUTTON_HEIGHT_CLASS = 'h-[38px]';
-
 // 헤더의 메뉴(햄버거) 버튼으로 여는 왼쪽 서랍 — 포커스 가두기, ESC·바깥 클릭 닫기, 스크롤 잠금은 Radix Dialog가 처리한다
 export function Sidebar({
   open,
@@ -78,23 +75,15 @@ export function Sidebar({
             <div className="flex gap-2.5 px-4">
               {profile ? (
                 <>
-                  <Button
-                    variant="point"
-                    className={cn('flex-1', BUTTON_HEIGHT_CLASS)}
-                    onClick={onMyBlog}
-                  >
+                  <Button variant="point" size={38} className="flex-1" onClick={onMyBlog}>
                     나의 깃로그
                   </Button>
-                  <Button
-                    variant="point"
-                    className={cn('flex-1', BUTTON_HEIGHT_CLASS)}
-                    onClick={onWrite}
-                  >
+                  <Button variant="point" size={38} className="flex-1" onClick={onWrite}>
                     깃로그 쓰기
                   </Button>
                 </>
               ) : (
-                <Button variant="point" className={BUTTON_HEIGHT_CLASS} onClick={onStart}>
+                <Button variant="point" size={38} onClick={onStart}>
                   깃로그 시작하기
                 </Button>
               )}
@@ -105,18 +94,10 @@ export function Sidebar({
             <div className="flex flex-col py-6">
               <div aria-hidden className="h-5" />
               <div className="flex justify-end gap-2.5 px-4">
-                <Button
-                  variant="outline"
-                  className={cn('w-[99px]', BUTTON_HEIGHT_CLASS)}
-                  onClick={onSettings}
-                >
+                <Button variant="outline" size={38} className="w-[99px]" onClick={onSettings}>
                   설정
                 </Button>
-                <Button
-                  variant="outline"
-                  className={cn('w-[99px]', BUTTON_HEIGHT_CLASS)}
-                  onClick={onLogout}
-                >
+                <Button variant="outline" size={38} className="w-[99px]" onClick={onLogout}>
                   로그아웃
                 </Button>
               </div>

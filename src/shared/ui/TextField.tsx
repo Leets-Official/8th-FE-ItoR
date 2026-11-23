@@ -18,7 +18,7 @@ interface TextFieldProps extends Omit<ComponentProps<'input'>, 'size'> {
   size?: TextFieldSize;
 }
 
-// Figma 상태 defalt / input / click / Disabled = placeholder 표시 / 값 입력 / focus / disabled
+// Figma 상태 default / input / click / Disabled = placeholder 표시 / 값 입력 / focus / disabled
 // readOnly: 내 프로필 설정처럼 값을 보여주기만 하는 칸 — 수정할 수 없다는 걸 알 수 있게 글자를 회색으로 둔다
 export function TextField({
   size = 14,

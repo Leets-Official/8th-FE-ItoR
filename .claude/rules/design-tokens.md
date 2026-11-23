@@ -12,7 +12,8 @@ paths:
 - 별도의 `tailwind.config.js`는 없습니다 — v4는 Vite 플러그인을 통해 자체적으로 설정됩니다.
 - `src/app/styles/index.css`의 `@import "tailwindcss";`로 로드되며, `main.tsx`에서 한 번만 임포트됩니다.
 - 폰트·색상·타이포그래피 디자인 토큰은 같은 파일의 `@theme` 블록 **한 곳에만** 모여 있습니다.
-- 웹폰트(Noto Sans KR, Roboto, Smooch)는 [index.html](../../index.html)에서 Google Fonts로 불러옵니다.
+- 웹폰트 Noto Sans KR · Roboto는 [index.html](../../index.html)에서 Google Fonts로 불러옵니다.
+- Smooch는 GITLOG 로고에만 쓰여 그 글자만 담은 서브셋(`public/fonts/smooch_gitlog.woff2`)을 직접 두고, `index.css`의 `@font-face`와 `index.html`의 `<link rel="preload">`로 불러옵니다. 첫 방문 LCP가 로그인 모달의 로고라 JS 실행 전에 받기 위해서입니다. 로고 외의 글자에 `font-smooch`를 쓰려면 Google Fonts의 `css2?family=Smooch&text={글자}` 응답에 있는 woff2로 파일을 다시 받습니다.
 
 ## 색상 토큰
 
@@ -51,6 +52,6 @@ Figma 텍스트 스타일은 `@theme`의 `--text-*` 토큰(글자 크기 + 줄 �
   | -------------------------------- | --------------- |
   | Noto Sans KR (`font-sans`, 기본) | 300 · 400 · 500 |
   | Roboto (`font-roboto`)           | 400 · 500       |
-  | Smooch (`font-smooch`)           | 400             |
+  | Smooch (`font-smooch`)           | 400 (GITLOG만)  |
 
   목록에 없는 굵기(`font-bold`, `font-semibold` 등)를 쓰면 브라우저가 가짜 볼드로 그립니다. 새 굵기가 필요하면 `index.html`의 Google Fonts URL에 먼저 추가합니다.

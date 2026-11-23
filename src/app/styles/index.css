@@ -2,6 +2,15 @@
 /* shadcn/ui 컴포넌트의 열림·닫힘 애니메이션 유틸리티 (animate-in, fade-in-0 등) */
 @import 'tw-animate-css';
 
+/* Smooch는 GITLOG 로고에만 쓰여 그 글자(G·I·L·O·T)만 담은 2.4KB 서브셋을 직접 둔다 — 다른 글자는 cursive로 그려진다 */
+@font-face {
+  font-family: 'Smooch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/smooch_gitlog.woff2') format('woff2');
+}
+
 @theme {
   --font-sans: 'Noto Sans KR', sans-serif;
   --font-roboto: 'Roboto', sans-serif;

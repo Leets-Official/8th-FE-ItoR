@@ -22,15 +22,16 @@ export function CommentSection({
   onLoginRequest,
   onCommentChange,
 }: CommentSectionProps) {
-  const { mutate: createComment } = useCreateComment(onCommentChange);
+  const { mutate: createComment, isPending: isCreating } = useCreateComment(onCommentChange);
   const { mutate: deleteComment } = useDeleteComment(onCommentChange);
 
-  function handleCommentSubmit(content: string) {
+  // 훅의 onSuccess가 목록을 다시 받아 온 뒤에 불려, 새 댓글이 보일 때 입력창이 비워진다
+  function handleCommentSubmit(content: string, onSuccess: () => void) {
     if (!currentUser) return;
 
     createComment(
       { postId, content },
-      { onError: () => showToast('negative', '댓글을 등록하지 못했습니다.') },
+      { onSuccess, onError: () => showToast('negative', '댓글을 등록하지 못했습니다.') },
     );
   }
 
@@ -74,6 +75,7 @@ export function CommentSection({
           currentUser={currentUser}
           onLoginRequest={onLoginRequest}
           onSubmit={handleCommentSubmit}
+          isSubmitting={isCreating}
         />
       </div>
     </section>
