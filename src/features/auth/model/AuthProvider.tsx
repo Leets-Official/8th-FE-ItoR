@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue } from './authContext';
 import { onSessionExpired } from '@/shared/api/instance';
-import { clearTokens, getRefreshToken } from '@/shared/api/tokenStorage';
+import { clearTokens, getRefreshToken, getSessionId } from '@/shared/api/tokenStorage';
 import { showToast } from '@/shared/ui';
 import {
   registerWithEmail,
@@ -44,7 +44,12 @@ function readStoredUser(): AuthUser | undefined {
     if (!stored) return undefined;
 
     const parsed: unknown = JSON.parse(stored);
-    return isAuthUser(parsed) ? parsed : undefined;
+    // 토큰 없이 사용자 정보만 남아 있으면 화면만 로그인 상태가 되므로 지우고 다시 로그인하게 한다
+    if (!isAuthUser(parsed) || !getRefreshToken()) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      return undefined;
+    }
+    return parsed;
   } catch {
     return undefined;
   }
@@ -102,11 +107,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       async updateProfile(input) {
         if (!currentUser) return undefined;
 
+        // 요청을 보낸 세션을 기억해 둔다. 리프레시 토큰은 저장 중 재발급되면 바뀌어 세션 id로 비교한다
+        const sessionId = getSessionId();
         const result = await updateMyProfile(input);
         if ('error' in result) return result;
 
-        // 저장하는 동안 로그아웃했거나 세션이 만료됐으면 로그인 상태를 되살리지 않는다
-        if (getRefreshToken()) {
+        // 저장하는 동안 로그아웃했거나, 세션이 만료됐거나, 다른 계정으로 로그인했으면
+        // 이전 계정의 응답으로 로그인 상태를 덮어쓰지 않는다
+        if (sessionId && getSessionId() === sessionId) {
           // 내 정보 응답에는 가입 방식이 없어 로그인할 때 정한 값을 유지한다
           const user = { ...result.user, provider: currentUser.provider };
           setCurrentUser(user);

@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios';
 import { api, type ApiResponse } from '@/shared/api/instance';
-import { clearTokens, saveTokens } from '@/shared/api/tokenStorage';
+import { clearTokens, startSession } from '@/shared/api/tokenStorage';
 import type {
   AuthUser,
   KakaoLoginError,
@@ -68,7 +68,7 @@ export async function requestLogin(
       email,
       password,
     });
-    saveTokens(data.data);
+    startSession(data.data);
     return { user: await getMyInfo() };
   } catch (error) {
     // 내 정보 조회가 실패하면 로그인되지 않은 상태로 남으므로 받아 둔 토큰도 버린다
@@ -95,7 +95,7 @@ export async function requestKakaoLogin(
       return { error: 'unregistered' };
     }
 
-    saveTokens({ accessToken, refreshToken });
+    startSession({ accessToken, refreshToken });
     return { user: await getMyInfo() };
   } catch {
     clearTokens();
