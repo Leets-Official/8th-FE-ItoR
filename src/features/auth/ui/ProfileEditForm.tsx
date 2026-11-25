@@ -56,6 +56,8 @@ export function ProfileEditForm({
   const { updateProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImageUrl, setProfileImageUrl] = useState(user.profileImageUrl);
+  // 올리는 중에 저장하면 이전 사진 주소로 저장되고, 화면에만 새 사진이 보이게 되므로 저장을 막는다
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [birthDate, setBirthDate] = useState(user.birthDate);
   const [errors, setErrors] = useState<ProfileEditFieldErrors>({});
   const { provider } = user;
@@ -64,12 +66,15 @@ export function ProfileEditForm({
     const file = event.target.files?.[0];
     // 같은 파일을 다시 골라도 change 이벤트가 발생하도록 비운다
     event.target.value = '';
-    if (!file) return;
+    if (!file || isUploadingImage) return;
 
+    setIsUploadingImage(true);
     try {
       setProfileImageUrl(await uploadImage(file));
     } catch {
       showToast('negative', '프로필 사진을 올리지 못했습니다.');
+    } finally {
+      setIsUploadingImage(false);
     }
   }
 
@@ -92,6 +97,10 @@ export function ProfileEditForm({
     event.preventDefault();
     // 응답을 기다리는 동안 다시 제출해 수정 요청과 토스트가 겹치지 않게 한다
     if (isSubmitting) return;
+    if (isUploadingImage) {
+      showToast('negative', '프로필 사진을 올리는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
     const form = event.currentTarget;
     const formData = new FormData(form);
     const read = (name: string) => String(formData.get(name) ?? '').trim();
@@ -166,7 +175,10 @@ export function ProfileEditForm({
           <button
             type="button"
             aria-label="프로필 사진 변경"
-            className="relative block size-16 cursor-pointer rounded-full"
+            className="relative block size-16 cursor-pointer rounded-full disabled:cursor-default"
+            // 저장 중에 사진을 바꾸면 저장한 값과 화면이 어긋나고, 올리는 중에 또 고르면 늦게 끝난 쪽이 덮어쓴다
+            disabled={isSubmitting || isUploadingImage}
+            aria-busy={isUploadingImage || undefined}
             onClick={() => fileInputRef.current?.click()}
           >
             <img

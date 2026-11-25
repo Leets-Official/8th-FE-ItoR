@@ -70,8 +70,9 @@ export function PostEditor({
   const caretRef = useRef<Caret | null>(null);
   // 렌더링이 끝난 뒤 포커스를 옮길 자리. 합쳐진 글이 화면에 반영되기 전에는 커서를 둘 수 없다
   const pendingFocusRef = useRef<Caret | null>(null);
-  // 올리는 중인 사진 수. 끝나기 전에 게시하면 사진이 빠진 채 저장되므로 게시를 막는 데 쓴다
-  const uploadingCountRef = useRef(0);
+  // 사진을 올리는 중인지. 끝나기 전에 게시하면 사진이 빠진 채 저장되므로 게시를 막고,
+  // 본문을 고치면 사진을 넣을 커서 위치가 어긋나므로 본문과 사진 추가도 잠시 막는다
+  const [isUploading, setIsUploading] = useState(false);
   const [title, setTitle] = useState(initialValue?.title ?? '');
   const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
     initialValue ? toEditorBlocks(initialValue.content) : [createTextBlock()],
@@ -126,19 +127,19 @@ export function PostEditor({
     const file = event.target.files?.[0];
     // 같은 파일을 다시 골라도 change 이벤트가 발생하도록 비운다
     event.target.value = '';
-    if (!file) return;
+    if (!file || isUploading) return;
 
-    // 사진을 올리는 동안 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
+    // 사진을 올리는 동안 다른 칸으로 커서가 옮겨 갈 수 있어 고른 시점의 위치를 쓴다
     const caret = caretRef.current;
     let imageUrl: string;
-    uploadingCountRef.current += 1;
+    setIsUploading(true);
     try {
       imageUrl = await uploadImage(file);
     } catch {
       showToast('negative', '사진을 올리지 못했습니다.');
       return;
     } finally {
-      uploadingCountRef.current -= 1;
+      setIsUploading(false);
     }
 
     const imageId = crypto.randomUUID();
@@ -189,7 +190,7 @@ export function PostEditor({
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (uploadingCountRef.current > 0) {
+    if (isUploading) {
       showToast('negative', '사진을 올리는 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
@@ -228,6 +229,7 @@ export function PostEditor({
           variant="text"
           icon="add_photo_alternate"
           className="h-[25px] whitespace-nowrap"
+          disabled={isUploading}
           // 버튼이 포커스를 가져가도 커서 위치는 caretRef에 남아 있다
           onClick={() => fileInputRef.current?.click()}
         >
@@ -279,6 +281,7 @@ export function PostEditor({
                   // 글이 하나뿐일 때만 안내 문구를 보여준다
                   placeholder={blocks.length === 1 ? '어떠한 것을 깨달았나요?' : undefined}
                   value={block.text}
+                  readOnly={isUploading}
                   className={cn(
                     TEXTAREA_CLASS,
                     'text-14 font-light text-gray-20 placeholder:text-gray-56',
@@ -305,6 +308,8 @@ export function PostEditor({
                     <IconButton
                       icon="delete_forever"
                       label="사진 삭제"
+                      // 사진을 빼면 앞뒤 글 칸이 합쳐져, 올리는 중인 사진이 들어갈 칸이 사라질 수 있다
+                      disabled={isUploading}
                       onClick={() => handleImageRemove(block.id)}
                     />
                   </div>
