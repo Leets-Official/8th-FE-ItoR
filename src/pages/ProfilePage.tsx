@@ -8,6 +8,7 @@ export function ProfilePage() {
   const { currentUser } = useAuth();
   const { openSidebar } = useSidebar();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const editFormRef = useRef<HTMLFormElement>(null);
 
   // 로그아웃하거나 비로그인으로 들어오면 볼 내 정보가 없으므로 메인으로 보낸다
@@ -19,6 +20,7 @@ export function ProfilePage() {
         <PageHeader
           variant="profile-edit"
           className="sticky top-0 z-10"
+          isSaving={isSaving}
           onMenu={openSidebar}
           onCancel={() => setIsEditing(false)}
           // 검증과 저장은 폼의 submit에서 처리한다
@@ -37,6 +39,8 @@ export function ProfilePage() {
           <ProfileEditForm
             ref={editFormRef}
             user={currentUser}
+            isSubmitting={isSaving}
+            onSubmittingChange={setIsSaving}
             onSuccess={() => setIsEditing(false)}
           />
         ) : (

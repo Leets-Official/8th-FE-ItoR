@@ -4,7 +4,18 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios';
+import { isAccessTokenExpired } from './isAccessTokenExpired';
 import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from './tokenStorage';
+
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    // 비로그인으로도 부를 수 있는 API면 true. 토큰을 붙이지 않고 만료돼도 재발급하지 않는다
+    isPublic?: boolean;
+  }
+}
+
+// 세션이 만료돼 요청을 보내지 않았을 때의 에러 코드. 서버의 4xx 응답(ERR_BAD_REQUEST)과 구분한다
+export const SESSION_EXPIRED_ERROR_CODE = 'ERR_SESSION_EXPIRED';
 
 // 서버는 모든 응답을 { code, message, data }로 감싸 보낸다
 export interface ApiResponse<T> {
@@ -16,12 +27,6 @@ export interface ApiResponse<T> {
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-});
-
-api.interceptors.request.use((config) => {
-  const accessToken = getAccessToken();
-  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
-  return config;
 });
 
 interface ReissueResponse {
@@ -44,10 +49,18 @@ export function onSessionExpired(listener: () => void) {
   };
 }
 
+function expireSession() {
+  clearTokens();
+  sessionExpiredListeners.forEach((listener) => listener());
+}
+
 async function reissueTokens() {
   const refreshToken = getRefreshToken();
   // 로그아웃했거나 다른 요청의 재발급이 이미 실패해 토큰을 지웠다
-  if (!refreshToken) return false;
+  if (!refreshToken) {
+    if (getAccessToken()) expireSession();
+    return false;
+  }
 
   try {
     // 만료된 액세스 토큰이 붙지 않게 인터셉터가 없는 기본 axios로 보낸다
@@ -56,16 +69,17 @@ async function reissueTokens() {
       { refreshToken },
       { baseURL: api.defaults.baseURL },
     );
+    // 기다리는 동안 로그아웃하거나 다른 계정으로 로그인했으면 이전 세션을 복원하지 않는다
+    if (getRefreshToken() !== refreshToken) return false;
     if (data.data?.accessToken && data.data.refreshToken) {
       saveTokens(data.data);
       return true;
     }
   } catch {
-    // 리프레시 토큰도 만료됐거나 잘못됐으면 아래에서 로그아웃한다
+    // 리프레시 토큰도 만료됐거나 잘못됐으면, 또는 새 토큰을 저장하지 못했으면 아래에서 로그아웃한다
   }
 
-  clearTokens();
-  sessionExpiredListeners.forEach((listener) => listener());
+  if (getRefreshToken() === refreshToken) expireSession();
   return false;
 }
 
@@ -78,6 +92,42 @@ function reissueOnce() {
   });
   return reissuePromise;
 }
+
+function isProtectedBackendRequest(config: InternalAxiosRequestConfig) {
+  if (config.isPublic) return false;
+
+  // 외부 URL(S3 등)로 보내는 요청에는 토큰을 붙이지 않는다
+  const backendUrl = new URL(api.defaults.baseURL || '/', window.location.origin);
+  const requestUrl = new URL(api.getUri(config), window.location.origin);
+  const basePath = backendUrl.pathname.replace(/\/$/, '');
+  if (requestUrl.origin !== backendUrl.origin || !requestUrl.pathname.startsWith(`${basePath}/`)) {
+    return false;
+  }
+
+  // 로그인·가입·재발급은 토큰 없이 보낸다
+  const path = requestUrl.pathname.slice(basePath.length);
+  return path !== '/auth' && !path.startsWith('/auth/');
+}
+
+api.interceptors.request.use(async (config: RetryableConfig) => {
+  if (!isProtectedBackendRequest(config)) return config;
+
+  let accessToken = getAccessToken();
+  if (!accessToken && !getRefreshToken()) return config;
+
+  if (!config.hasRetried && (!accessToken || isAccessTokenExpired(accessToken))) {
+    if (!(await reissueOnce())) {
+      throw new AxiosError('로그인이 만료되었습니다.', SESSION_EXPIRED_ERROR_CODE, config);
+    }
+    accessToken = getAccessToken();
+  }
+
+  if (!accessToken) {
+    throw new AxiosError('인증 토큰이 없습니다.', SESSION_EXPIRED_ERROR_CODE, config);
+  }
+  config.headers.set('Authorization', `Bearer ${accessToken}`);
+  return config;
+});
 
 // 서버는 토큰이 만료되거나 잘못되면 HTTP 401 대신 200에 본문 code 401로 응답하기도 해서 둘 다 본다.
 // 토큰이 필요한 일부 API(/posts/token 등)는 만료된 토큰에 500과 'JWT expired …' 메시지로 응답해 이것도 만료로 본다
@@ -108,7 +158,7 @@ function toAxiosError(failure: AxiosResponse | AxiosError) {
 async function retryAfterReissue(config: RetryableConfig, failure: AxiosResponse | AxiosError) {
   const sentToken = config.headers.Authorization;
   // 로그인·가입 실패의 401이나 토큰 없이 보낸 요청은 재발급과 상관없다
-  if (!sentToken || config.hasRetried || config.url?.startsWith('/auth/')) {
+  if (!sentToken || config.hasRetried || !isProtectedBackendRequest(config)) {
     throw toAxiosError(failure);
   }
 

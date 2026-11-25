@@ -103,7 +103,7 @@ function SidebarLayout({ children }: SidebarLayoutProps) {
 
 // 카카오 로그인 flow — 가입되지 않은 카카오 계정이면 출발한 페이지 위에서 회원가입 여부를 묻는다
 function KakaoSignUpPrompt() {
-  const { pathname, state } = useLocation();
+  const { pathname, search, hash, state } = useLocation();
   const navigate = useNavigate();
   const isOpen = hasKakaoSignUpPrompt(state);
   // 회원가입 버튼도 닫힘(onOpenChange)을 함께 일으키므로, 이동한 뒤 출발 페이지로 되돌리지 않게 막는다
@@ -111,7 +111,7 @@ function KakaoSignUpPrompt() {
 
   // 새로고침·뒤로 가기로 다시 묻지 않도록 state를 지운다
   function clearPrompt() {
-    navigate(pathname, { replace: true, state: null });
+    navigate({ pathname, search, hash }, { replace: true, state: null });
   }
 
   function handleOpenChange(open: boolean) {

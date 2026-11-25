@@ -37,15 +37,27 @@ interface ProfileEditFormProps {
   user: AuthUser;
   // 저장하기 버튼이 폼 바깥(헤더)에 있어서, 페이지가 이 ref로 requestSubmit()을 호출해 제출한다
   ref?: Ref<HTMLFormElement>;
+  // 헤더의 저장하기·취소하기 버튼도 막아야 해서 제출 중 여부는 페이지가 갖는다
+  isSubmitting: boolean;
+  onSubmittingChange: (isSubmitting: boolean) => void;
   onSuccess?: () => void;
   className?: string;
 }
 
 // 내 프로필 설정의 수정 모드 — AccountInfo와 같은 자리에서 가입 방식을 뺀 모든 항목을 고친다
-export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEditFormProps) {
+export function ProfileEditForm({
+  user,
+  ref,
+  isSubmitting,
+  onSubmittingChange,
+  onSuccess,
+  className,
+}: ProfileEditFormProps) {
   const { updateProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profileImageUrl, setProfileImageUrl] = useState(user.profileImageUrl);
+  // 올리는 중에 저장하면 이전 사진 주소로 저장되고, 화면에만 새 사진이 보이게 되므로 저장을 막는다
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [birthDate, setBirthDate] = useState(user.birthDate);
   const [errors, setErrors] = useState<ProfileEditFieldErrors>({});
   const { provider } = user;
@@ -54,12 +66,15 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
     const file = event.target.files?.[0];
     // 같은 파일을 다시 골라도 change 이벤트가 발생하도록 비운다
     event.target.value = '';
-    if (!file) return;
+    if (!file || isUploadingImage) return;
 
+    setIsUploadingImage(true);
     try {
       setProfileImageUrl(await uploadImage(file));
     } catch {
       showToast('negative', '프로필 사진을 올리지 못했습니다.');
+    } finally {
+      setIsUploadingImage(false);
     }
   }
 
@@ -80,6 +95,12 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    // 응답을 기다리는 동안 다시 제출해 수정 요청과 토스트가 겹치지 않게 한다
+    if (isSubmitting) return;
+    if (isUploadingImage) {
+      showToast('negative', '프로필 사진을 올리는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
     const form = event.currentTarget;
     const formData = new FormData(form);
     const read = (name: string) => String(formData.get(name) ?? '').trim();
@@ -104,6 +125,7 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
       nextErrors.passwordConfirm = PROFILE_ERROR_MESSAGE.passwordMismatch;
     }
     if (Object.keys(nextErrors).length === 0) {
+      onSubmittingChange(true);
       const failure = await updateProfile({
         ...values,
         email,
@@ -111,8 +133,14 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
         profileImageUrl,
         password: password || undefined,
       });
+      onSubmittingChange(false);
+
       if (failure?.error === 'duplicate-email') {
         nextErrors.email = PROFILE_ERROR_MESSAGE.duplicateEmail;
+      } else if (failure?.error === 'password-not-saved') {
+        // 수정 모드에 남겨 비밀번호만 다시 시도할 수 있게 한다
+        showToast('negative', '프로필은 저장했지만 비밀번호는 변경하지 못했습니다.');
+        nextErrors.password = failure.message ?? PROFILE_ERROR_MESSAGE.passwordNotSaved;
       } else if (failure) {
         showToast('negative', failure.message ?? '저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
         return;
@@ -147,7 +175,10 @@ export function ProfileEditForm({ user, ref, onSuccess, className }: ProfileEdit
           <button
             type="button"
             aria-label="프로필 사진 변경"
-            className="relative block size-16 cursor-pointer rounded-full"
+            className="relative block size-16 cursor-pointer rounded-full disabled:cursor-default"
+            // 저장 중에 사진을 바꾸면 저장한 값과 화면이 어긋나고, 올리는 중에 또 고르면 늦게 끝난 쪽이 덮어쓴다
+            disabled={isSubmitting || isUploadingImage}
+            aria-busy={isUploadingImage || undefined}
             onClick={() => fileInputRef.current?.click()}
           >
             <img

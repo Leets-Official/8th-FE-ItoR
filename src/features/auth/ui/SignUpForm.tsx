@@ -280,7 +280,7 @@ export function SignUpForm({ provider, onSuccess, className }: SignUpFormProps) 
 
       <Blank size={32} />
       <div className={cn(SECTION_CLASS, 'flex px-4')}>
-        <Button type="submit" disabled={isSubmitting} className="h-[38px] flex-1">
+        <Button type="submit" size={38} disabled={isSubmitting} className="flex-1">
           회원가입 완료
         </Button>
       </div>
