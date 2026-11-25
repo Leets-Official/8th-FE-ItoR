@@ -49,7 +49,8 @@ export function CommentField({
       setContent('');
       return;
     }
-    onSubmit?.(trimmedContent, () => setContent(''));
+    // 응답을 기다리는 동안 이어서 입력한 내용은 지우지 않도록, 제출한 그대로일 때만 비운다
+    onSubmit?.(trimmedContent, () => setContent((current) => (current === content ? '' : current)));
   }
 
   if (!currentUser) {
