@@ -26,14 +26,13 @@ export function HomePage() {
   const mine = useMyPostListQuery(isMyGitlog && Boolean(previewUser));
   const result = isMyGitlog ? mine : list;
   const posts = isMyGitlog
-    ? (mine.data ?? []).slice((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE)
+    ? (mine.data?.pages.flatMap((group) => group.posts) ?? [])
     : (list.data?.posts ?? []);
-  const totalPages = isMyGitlog
-    ? Math.ceil((mine.data?.length ?? 0) / POSTS_PER_PAGE)
-    : (list.data?.totalPages ?? 0);
+  const totalPages = list.data?.totalPages ?? 0;
+  const isLoadMoreError = isMyGitlog && mine.isFetchNextPageError;
 
   useEffect(() => {
-    if (!result.data || page <= Math.max(1, totalPages)) return;
+    if (isMyGitlog || !list.data || page <= Math.max(1, totalPages)) return;
     setSearchParams(
       (previous) => {
         const params = new URLSearchParams(previous);
@@ -42,11 +41,11 @@ export function HomePage() {
       },
       { replace: true },
     );
-  }, [result.data, page, totalPages, setSearchParams]);
+  }, [isMyGitlog, list.data, page, totalPages, setSearchParams]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [page]);
+  }, [isMyGitlog, page]);
 
   function changePage(nextPage: number) {
     const params = new URLSearchParams(searchParams);
@@ -74,7 +73,7 @@ export function HomePage() {
           <p role="status" className="px-4 py-8 text-center">
             {isMyGitlog ? '내 게시물을 확인하고 있습니다.' : '게시물을 불러오고 있습니다.'}
           </p>
-        ) : result.isError ? (
+        ) : result.isError && !isLoadMoreError ? (
           <div className="space-y-4 px-4 py-8 text-center">
             <p role="alert">{getApiErrorMessage(result.error)}</p>
             <GitlogButton onClick={() => void result.refetch()}>다시 시도</GitlogButton>
@@ -96,12 +95,34 @@ export function HomePage() {
                 />
               ))}
             </ul>
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={changePage}
-              className="mt-5 justify-center sm:mt-8"
-            />
+            {isMyGitlog ? (
+              mine.hasNextPage && (
+                <div className="mt-5 text-center sm:mt-8">
+                  {isLoadMoreError && (
+                    <p role="alert" className="mb-3">
+                      {getApiErrorMessage(mine.error)}
+                    </p>
+                  )}
+                  <GitlogButton
+                    disabled={mine.isFetching}
+                    onClick={() => void mine.fetchNextPage({ cancelRefetch: false })}
+                  >
+                    {mine.isFetchingNextPage
+                      ? '불러오는 중...'
+                      : isLoadMoreError
+                        ? '다시 시도'
+                        : '더보기'}
+                  </GitlogButton>
+                </div>
+              )
+            ) : (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={changePage}
+                className="mt-5 justify-center sm:mt-8"
+              />
+            )}
           </>
         )}
       </div>

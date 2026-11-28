@@ -4,10 +4,18 @@ import { getAuthSnapshot } from '@/shared/apis/tokenSession';
 
 import type { Post } from '../model/post';
 import { POSTS_PER_PAGE } from '../model/post';
+import type { PostSummaryResponse } from '../model/postResponse';
 import { mapPostSummary } from '../lib/mapPostResponse';
 import { postsApi } from './postsApi';
 
-export async function getMyPosts(revision: number, signal?: AbortSignal) {
+export interface MyPostsCursor {
+  nextPage: number;
+  pageMax: number;
+  pending: PostSummaryResponse[];
+  visitedIds: string[];
+}
+
+export async function getMyPosts(revision: number, cursor: MyPostsCursor, signal?: AbortSignal) {
   const requireSession = () => {
     if (signal?.aborted) throw new DOMException('조회가 취소되었습니다.', 'AbortError');
     const session = getAuthSnapshot();
@@ -15,45 +23,56 @@ export async function getMyPosts(revision: number, signal?: AbortSignal) {
       throw new Error('로그인 상태가 변경되었습니다. 다시 로그인해주세요.');
     }
   };
-  const owned: Post[] = [];
-  const visited = new Set<string>();
-  let page = 1;
-  let totalPages = 1;
-  // shortcut: 목록 전체와 인증 상세의 isOwner를 확인한다.
-  while (page <= totalPages) {
+  const posts: Post[] = [];
+  const visited = new Set(cursor.visitedIds);
+  let { nextPage, pageMax, pending } = cursor;
+
+  while (posts.length < POSTS_PER_PAGE && (pending.length > 0 || nextPage <= pageMax)) {
     requireSession();
-    const { data } = await postsApi.getList({ page, size: POSTS_PER_PAGE }, true, signal);
-    requireSession();
-    totalPages = data.pageMax;
-    const candidates = data.posts.filter((post) => {
-      if (visited.has(post.postId)) return false;
-      visited.add(post.postId);
-      return true;
-    });
-    // 상세 요청은 한 번에 최대 4개만 보내고 목록 순서를 유지한다.
-    for (let start = 0; start < candidates.length; start += 4) {
-      requireSession();
-      const group = await Promise.all(
-        candidates.slice(start, start + 4).map(async (summary) => {
-          try {
-            const { data: detail } = await postsApi.getDetail(summary.postId, true, signal);
-            requireSession();
-            return detail.isOwner ? mapPostSummary(summary) : null;
-          } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-              requireSession();
-              return null;
-            }
-            throw error;
-          }
-        }),
+    if (pending.length === 0) {
+      const { data } = await postsApi.getList(
+        { page: nextPage, size: POSTS_PER_PAGE },
+        true,
+        signal,
       );
-      group.forEach((post) => {
-        if (post) owned.push(post);
+      requireSession();
+      nextPage++;
+      pageMax = data.pageMax;
+      pending = data.posts.filter(({ postId }) => {
+        if (visited.has(postId)) return false;
+        visited.add(postId);
+        return true;
       });
+      continue;
     }
-    page++;
+
+    const batchSize = Math.min(4, POSTS_PER_PAGE - posts.length);
+    const group = await Promise.allSettled(
+      pending.slice(0, batchSize).map(async (summary) => {
+        try {
+          const { data: detail } = await postsApi.getDetail(summary.postId, true, signal);
+          requireSession();
+          return detail.isOwner ? mapPostSummary(summary) : null;
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            requireSession();
+            return null;
+          }
+          throw error;
+        }
+      }),
+    );
+    for (const result of group) {
+      if (result.status === 'rejected') throw result.reason;
+      if (result.value) posts.push(result.value);
+    }
+    pending = pending.slice(batchSize);
   }
+
   requireSession();
-  return owned;
+  const nextCursor =
+    pending.length > 0 || nextPage <= pageMax
+      ? { nextPage, pageMax, pending, visitedIds: [...visited] }
+      : undefined;
+  return { posts, nextCursor };
 }
