@@ -1,6 +1,8 @@
 import type { PostContentBlock } from '../model/post';
 
 export function PostContent({ blocks }: { blocks: PostContentBlock[] }) {
+  const firstImageIndex = blocks.findIndex((block) => block.type === 'image');
+
   return (
     <div className="mx-auto w-full max-w-[688px] py-5 sm:py-8">
       {blocks.map((block, index) => (
@@ -15,7 +17,7 @@ export function PostContent({ blocks }: { blocks: PostContentBlock[] }) {
               alt={block.alt}
               width={block.width}
               height={block.height}
-              loading={index <= 1 ? 'eager' : 'lazy'}
+              loading={index === firstImageIndex ? 'eager' : 'lazy'}
               decoding="async"
               className="h-auto w-full rounded-sm"
             />
