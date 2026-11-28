@@ -1,4 +1,6 @@
-import { useNavigate, useOutletContext } from 'react-router';
+import { useLayoutEffect, useRef } from 'react';
+
+import { useLocation, useNavigate, useOutletContext } from 'react-router';
 import { useUpdateProfileMutation } from '@/features/profile/api/useUpdateProfileMutation';
 import { useUserQuery } from '@/features/profile/api/useUserQuery';
 import { getApiErrorMessage } from '@/shared/apis/response';
@@ -16,6 +18,17 @@ export function ProfileSettingsPage({ editing = false }: { editing?: boolean }) 
   const update = useUpdateProfileMutation();
   const me = useUserQuery(getAuthSnapshot());
   const navigate = useNavigate();
+  const { key } = useLocation();
+  const editVisitRef = useRef<symbol | null>(null);
+
+  useLayoutEffect(() => {
+    if (!editing) return;
+    editVisitRef.current = Symbol();
+    return () => {
+      editVisitRef.current = null;
+    };
+  }, [editing, key]);
+
   if (!previewUser)
     return (
       <main className="p-8 text-center font-auth">
@@ -27,9 +40,14 @@ export function ProfileSettingsPage({ editing = false }: { editing?: boolean }) 
     );
   async function save(draft: ProfileDraft) {
     if (!previewUser || update.isPending) return false;
+    const editVisit = editVisitRef.current;
+    const editUrl = window.location.href;
     try {
       const result = await update.mutateAsync({ profile: previewUser, draft });
-      navigate('/mypage/settings');
+      // The browser URL can change before a lazy route commits.
+      if (editVisit && editVisitRef.current === editVisit && window.location.href === editUrl) {
+        navigate('/mypage/settings');
+      }
       if (!result.refreshed) {
         notify.error('변경은 저장되었지만 최신 정보를 불러오지 못했습니다. 다시 조회해주세요.');
       } else {
