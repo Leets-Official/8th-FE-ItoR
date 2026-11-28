@@ -16,7 +16,6 @@ import { cn } from '@/shared/utils/cn';
 
 import { validateProfile } from '../lib/validateProfile';
 import { readProfilePhoto } from '../lib/readProfilePhoto';
-import { useProfileImageUploadMutation } from '../api/useProfileImageUploadMutation';
 import type { Profile, ProfileDraft, ProfileErrors, ProfileFieldName } from '../model/profile';
 
 interface ProfileFieldProps extends Omit<ComponentProps<'input'>, 'size'> {
@@ -57,7 +56,7 @@ interface ProfileSettingsFormProps {
   profile: Profile;
   editing: boolean;
   pending: boolean;
-  onSave: (draft: ProfileDraft) => Promise<boolean>;
+  onSave: (draft: ProfileDraft, photo?: File) => Promise<boolean>;
 }
 
 export function ProfileSettingsForm({
@@ -72,7 +71,6 @@ export function ProfileSettingsForm({
     birthDate: profile.birthDate,
     nickname: profile.nickname,
     introduction: profile.introduction ?? '',
-    avatarUrl: profile.avatarUrl,
     password: '',
     passwordConfirmation: '',
   };
@@ -82,10 +80,9 @@ export function ProfileSettingsForm({
   const [touched, setTouched] = useState<Partial<Record<ProfileFieldName, boolean>>>({});
   const submitting = useRef(false);
   const photoRequest = useRef(0);
-  const photoController = useRef<AbortController | null>(null);
+  const [photo, setPhoto] = useState<Awaited<ReturnType<typeof readProfilePhoto>> | null>(null);
   const [loadingPhoto, setLoadingPhoto] = useState(false);
   const [photoError, setPhotoError] = useState('');
-  const upload = useProfileImageUploadMutation();
   const form = useRef<HTMLFormElement>(null);
   const errors: ProfileErrors = Object.fromEntries(
     Object.entries(editing ? validateProfile(values, profile.method) : {}).filter(
@@ -97,7 +94,6 @@ export function ProfileSettingsForm({
   useEffect(
     () => () => {
       photoRequest.current++;
-      photoController.current?.abort();
     },
     [],
   );
@@ -105,41 +101,28 @@ export function ProfileSettingsForm({
   async function selectPhoto(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
     event.currentTarget.value = '';
-    if (!file || pending) return;
-    photoController.current?.abort();
+    if (!file || pending || submitting.current) return;
     const request = ++photoRequest.current;
-    const controller = new AbortController();
-    photoController.current = controller;
     setLoadingPhoto(true);
     setPhotoError('');
     try {
-      const photo = await readProfilePhoto(file);
-      if (request !== photoRequest.current || controller.signal.aborted) return;
-      setValues((previous) => ({ ...previous, avatarUrl: photo.src }));
-      const imageUrl = await upload.mutateAsync({ file: photo.file, signal: controller.signal });
-      if (request === photoRequest.current && !controller.signal.aborted) {
-        setValues((previous) => ({ ...previous, avatarUrl: imageUrl }));
-      }
+      const selected = await readProfilePhoto(file);
+      if (request === photoRequest.current) setPhoto(selected);
     } catch (error) {
-      if (request === photoRequest.current && !controller.signal.aborted) {
-        setPhotoError(error instanceof Error ? error.message : '사진 업로드에 실패했습니다.');
+      if (request === photoRequest.current) {
+        setPhotoError(error instanceof Error ? error.message : '사진을 불러올 수 없습니다.');
       }
     } finally {
-      if (request === photoRequest.current) {
-        setLoadingPhoto(false);
-        photoController.current = null;
-      }
+      if (request === photoRequest.current) setLoadingPhoto(false);
     }
   }
 
   function keepPreviousPhoto() {
+    if (pending || submitting.current) return;
     photoRequest.current++;
-    photoController.current?.abort();
-    photoController.current = null;
-    upload.reset();
     setLoadingPhoto(false);
     setPhotoError('');
-    setValues((previous) => ({ ...previous, avatarUrl: profile.avatarUrl }));
+    setPhoto(null);
   }
 
   function change(event: ChangeEvent<HTMLInputElement>) {
@@ -169,7 +152,7 @@ export function ProfileSettingsForm({
     event.preventDefault();
     if (!editing || pending || submitting.current) return;
     if (loadingPhoto || photoError) {
-      notify.error(loadingPhoto ? '프로필 사진을 업로드하고 있습니다.' : photoError);
+      notify.error(loadingPhoto ? '프로필 사진 미리보기를 준비하고 있습니다.' : photoError);
       return;
     }
     setSubmitted(true);
@@ -182,7 +165,8 @@ export function ProfileSettingsForm({
     }
     submitting.current = true;
     try {
-      if (await onSave(values)) {
+      if (await onSave({ ...values, avatarUrl: profile.avatarUrl }, photo?.file)) {
+        setPhoto(null);
         setValues((previous) => ({ ...previous, password: '', passwordConfirmation: '' }));
       }
     } finally {
@@ -203,7 +187,7 @@ export function ProfileSettingsForm({
           <div className="px-4 py-3">
             <div className="relative size-16">
               <ProfileAvatar
-                src={displayedValues.avatarUrl}
+                src={(editing ? photo?.src : undefined) ?? profile.avatarUrl}
                 alt={`${displayedValues.nickname || '기본'} 프로필 사진`}
                 className="size-16"
                 loading="eager"
@@ -224,7 +208,7 @@ export function ProfileSettingsForm({
             </div>
             {loadingPhoto && (
               <p role="status" className="mt-2 text-xs text-neutral-400">
-                프로필 사진을 업로드하고 있습니다.
+                프로필 사진 미리보기를 준비하고 있습니다.
               </p>
             )}
             {photoError && (
@@ -232,7 +216,7 @@ export function ProfileSettingsForm({
                 {photoError}
               </p>
             )}
-            {editing && (loadingPhoto || photoError || values.avatarUrl !== profile.avatarUrl) && (
+            {editing && (loadingPhoto || photoError || photo) && (
               <button
                 type="button"
                 disabled={pending}

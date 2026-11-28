@@ -1,7 +1,10 @@
+import { useRef } from 'react';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { getAuthSnapshot } from '@/shared/apis/tokenSession';
 import { getApiErrorMessage } from '@/shared/apis/response';
+import { uploadImage } from '@/shared/apis/uploadImage';
 import { postQueries } from '@/features/posts/api/postQueries';
 
 import type { Profile, ProfileDraft } from '../model/profile';
@@ -12,12 +15,24 @@ import { userQueryOptions } from './useUserQuery';
 
 export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
+  const uploadedPhoto = useRef<{ file: File; revision: number; url: string } | null>(null);
   return useMutation({
     mutationKey: [...profileQueries.all, 'update'],
-    mutationFn: async ({ profile, draft }: { profile: Profile; draft: ProfileDraft }) => {
+    mutationFn: async ({
+      profile,
+      draft,
+      photo,
+    }: {
+      profile: Profile;
+      draft: ProfileDraft;
+      photo?: File;
+    }) => {
       const session = getAuthSnapshot();
       if (!session.hasSession) throw new Error('로그인이 필요합니다.');
-      const { user, nickname, picture, password } = createProfileChanges(profile, draft);
+      const { user, nickname, picture, password } = createProfileChanges(
+        profile,
+        photo ? { ...draft, avatarUrl: undefined } : draft,
+      );
       let saved = 0;
       let refreshed = true;
       const sameSession = () =>
@@ -34,7 +49,18 @@ export function useUpdateProfileMutation() {
       try {
         if (user) await run(() => profileApi.update(user));
         if (nickname) await run(() => profileApi.updateNickname(nickname));
-        if (picture) await run(() => profileApi.updatePicture(picture));
+        if (photo) {
+          requireSession();
+          // Retry a failed picture registration with the URL we already uploaded.
+          let uploaded = uploadedPhoto.current;
+          if (uploaded?.file !== photo || uploaded.revision !== session.revision) {
+            uploaded = { file: photo, revision: session.revision, url: await uploadImage(photo) };
+            uploadedPhoto.current = uploaded;
+          }
+          const { url } = uploaded;
+          if (url !== profile.avatarUrl)
+            await run(() => profileApi.updatePicture({ profilePicture: url }));
+        } else if (picture) await run(() => profileApi.updatePicture(picture));
         if (password) await run(() => profileApi.updatePassword(password));
       } catch (error) {
         throw new Error(

@@ -38,12 +38,12 @@ export function ProfileSettingsPage({ editing = false }: { editing?: boolean }) 
         </GitlogButton>
       </main>
     );
-  async function save(draft: ProfileDraft) {
+  async function save(draft: ProfileDraft, photo?: File) {
     if (!previewUser || update.isPending) return false;
     const editVisit = editVisitRef.current;
     const editUrl = window.location.href;
     try {
-      const result = await update.mutateAsync({ profile: previewUser, draft });
+      const result = await update.mutateAsync({ profile: previewUser, draft, photo });
       // The browser URL can change before a lazy route commits.
       if (editVisit && editVisitRef.current === editVisit && window.location.href === editUrl) {
         navigate('/mypage/settings');

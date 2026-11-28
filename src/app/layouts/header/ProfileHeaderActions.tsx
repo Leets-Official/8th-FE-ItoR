@@ -1,12 +1,8 @@
 import { Link } from 'react-router';
-import { useIsMutating } from '@tanstack/react-query';
-
-import { profileQueries } from '@/features/profile/api/profileQueries';
 
 import { Button } from '@/shared/ui/primitives/button';
 
 export function ProfileHeaderActions({ editing, pending }: { editing: boolean; pending: boolean }) {
-  const uploading = useIsMutating({ mutationKey: [...profileQueries.all, 'uploadImage'] }) > 0;
   return (
     <div className="flex items-center gap-2.5">
       {editing ? (
@@ -30,11 +26,11 @@ export function ProfileHeaderActions({ editing, pending }: { editing: boolean; p
           <Button
             type="submit"
             form="profile-settings"
-            disabled={pending || uploading}
+            disabled={pending}
             variant="ghost"
             className="h-10 rounded-full px-3 font-normal text-black"
           >
-            {pending ? '저장 중...' : uploading ? '사진 업로드 중...' : '저장하기'}
+            {pending ? '저장 중...' : '저장하기'}
           </Button>
         </>
       ) : (
