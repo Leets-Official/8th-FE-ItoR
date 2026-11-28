@@ -44,9 +44,10 @@ export function useUpdateProfileMutation() {
       } finally {
         if (sameSession() && saved) {
           const key = profileQueries.me(session.revision);
+          await queryClient.cancelQueries({ queryKey: key, exact: true });
           await queryClient.invalidateQueries({ queryKey: key, exact: true, refetchType: 'none' });
           try {
-            await queryClient.fetchQuery(userQueryOptions(session));
+            if (sameSession()) await queryClient.fetchQuery(userQueryOptions(session));
           } catch {
             refreshed = false;
           }
