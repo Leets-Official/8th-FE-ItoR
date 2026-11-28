@@ -16,6 +16,8 @@ export function AuthPanel({ children, dark = false }: AuthPanelProps) {
           <img
             src={gitlogLogo}
             alt="GITLOG"
+            width={77}
+            height={40}
             className={cn('h-40 w-80 max-w-full object-contain', dark && 'invert')}
           />
         </div>

@@ -37,6 +37,8 @@ Thumbs.db
 # Testing
 coverage/
 .nyc_output/
+.lighthouseci/
+lighthouse-reports/
 
 # Production
 .cache/

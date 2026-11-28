@@ -1,5 +1,7 @@
 node_modules/
 dist/
+.lighthouseci/
+lighthouse-reports/
 package-lock.json
 .agents/
 .github/ISSUE_TEMPLATE/

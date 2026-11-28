@@ -21,7 +21,7 @@ export function PageHeader({ menu, actions, className, showLogo = true }: PageHe
         {menu}
         {showLogo && (
           <Link to="/" className="flex items-center" aria-label="Gitlog 홈">
-            <img src={gitlogLogo} alt="GITLOG" className="h-5 w-auto" />
+            <img src={gitlogLogo} alt="GITLOG" width={77} height={40} className="h-5 w-auto" />
           </Link>
         )}
       </div>
