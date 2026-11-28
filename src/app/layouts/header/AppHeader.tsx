@@ -1,4 +1,4 @@
-import { lazy, Suspense, type Ref } from 'react';
+import { lazy, type Ref } from 'react';
 
 import { useLocation, useMatch } from 'react-router';
 
@@ -8,6 +8,7 @@ import { IconButton } from '@/shared/ui/IconButton';
 import { GitlogButton } from '@/shared/ui/GitlogButton';
 import { PageHeader } from '@/shared/ui/PageHeader';
 
+import { LoadBoundary, LoadErrorNotice } from '../LoadBoundary';
 import { HomeHeaderActions } from './HomeHeaderActions';
 import { WriteHeaderActions } from './WriteHeaderActions';
 import { ProfileHeaderActions } from './ProfileHeaderActions';
@@ -35,6 +36,14 @@ interface AppHeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   menuButtonRef: Ref<HTMLButtonElement>;
+}
+
+function HeaderLoadError({ message, onClose }: { message: string; onClose?: () => void }) {
+  return (
+    <div className="fixed inset-x-4 top-20 z-50 rounded-lg border border-neutral-200 bg-white p-4 text-center shadow sm:left-auto">
+      <LoadErrorNotice message={message} onClose={onClose} />
+    </div>
+  );
 }
 
 export function AppHeader({
@@ -91,21 +100,22 @@ export function AppHeader({
             <ProfileHeaderActions editing={pathname.endsWith('/edit')} pending={profilePending} />
           )}
           {isPostPage && (
-            <Suspense
-              fallback={
+            <LoadBoundary
+              key={pathname}
+              pending={
                 <span role="status" className="sr-only">
                   게시글 메뉴를 불러오고 있습니다.
                 </span>
               }
+              failure={<HeaderLoadError message="게시글 메뉴를 불러오지 못했습니다." />}
             >
               <PostHeaderActions
-                key={pathname}
                 canManage={canManagePost}
                 pending={postPending}
                 onEdit={onEditPost}
                 onDelete={onDeletePost}
               />
-            </Suspense>
+            </LoadBoundary>
           )}
           {!isBlogPage && !isSignupPage && !isProfilePage && (
             <GitlogButton
@@ -118,15 +128,23 @@ export function AppHeader({
           )}
           {/* 첫 열기 후에는 닫기 애니메이션과 포커스 복원을 위해 마운트를 유지한다. */}
           {hasOpenedLogin && (
-            <Suspense
-              fallback={
+            <LoadBoundary
+              pending={
                 <span role="status" className="text-xs text-neutral-600">
                   로그인 화면 로딩 중...
                 </span>
               }
+              failure={
+                loginOpen && (
+                  <HeaderLoadError
+                    message="로그인 화면을 불러오지 못했습니다."
+                    onClose={() => onLoginOpenChange(false)}
+                  />
+                )
+              }
             >
               <LoginDialog open={loginOpen} onOpenChange={onLoginOpenChange} onLogin={onLogin} />
-            </Suspense>
+            </LoadBoundary>
           )}
         </>
       }

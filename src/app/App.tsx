@@ -1,8 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { AppLayout } from './layouts/AppLayout';
+import { LoadBoundary, LoadErrorNotice } from './layouts/LoadBoundary';
 
 const ComponentGallery = lazy(() =>
   import('./ComponentGallery').then((module) => ({ default: module.ComponentGallery })),
@@ -34,11 +35,16 @@ const ProfileSettingsPage = lazy(() =>
 export function App() {
   return (
     <BrowserRouter>
-      <Suspense
-        fallback={
+      <LoadBoundary
+        pending={
           <p role="status" className="p-8 text-center">
             화면을 불러오고 있습니다.
           </p>
+        }
+        failure={
+          <main className="p-8 text-center">
+            <LoadErrorNotice message="화면을 불러오지 못했습니다." />
+          </main>
         }
       >
         <Routes>
@@ -64,7 +70,7 @@ export function App() {
             />
           </Route>
         </Routes>
-      </Suspense>
+      </LoadBoundary>
     </BrowserRouter>
   );
 }

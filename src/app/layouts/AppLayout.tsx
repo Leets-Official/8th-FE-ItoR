@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 
 import { useIsMutating } from '@tanstack/react-query';
-import { Outlet, useMatch, useNavigate } from 'react-router';
+import { Outlet, useLocation, useMatch, useNavigate } from 'react-router';
 
 import { postQueries } from '@/features/posts/api/postQueries';
 import { useDeletePostMutation } from '@/features/posts/api/usePostMutations';
@@ -16,6 +16,7 @@ import { notify } from '@/shared/ui/StatusToast';
 import { cn } from '@/shared/utils/cn';
 import { GitlogButton } from '@/shared/ui/GitlogButton';
 
+import { LoadBoundary, LoadErrorNotice } from './LoadBoundary';
 import { AppHeader } from './header/AppHeader';
 import { useLayoutAuth } from './hooks/useLayoutAuth';
 import { useRouteScroll } from './hooks/useRouteScroll';
@@ -23,6 +24,9 @@ import { useRouteScroll } from './hooks/useRouteScroll';
 const AppSidebar = lazy(() =>
   import('./AppSidebar').then((module) => ({ default: module.AppSidebar })),
 );
+
+const sidebarFallbackClass =
+  'fixed inset-y-0 left-0 z-40 w-60 max-w-full border-r border-neutral-200 bg-neutral-100 p-4';
 
 export interface AppLayoutContext {
   openLogin: () => void;
@@ -77,6 +81,7 @@ export function AppLayout() {
   const profilePending = useIsMutating({ mutationKey: [...profileQueries.all, 'update'] }) > 0;
   const deleting = useRef(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   useRouteScroll();
 
   async function removeCurrentPost() {
@@ -102,16 +107,18 @@ export function AppLayout() {
   return (
     <div className={cn('min-h-dvh bg-white text-neutral-950', sidebarOpen && 'sm:pl-60 xl:pl-0')}>
       {sidebarOpen && (
-        <Suspense
-          fallback={
-            <aside
-              aria-label="메뉴 로딩"
-              className="fixed inset-y-0 left-0 z-40 w-60 max-w-full border-r border-neutral-200 bg-neutral-100 p-4"
-            >
+        <LoadBoundary
+          pending={
+            <aside aria-label="깃로그 메뉴" className={sidebarFallbackClass}>
               <p role="status" className="py-3">
                 메뉴를 불러오고 있습니다.
               </p>
               <GitlogButton onClick={closeSidebar}>메뉴 닫기</GitlogButton>
+            </aside>
+          }
+          failure={
+            <aside aria-label="깃로그 메뉴" className={sidebarFallbackClass}>
+              <LoadErrorNotice message="메뉴를 불러오지 못했습니다." onClose={closeSidebar} />
             </aside>
           }
         >
@@ -137,7 +144,7 @@ export function AppLayout() {
             }}
             onLogout={logout}
           />
-        </Suspense>
+        </LoadBoundary>
       )}
       <AppHeader
         sidebarOpen={sidebarOpen}
@@ -175,11 +182,17 @@ export function AppLayout() {
           </GitlogButton>
         </main>
       ) : (
-        <Suspense
-          fallback={
+        <LoadBoundary
+          key={pathname}
+          pending={
             <p role="status" className="p-8 text-center">
               화면을 불러오고 있습니다.
             </p>
+          }
+          failure={
+            <main className="p-8 text-center">
+              <LoadErrorNotice message="화면을 불러오지 못했습니다." />
+            </main>
           }
         >
           <Outlet
@@ -193,7 +206,7 @@ export function AppLayout() {
               } satisfies AppLayoutContext
             }
           />
-        </Suspense>
+        </LoadBoundary>
       )}
       <Toaster offset={88} mobileOffset={88} />
     </div>
